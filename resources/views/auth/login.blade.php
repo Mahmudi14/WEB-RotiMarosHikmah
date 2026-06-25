@@ -8,7 +8,8 @@
 
     <link rel="icon" type="image/png" href="{{ asset('images/icons/icon-512.png') }}">
 
-    <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
+    <link rel="manifest" href="{{ asset('manifest.webmanifest') }}?v=2">
+    <meta name="theme-color" content="#1F444C">
 
     <meta name="theme-color" content="#1F444C">
     <meta name="mobile-web-app-capable" content="yes">
