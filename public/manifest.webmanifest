@@ -1,22 +1,22 @@
 {
     "name": "Roti Maros Hikmah",
-    "short_name": "RoMaHKM",
+    "short_name": "Roti Maros Hikmah",
     "description": "Sistem kasir Roti Maros Hikmah",
     "start_url": "/",
     "scope": "/",
     "display": "standalone",
     "background_color": "#F7F6F4",
     "theme_color": "#1F444C",
-    "orientation": "portrait-primary",
+    "orientation": "any",
     "icons": [
         {
-            "src": "/images/icons/icon-512.png",
+            "src": "/images/icons/logo-512.png",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "any maskable"
         },
         {
-            "src": "/images/icons/icon-512.png",
+            "src": "/images/icons/logo-512.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "any maskable"

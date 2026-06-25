@@ -48,6 +48,8 @@ class StoreProductRequest extends FormRequest
                 'mimes:jpg,jpeg,png,webp',
                 'max:2048',
             ],
+            'stock' => ['required', 'integer', 'min:0'],
+            'min_stock' => ['nullable', 'integer', 'min:0'],
         ];
     }
 
@@ -77,6 +79,10 @@ class StoreProductRequest extends FormRequest
             'gambar.image' => 'File harus berupa gambar.',
             'gambar.mimes' => 'Gambar harus berformat jpg, jpeg, png, atau webp.',
             'gambar.max' => 'Ukuran gambar maksimal 2MB.',
+
+            'stock.required' => 'Stok awal wajib diisi.',
+            'stock.integer' => 'Stok awal harus berupa angka bulat.',
+            'stock.min' => 'Stok awal tidak boleh kurang dari 0.',
         ];
     }
 }

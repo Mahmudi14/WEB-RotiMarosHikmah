@@ -4,11 +4,15 @@ namespace App\Services\Admin;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\StockMovement;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class ProductService
 {
@@ -70,39 +74,96 @@ class ProductService
             ->when($availability && array_key_exists($availability, $this->availabilityStatuses()), function ($query) use ($availability) {
                 $query->where('status_ketersediaan', $availability);
             })
+            ->latest()
             ->paginate($perPage)
             ->withQueryString();
     }
 
     public function createProduct(array $data, ?UploadedFile $image = null): Product
     {
-        $data = $this->normalizeData($data);
+        $storedImagePath = null;
 
-        $data['slug'] = $this->generateUniqueSlug($data['nama_produk']);
-        $data['status_ketersediaan'] = 'tersedia';
-        $data['status'] = 'aktif';
+        try {
+            return DB::transaction(function () use ($data, $image, &$storedImagePath) {
+                $data = $this->normalizeData($data);
 
-        if ($image) {
-            $data['gambar'] = $this->storeImage($image);
+                $initialStock = (int) ($data['stock'] ?? 0);
+
+                $data['stock'] = max(0, $initialStock);
+                $data['slug'] = $this->generateUniqueSlug($data['nama_produk']);
+                $data['status_ketersediaan'] = $data['stock'] > 0 ? 'tersedia' : 'habis';
+                $data['status'] = 'aktif';
+
+                if ($image) {
+                    $storedImagePath = $this->storeImage($image);
+                    $data['gambar'] = $storedImagePath;
+                }
+
+                $product = Product::create($data);
+
+                if ($product->stock > 0) {
+                    StockMovement::create([
+                        'product_id' => $product->id,
+                        'type' => 'in',
+                        'quantity' => $product->stock,
+                        'stock_before' => 0,
+                        'stock_after' => $product->stock,
+                        'source' => 'initial',
+                        'note' => 'Stok awal saat produk dibuat.',
+                        'created_by' => auth()->id(),
+                    ]);
+                }
+
+                return $product;
+            });
+        } catch (Throwable $e) {
+            if ($storedImagePath) {
+                $this->deleteImage($storedImagePath);
+            }
+
+            throw $e;
         }
-
-        return Product::create($data);
     }
 
     public function updateProduct(Product $product, array $data, ?UploadedFile $image = null): Product
     {
-        $data = $this->normalizeData($data);
+        $storedImagePath = null;
 
-        $data['slug'] = $this->generateUniqueSlug($data['nama_produk'], $product->id);
+        try {
+            return DB::transaction(function () use ($product, $data, $image, &$storedImagePath) {
+                $data = $this->normalizeData($data);
 
-        if ($image) {
-            $this->deleteImage($product->gambar);
-            $data['gambar'] = $this->storeImage($image);
+                unset($data['stock']);
+                unset($data['status_ketersediaan']);
+
+                $data['slug'] = $this->generateUniqueSlug($data['nama_produk'], $product->id);
+
+                $data['status_ketersediaan'] = (int) $product->stock > 0
+                    ? 'tersedia'
+                    : 'habis';
+
+                if ($image) {
+                    $storedImagePath = $this->storeImage($image);
+                    $data['gambar'] = $storedImagePath;
+                }
+
+                $oldImage = $product->gambar;
+
+                $product->update($data);
+
+                if ($image) {
+                    $this->deleteImage($oldImage);
+                }
+
+                return $product;
+            });
+        } catch (Throwable $e) {
+            if ($storedImagePath) {
+                $this->deleteImage($storedImagePath);
+            }
+
+            throw $e;
         }
-
-        $product->update($data);
-
-        return $product;
     }
 
     public function toggleAvailability(Product $product): string
@@ -110,6 +171,12 @@ class ProductService
         $newAvailability = $product->status_ketersediaan === 'tersedia'
             ? 'habis'
             : 'tersedia';
+
+        if ($newAvailability === 'tersedia' && (int) $product->stock <= 0) {
+            throw ValidationException::withMessages([
+                'status_ketersediaan' => 'Produk dengan stok 0 tidak dapat ditandai tersedia.',
+            ]);
+        }
 
         $product->update([
             'status_ketersediaan' => $newAvailability,
@@ -142,6 +209,10 @@ class ProductService
     {
         if (array_key_exists('kode_produk', $data) && blank($data['kode_produk'])) {
             $data['kode_produk'] = null;
+        }
+
+        if (array_key_exists('stock', $data)) {
+            $data['stock'] = max(0, (int) $data['stock']);
         }
 
         unset($data['gambar']);

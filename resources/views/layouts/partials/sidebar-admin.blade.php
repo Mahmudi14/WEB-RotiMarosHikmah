@@ -71,6 +71,24 @@
             <span>Produk</span>
         </a>
 
+        <a href="{{ route('admin.stocks.index') }}"
+            class="{{ request()->routeIs('admin.stocks.*')
+                ? 'bg-[#F4B044] text-[#2B1A10] shadow-lg shadow-[#F4B044]/20'
+                : 'text-[#F7F6F4] hover:bg-white/10 hover:text-white' }}
+group flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition">
+            <span
+                class="{{ request()->routeIs('admin.stocks.*') ? 'bg-[#2B1A10]/10' : 'bg-white/10 group-hover:bg-white/15' }}
+flex h-9 w-9 items-center justify-center rounded-xl transition">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M3 7.5L12 3l9 4.5M3 7.5l9 4.5m-9-4.5v9L12 21m0-9l9-4.5m-9 4.5v9m9-13.5v9L12 21" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 10.25v4.5m9-7.5v4.5" />
+                </svg>
+            </span>
+
+            <span>Stok</span>
+        </a>
+
         {{-- Promo --}}
         <a href="{{ route('admin.promos.index') }}"
             class="{{ request()->routeIs('admin.promos.*')

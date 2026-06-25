@@ -170,6 +170,8 @@ class ProductSeeder extends Seeder
                 continue;
             }
 
+            $stock = (int) ($product['stock'] ?? 20);
+
             DB::table('products')->updateOrInsert(
                 ['kode_produk' => $product['kode_produk']],
                 [
@@ -179,8 +181,9 @@ class ProductSeeder extends Seeder
                     'slug' => Str::slug($product['nama_produk']),
                     'deskripsi' => $product['deskripsi'],
                     'harga_jual' => $product['harga_jual'],
+                    'stock' => $stock,
                     'gambar' => null,
-                    'status_ketersediaan' => 'tersedia',
+                    'status_ketersediaan' => $stock > 0 ? 'tersedia' : 'habis',
                     'status' => 'aktif',
                     'created_at' => $now,
                     'updated_at' => $now,

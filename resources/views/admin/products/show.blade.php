@@ -3,6 +3,13 @@
 @section('page_title', 'Detail Produk')
 
 @section('content')
+    @php
+        $stock = (int) $product->stock;
+
+        $availabilityLabel = $stock > 0 ? 'Tersedia' : 'Habis';
+
+        $availabilityClass = $stock > 0 ? 'bg-[#1F444C]/10 text-[#1F444C]' : 'bg-[#A92A35]/10 text-[#A92A35]';
+    @endphp
     <div class="space-y-6" x-data="{
         confirmModalOpen: false,
         confirmAction: '',
@@ -13,20 +20,6 @@
     
         openConfirmModal(action, type, currentValue) {
             this.confirmAction = action;
-    
-            if (type === 'availability') {
-                if (currentValue === 'tersedia') {
-                    this.confirmTitle = 'Tandai Produk Habis?';
-                    this.confirmMessage = 'Produk ini akan ditandai habis dan nantinya tidak tersedia untuk transaksi kasir.';
-                    this.confirmButtonText = 'Ya, Tandai Habis';
-                    this.confirmButtonClass = 'bg-[#A92A35] text-white shadow-[#A92A35]/20 focus:ring-[#A92A35]/20';
-                } else {
-                    this.confirmTitle = 'Tandai Produk Tersedia?';
-                    this.confirmMessage = 'Produk ini akan ditandai tersedia kembali dan nantinya bisa digunakan pada transaksi kasir.';
-                    this.confirmButtonText = 'Ya, Tandai Tersedia';
-                    this.confirmButtonClass = 'bg-[#1F444C] text-white shadow-[#1F444C]/20 focus:ring-[#1F444C]/20';
-                }
-            }
     
             if (type === 'status') {
                 if (currentValue === 'aktif') {
@@ -158,19 +151,17 @@
 
                 <div
                     class="rounded-3xl border border-[#F4D3B0]/70 bg-white p-5 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
-                    <p class="text-sm font-bold text-[#6B3E12]">Ketersediaan</p>
+                    <p class="text-sm font-bold text-[#6B3E12]">Stok</p>
 
-                    @if ($product->status_ketersediaan === 'tersedia')
-                        <span
-                            class="mt-3 inline-flex rounded-full bg-[#1F444C]/10 px-3 py-1 text-xs font-black text-[#1F444C]">
-                            Tersedia
+                    <div class="mt-3 flex flex-wrap items-center gap-2">
+                        <span class="inline-flex rounded-full px-3 py-1 text-xs font-black {{ $availabilityClass }}">
+                            {{ $availabilityLabel }}
                         </span>
-                    @else
-                        <span
-                            class="mt-3 inline-flex rounded-full bg-[#A92A35]/10 px-3 py-1 text-xs font-black text-[#A92A35]">
-                            Habis
+
+                        <span class="inline-flex rounded-full bg-[#F4B044]/20 px-3 py-1 text-xs font-black text-[#6B3E12]">
+                            {{ number_format($stock, 0, ',', '.') }} stok
                         </span>
-                    @endif
+                    </div>
                 </div>
 
                 <div
@@ -217,36 +208,6 @@
             <p class="mt-4 text-sm leading-relaxed text-[#2B1A10]">
                 {{ $product->deskripsi ?: 'Belum ada deskripsi untuk produk ini.' }}
             </p>
-        </div>
-
-        {{-- Pengaturan Ketersediaan --}}
-        <div class="rounded-3xl border border-[#F4D3B0]/70 bg-white p-6 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
-            <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <div>
-                    <p class="text-sm font-black uppercase tracking-[0.2em] text-[#6B3E12]">
-                        Pengaturan Ketersediaan
-                    </p>
-
-                    <h3 class="mt-2 text-xl font-black text-[#2B1A10]">
-                        {{ $product->status_ketersediaan === 'tersedia' ? 'Tandai Produk Habis' : 'Tandai Produk Tersedia' }}
-                    </h3>
-
-                    <p class="mt-2 max-w-2xl text-sm leading-relaxed text-[#6B3E12]">
-                        {{ $product->status_ketersediaan === 'tersedia'
-                            ? 'Gunakan aksi ini jika produk sedang habis atau belum siap dijual.'
-                            : 'Gunakan aksi ini jika produk sudah tersedia kembali untuk dijual.' }}
-                    </p>
-                </div>
-
-                <button type="button"
-                    @click="openConfirmModal(@js(route('admin.products.update-availability', $product)), 'availability', @js($product->status_ketersediaan))"
-                    class="{{ $product->status_ketersediaan === 'tersedia'
-                        ? 'bg-[#A92A35] text-white shadow-[#A92A35]/20'
-                        : 'bg-[#1F444C] text-white shadow-[#1F444C]/20' }}
-                        inline-flex w-full items-center justify-center rounded-2xl px-5 py-3 text-sm font-black shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl md:w-auto">
-                    {{ $product->status_ketersediaan === 'tersedia' ? 'Tandai Habis' : 'Tandai Tersedia' }}
-                </button>
-            </div>
         </div>
 
         {{-- Pengaturan Status --}}

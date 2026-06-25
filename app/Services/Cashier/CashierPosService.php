@@ -15,6 +15,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Models\StockMovement;
 
 class CashierPosService
 {
@@ -35,7 +36,8 @@ class CashierPosService
             ->where('status', 'aktif')
             ->whereHas('products', function ($query) {
                 $query->where('products.status', 'aktif')
-                    ->where('products.status_ketersediaan', 'tersedia');
+                    ->where('products.status_ketersediaan', 'tersedia')
+                    ->where('products.stock', '>', 0);
             })
             ->orderBy('sort_order')
             ->orderBy('nama_kategori')
@@ -49,6 +51,7 @@ class CashierPosService
             ->join('categories', 'categories.id', '=', 'products.category_id')
             ->where('products.status', 'aktif')
             ->where('products.status_ketersediaan', 'tersedia')
+            ->where('products.stock', '>', 0)
             ->where('categories.status', 'aktif')
             ->orderBy('categories.sort_order')
             ->orderBy('products.nama_produk')
@@ -64,6 +67,7 @@ class CashierPosService
                     'nama_produk' => $product->nama_produk,
                     'harga_jual' => (float) $product->harga_jual,
                     'harga_jual_formatted' => $product->harga_jual_formatted,
+                    'stock' => (int) $product->stock,
                     'gambar_url' => $product->gambar ? Storage::url($product->gambar) : null,
                 ];
             });
@@ -120,6 +124,21 @@ class CashierPosService
                 $product = $products->get($requestedItem['product_id']);
 
                 $qty = (int) $requestedItem['qty'];
+
+                if ($qty <= 0) {
+                    throw new Exception('Jumlah produk tidak valid.');
+                }
+
+                if ((int) $product->stock <= 0) {
+                    throw new Exception("Produk {$product->nama_produk} sedang habis.");
+                }
+
+                if ((int) $product->stock < $qty) {
+                    throw new Exception(
+                        "Stok {$product->nama_produk} tidak cukup. Sisa stok: {$product->stock}."
+                    );
+                }
+
                 $price = (float) $product->harga_jual;
                 $lineSubtotal = $price * $qty;
 
@@ -178,14 +197,12 @@ class CashierPosService
 
                 'subtotal' => $subtotal,
 
-                // Promo snapshot
                 'promo_id' => $promo?->id,
                 'nama_promo' => $promo?->nama_promo,
                 'tipe_diskon_promo' => $promo?->tipe_diskon,
                 'nilai_diskon_promo' => $promo ? (float) $promo->nilai_diskon : 0,
                 'total_diskon' => (float) $totalDiscount,
 
-                // Pajak snapshot
                 'tax_id' => $tax?->id,
                 'nama_pajak' => $tax?->nama_pajak,
                 'persentase_pajak' => $tax ? (float) $tax->persentase : 0,
@@ -201,12 +218,59 @@ class CashierPosService
 
             $sale->items()->createMany($saleItems->toArray());
 
+            $this->reduceStockAfterSale(
+                products: $products,
+                requestedItems: $requestedItems,
+                sale: $sale,
+                cashier: $cashier,
+            );
+
             $sale->load(['items', 'cashier', 'terminal', 'shift']);
 
             $this->createReceiptPrintJob($sale);
 
             return $sale;
         });
+    }
+
+    private function reduceStockAfterSale(
+        Collection $products,
+        Collection $requestedItems,
+        Sale $sale,
+        User $cashier
+    ): void {
+        foreach ($requestedItems as $requestedItem) {
+            /** @var Product $product */
+            $product = $products->get($requestedItem['product_id']);
+
+            $qty = (int) $requestedItem['qty'];
+            $stockBefore = (int) $product->stock;
+            $stockAfter = $stockBefore - $qty;
+
+            if ($stockAfter < 0) {
+                throw new Exception(
+                    "Stok {$product->nama_produk} tidak cukup. Sisa stok: {$stockBefore}."
+                );
+            }
+
+            $product->update([
+                'stock' => $stockAfter,
+                'status_ketersediaan' => $stockAfter > 0 ? 'tersedia' : 'habis',
+            ]);
+
+            StockMovement::create([
+                'product_id' => $product->id,
+                'type' => 'out',
+                'quantity' => $qty,
+                'stock_before' => $stockBefore,
+                'stock_after' => $stockAfter,
+                'source' => 'sale',
+                'reference_type' => Sale::class,
+                'reference_id' => $sale->id,
+                'note' => 'Stok keluar dari transaksi ' . $sale->kode_transaksi . '.',
+                'created_by' => $cashier->id,
+            ]);
+        }
     }
 
     protected function findBestPromo(Collection $saleItems, float $subtotal): array

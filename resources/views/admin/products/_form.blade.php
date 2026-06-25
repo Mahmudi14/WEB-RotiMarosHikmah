@@ -1,10 +1,8 @@
 <form method="POST" action="{{ $action }}" enctype="multipart/form-data" class="space-y-5" x-data="{
     categoryOpen: false,
-    availabilityOpen: false,
     statusOpen: false,
 
     selectedCategory: @js((string) old('category_id', $product->category_id ?? '')),
-    selectedAvailability: @js(old('status_ketersediaan', $product->status_ketersediaan ?? 'tersedia')),
     selectedStatus: @js(old('status', $product->status ?? 'aktif')),
 
     categories: @js(
@@ -17,17 +15,12 @@
         ->toArray(),
 ),
 
-    availabilityStatuses: @js($availabilityStatuses ?? ['tersedia' => 'Tersedia', 'habis' => 'Habis']),
     productStatuses: @js($productStatuses ?? ['aktif' => 'Aktif', 'nonaktif' => 'Nonaktif']),
 
     imagePreview: @js(isset($product) && $product?->gambar ? asset('storage/' . $product->gambar) : null),
 
     get selectedCategoryLabel() {
         return this.selectedCategory ? this.categories[this.selectedCategory] : 'Pilih Kategori'
-    },
-
-    get selectedAvailabilityLabel() {
-        return this.availabilityStatuses[this.selectedAvailability] ?? 'Pilih Ketersediaan'
     },
 
     get selectedStatusLabel() {
@@ -147,46 +140,79 @@
                 @enderror
             </div>
 
-            {{-- Harga Jual --}}
-            {{-- Harga Jual --}}
-            <div x-data="{
-                rawPrice: @js((string) old('harga_jual', isset($product) && $product?->harga_jual !== null ? (int) $product->harga_jual : '')),
-            
-                formatRupiah(value) {
-                    value = String(value ?? '').replace(/\D/g, '');
-            
-                    if (!value) {
-                        return '';
+            <div class="grid gap-5 md:grid-cols-2">
+                {{-- Harga Jual --}}
+                <div x-data="{
+                    rawPrice: @js((string) old('harga_jual', isset($product) && $product?->harga_jual !== null ? (int) $product->harga_jual : '')),
+                
+                    formatRupiah(value) {
+                        value = String(value ?? '').replace(/\D/g, '');
+                
+                        if (!value) {
+                            return '';
+                        }
+                
+                        return new Intl.NumberFormat('id-ID').format(Number(value));
+                    },
+                
+                    updatePrice(event) {
+                        this.rawPrice = event.target.value.replace(/\D/g, '');
+                        event.target.value = this.formatRupiah(this.rawPrice);
                     }
-            
-                    return new Intl.NumberFormat('id-ID').format(Number(value));
-                },
-            
-                updatePrice(event) {
-                    this.rawPrice = event.target.value.replace(/\D/g, '');
-                    event.target.value = this.formatRupiah(this.rawPrice);
-                }
-            }">
-                <label class="mb-2 block text-sm font-black text-[#2B1A10]">
-                    Harga Jual
-                </label>
+                }">
+                    <label class="mb-2 block text-sm font-black text-[#2B1A10]">
+                        Harga Jual
+                    </label>
 
-                <input type="hidden" name="harga_jual" x-model="rawPrice">
+                    <input type="hidden" name="harga_jual" x-model="rawPrice">
 
-                <div class="relative">
-                    <span
-                        class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-sm font-black text-[#6B3E12]/70">
-                        Rp
-                    </span>
+                    <div class="relative">
+                        <span
+                            class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-sm font-black text-[#6B3E12]/70">
+                            Rp
+                        </span>
 
-                    <input type="text" inputmode="numeric" x-init="$el.value = formatRupiah(rawPrice)" @input="updatePrice($event)"
-                        placeholder="Contoh: 15.000"
-                        class="block h-12 w-full rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] py-0 pl-12 pr-4 text-sm font-medium text-[#2B1A10] shadow-sm transition placeholder:text-[#6B3E12]/45 focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
+                        <input type="text" inputmode="numeric" x-init="$el.value = formatRupiah(rawPrice)" @input="updatePrice($event)"
+                            placeholder="Contoh: 15.000"
+                            class="block h-12 w-full rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] py-0 pl-12 pr-4 text-sm font-medium text-[#2B1A10] shadow-sm transition placeholder:text-[#6B3E12]/45 focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
+                    </div>
+
+                    @error('harga_jual')
+                        <p class="mt-2 text-sm font-bold text-[#A92A35]">{{ $message }}</p>
+                    @enderror
                 </div>
 
-                @error('harga_jual')
-                    <p class="mt-2 text-sm font-bold text-[#A92A35]">{{ $message }}</p>
-                @enderror
+                {{-- Stok --}}
+                @if (!isset($product) || !$product)
+                    <div>
+                        <label class="mb-2 block text-sm font-black text-[#2B1A10]">
+                            Stok Awal
+                        </label>
+
+                        <input type="number" name="stock" min="0" value="{{ old('stock', 0) }}"
+                            placeholder="Contoh: 20"
+                            class="block h-12 w-full rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-4 py-0 text-sm font-medium text-[#2B1A10] shadow-sm transition placeholder:text-[#6B3E12]/45 focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
+
+                        @error('stock')
+                            <p class="mt-2 text-sm font-bold text-[#A92A35]">{{ $message }}</p>
+                        @enderror
+                    </div>
+                @else
+                    <div>
+                        <label class="mb-2 block text-sm font-black text-[#2B1A10]">
+                            Stok Saat Ini
+                        </label>
+
+                        <div
+                            class="flex h-12 w-full items-center rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-4 text-sm font-black text-[#2B1A10] shadow-sm">
+                            {{ number_format((int) $product->stock, 0, ',', '.') }}
+                        </div>
+
+                        <p class="mt-2 text-xs font-semibold leading-relaxed text-[#6B3E12]">
+                            Perubahan stok dilakukan melalui menu Stok.
+                        </p>
+                    </div>
+                @endif
             </div>
 
             {{-- Deskripsi --}}
@@ -203,110 +229,6 @@
                 @enderror
             </div>
 
-            @if ($showStatuses ?? false)
-                <div class="grid gap-5 md:grid-cols-2">
-                    {{-- Status Ketersediaan --}}
-                    <div>
-                        <label class="mb-2 block text-sm font-black text-[#2B1A10]">
-                            Status Ketersediaan
-                        </label>
-
-                        <input type="hidden" name="status_ketersediaan" x-model="selectedAvailability">
-
-                        <div class="relative">
-                            <button type="button" @click="availabilityOpen = !availabilityOpen"
-                                class="flex h-12 w-full items-center justify-between rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-4 py-0 text-left text-sm font-bold text-[#2B1A10] shadow-sm transition hover:bg-white focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
-                                <span x-text="selectedAvailabilityLabel"></span>
-
-                                <svg class="h-5 w-5 text-[#6B3E12] transition duration-200"
-                                    :class="availabilityOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor"
-                                    stroke-width="2.4" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
-
-                            <div x-show="availabilityOpen" x-cloak @click.outside="availabilityOpen = false"
-                                x-transition
-                                class="absolute z-40 mt-3 w-full overflow-hidden rounded-2xl border border-[#F4D3B0]/80 bg-white shadow-[0_25px_70px_-35px_rgba(31,68,76,0.55)]">
-                                <div class="p-2">
-                                    @foreach ($availabilityStatuses as $value => $label)
-                                        <button type="button"
-                                            @click="selectedAvailability = '{{ $value }}'; availabilityOpen = false"
-                                            class="flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-bold transition"
-                                            :class="selectedAvailability === '{{ $value }}'
-                                                ?
-                                                'bg-[#F4B044] text-[#2B1A10]' :
-                                                'text-[#2B1A10] hover:bg-[#F4B044]/15'">
-                                            <span>{{ $label }}</span>
-
-                                            <svg x-show="selectedAvailability === '{{ $value }}'" x-cloak
-                                                class="h-5 w-5" fill="none" stroke="currentColor"
-                                                stroke-width="2.8" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    d="M5 13l4 4L19 7" />
-                                            </svg>
-                                        </button>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-
-                        @error('status_ketersediaan')
-                            <p class="mt-2 text-sm font-bold text-[#A92A35]">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    {{-- Status Produk --}}
-                    <div>
-                        <label class="mb-2 block text-sm font-black text-[#2B1A10]">
-                            Status Produk
-                        </label>
-
-                        <input type="hidden" name="status" x-model="selectedStatus">
-
-                        <div class="relative">
-                            <button type="button" @click="statusOpen = !statusOpen"
-                                class="flex h-12 w-full items-center justify-between rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-4 py-0 text-left text-sm font-bold text-[#2B1A10] shadow-sm transition hover:bg-white focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
-                                <span x-text="selectedStatusLabel"></span>
-
-                                <svg class="h-5 w-5 text-[#6B3E12] transition duration-200"
-                                    :class="statusOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor"
-                                    stroke-width="2.4" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
-
-                            <div x-show="statusOpen" x-cloak @click.outside="statusOpen = false" x-transition
-                                class="absolute z-40 mt-3 w-full overflow-hidden rounded-2xl border border-[#F4D3B0]/80 bg-white shadow-[0_25px_70px_-35px_rgba(31,68,76,0.55)]">
-                                <div class="p-2">
-                                    @foreach ($productStatuses as $value => $label)
-                                        <button type="button"
-                                            @click="selectedStatus = '{{ $value }}'; statusOpen = false"
-                                            class="flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-bold transition"
-                                            :class="selectedStatus === '{{ $value }}'
-                                                ?
-                                                'bg-[#F4B044] text-[#2B1A10]' :
-                                                'text-[#2B1A10] hover:bg-[#F4B044]/15'">
-                                            <span>{{ $label }}</span>
-
-                                            <svg x-show="selectedStatus === '{{ $value }}'" x-cloak
-                                                class="h-5 w-5" fill="none" stroke="currentColor"
-                                                stroke-width="2.8" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    d="M5 13l4 4L19 7" />
-                                            </svg>
-                                        </button>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-
-                        @error('status')
-                            <p class="mt-2 text-sm font-bold text-[#A92A35]">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-            @endif
         </div>
 
         {{-- Gambar --}}

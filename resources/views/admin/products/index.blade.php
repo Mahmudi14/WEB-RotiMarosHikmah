@@ -35,7 +35,7 @@
                             Produk
                         </h2>
                         <p class="mt-2 max-w-2xl text-sm leading-relaxed text-[#F4D3B0]">
-                            Kelola produk roti, harga jual, gambar, kategori, ketersediaan, dan status produk.
+                            Kelola produk roti, harga jual, gambar, kategori, stok, dan status produk.
                         </p>
                     </div>
 
@@ -54,14 +54,34 @@
         <div class="rounded-3xl border border-[#F4D3B0]/70 bg-white p-5 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]"
             x-data="{
                 categoryOpen: false,
+                stockOpen: false,
+            
                 selectedCategory: @js((string) request('category_id', '')),
+                selectedStock: @js((string) request('stock_condition', '')),
+            
                 categories: @js($categories->mapWithKeys(fn($category) => [(string) $category->id => $category->nama_kategori])->toArray()),
+            
+                stockConditions: {
+                    '': 'Semua Stok',
+                    'available': 'Ada Stok',
+                    'out': 'Habis',
+                },
+            
                 get selectedCategoryLabel() {
                     return this.selectedCategory ? this.categories[this.selectedCategory] : 'Semua Kategori'
+                },
+            
+                get selectedStockLabel() {
+                    return this.stockConditions[this.selectedStock] ?? 'Semua Stok'
+                },
+            
+                closeDropdowns(except = '') {
+                    if (except !== 'category') this.categoryOpen = false;
+                    if (except !== 'stock') this.stockOpen = false;
                 }
             }">
             <form method="GET" action="{{ route('admin.products.index') }}"
-                class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_230px_auto] lg:items-center xl:grid-cols-[minmax(0,1fr)_310px_auto]">
+                class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_230px_200px_auto] lg:items-center xl:grid-cols-[minmax(0,1fr)_280px_220px_auto]">
 
                 {{-- Search --}}
                 <div class="relative">
@@ -82,10 +102,10 @@
                     <input type="hidden" name="category_id" x-model="selectedCategory">
 
                     <div class="relative">
-                        <button type="button" @click="categoryOpen = !categoryOpen"
+                        <button type="button" @click="categoryOpen = !categoryOpen; closeDropdowns('category')"
                             class="flex h-12 w-full items-center justify-between rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-4 py-0 text-left text-sm font-bold text-[#2B1A10] shadow-sm transition hover:bg-white focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
 
-                            <div class="flex items-center gap-3">
+                            <div class="flex min-w-0 items-center gap-3">
                                 <span
                                     class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#F4B044]/20 text-[#6B3E12]">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2"
@@ -99,7 +119,7 @@
                                     :class="selectedCategory ? 'text-[#2B1A10]' : 'text-[#6B3E12]/60'"></span>
                             </div>
 
-                            <svg class="h-5 w-5 text-[#6B3E12] transition duration-200"
+                            <svg class="h-5 w-5 shrink-0 text-[#6B3E12] transition duration-200"
                                 :class="categoryOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor"
                                 stroke-width="2.4" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
@@ -122,10 +142,7 @@
                                         ?
                                         'bg-[#F4B044] text-[#2B1A10]' :
                                         'text-[#2B1A10] hover:bg-[#F4B044]/15'">
-
-                                    <div>
-                                        <p>Semua Kategori</p>
-                                    </div>
+                                    <span>Semua Kategori</span>
 
                                     <svg x-show="selectedCategory === ''" x-cloak class="h-5 w-5" fill="none"
                                         stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
@@ -135,24 +152,105 @@
 
                                 @foreach ($categories as $category)
                                     <button type="button"
-                                        @click="selectedCategory = '{{ $category->id }}'; categoryOpen = false"
+                                        @click="selectedCategory = @js((string) $category->id); categoryOpen = false"
                                         class="group flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-bold transition"
-                                        :class="selectedCategory === '{{ $category->id }}'
-                                            ?
+                                        :class="selectedCategory === @js((string) $category->id) ?
                                             'bg-[#F4B044] text-[#2B1A10]' :
                                             'text-[#2B1A10] hover:bg-[#F4B044]/15'">
+                                        <span>{{ $category->nama_kategori }}</span>
 
-                                        <div>
-                                            <p>{{ $category->nama_kategori }}</p>
-
-                                        </div>
-
-                                        <svg x-show="selectedCategory === '{{ $category->id }}'" x-cloak class="h-5 w-5"
-                                            fill="none" stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
+                                        <svg x-show="selectedCategory === @js((string) $category->id)" x-cloak
+                                            class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.8"
+                                            viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                         </svg>
                                     </button>
                                 @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Custom Stock Dropdown --}}
+                <div>
+                    <input type="hidden" name="stock_condition" x-model="selectedStock">
+
+                    <div class="relative">
+                        <button type="button" @click="stockOpen = !stockOpen; closeDropdowns('stock')"
+                            class="flex h-12 w-full items-center justify-between rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-4 py-0 text-left text-sm font-bold text-[#2B1A10] shadow-sm transition hover:bg-white focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
+
+                            <div class="flex min-w-0 items-center gap-3">
+                                <span
+                                    class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#F4B044]/20 text-[#6B3E12]">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M20 7.5 12 3 4 7.5m16 0L12 12m8-4.5v9L12 21m0-9L4 7.5m8 4.5v9M4 7.5v9L12 21" />
+                                    </svg>
+                                </span>
+
+                                <span x-text="selectedStockLabel" class="truncate"
+                                    :class="selectedStock ? 'text-[#2B1A10]' : 'text-[#6B3E12]/60'"></span>
+                            </div>
+
+                            <svg class="h-5 w-5 shrink-0 text-[#6B3E12] transition duration-200"
+                                :class="stockOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor"
+                                stroke-width="2.4" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+
+                        <div x-show="stockOpen" x-cloak @click.outside="stockOpen = false"
+                            x-transition:enter="transition ease-out duration-150"
+                            x-transition:enter-start="opacity-0 scale-95 translate-y-1"
+                            x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                            x-transition:leave="transition ease-in duration-100"
+                            x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                            x-transition:leave-end="opacity-0 scale-95 translate-y-1"
+                            class="absolute z-40 mt-3 w-full overflow-hidden rounded-2xl border border-[#F4D3B0]/80 bg-white shadow-[0_25px_70px_-35px_rgba(31,68,76,0.55)]">
+
+                            <div class="p-2">
+                                <button type="button" @click="selectedStock = ''; stockOpen = false"
+                                    class="group flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-bold transition"
+                                    :class="selectedStock === ''
+                                        ?
+                                        'bg-[#F4B044] text-[#2B1A10]' :
+                                        'text-[#2B1A10] hover:bg-[#F4B044]/15'">
+                                    <span>Semua Stok</span>
+
+                                    <svg x-show="selectedStock === ''" x-cloak class="h-5 w-5" fill="none"
+                                        stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </button>
+
+                                <button type="button" @click="selectedStock = 'available'; stockOpen = false"
+                                    class="group flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-bold transition"
+                                    :class="selectedStock === 'available'
+                                        ?
+                                        'bg-[#F4B044] text-[#2B1A10]' :
+                                        'text-[#2B1A10] hover:bg-[#F4B044]/15'">
+                                    <span>Ada Stok</span>
+
+                                    <svg x-show="selectedStock === 'available'" x-cloak class="h-5 w-5" fill="none"
+                                        stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </button>
+
+                                <button type="button" @click="selectedStock = 'out'; stockOpen = false"
+                                    class="group flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-bold transition"
+                                    :class="selectedStock === 'out'
+                                        ?
+                                        'bg-[#F4B044] text-[#2B1A10]' :
+                                        'text-[#2B1A10] hover:bg-[#F4B044]/15'">
+                                    <span>Habis</span>
+
+                                    <svg x-show="selectedStock === 'out'" x-cloak class="h-5 w-5" fill="none"
+                                        stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -214,14 +312,15 @@
                     <tbody class="divide-y divide-[#F4D3B0]/60 bg-white">
                         @forelse ($products as $product)
                             @php
-                                $availabilityLabel =
-                                    $product->status_ketersediaan === 'tersedia' ? 'Tersedia' : 'Habis';
+                                $stock = (int) $product->stock;
+
+                                $availabilityLabel = $stock > 0 ? 'Tersedia' : 'Habis';
+
                                 $availabilityClass =
-                                    $product->status_ketersediaan === 'tersedia'
-                                        ? 'bg-[#1F444C]/10 text-[#1F444C]'
-                                        : 'bg-[#A92A35]/10 text-[#A92A35]';
+                                    $stock > 0 ? 'bg-[#1F444C]/10 text-[#1F444C]' : 'bg-[#A92A35]/10 text-[#A92A35]';
 
                                 $statusLabel = $product->status === 'aktif' ? 'Aktif' : 'Nonaktif';
+
                                 $statusClass =
                                     $product->status === 'aktif'
                                         ? 'bg-[#F4B044]/20 text-[#6B3E12]'

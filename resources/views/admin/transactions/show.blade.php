@@ -10,7 +10,7 @@
             $sale->status === 'selesai' ? 'bg-[#1F444C]/10 text-[#1F444C]' : 'bg-[#A92A35]/10 text-[#A92A35]';
     @endphp
 
-    <div class="space-y-6">
+    <div class="space-y-6" x-data="{ cancelOpen: false }">
         {{-- Header --}}
         <div class="overflow-hidden rounded-3xl bg-[#1F444C] p-6 text-white shadow-lg shadow-[#1F444C]/10">
             <div class="relative">
@@ -34,15 +34,20 @@
                     </div>
 
                     <div class="flex flex-col gap-3 sm:flex-row min-[1024px]:shrink-0">
-                        <a href="{{ route('admin.transactions.index') }}"
-                            class="inline-flex h-12 items-center justify-center rounded-2xl bg-[#F4B044] px-5 text-sm font-black text-[#2B1A10] shadow-lg shadow-[#F4B044]/20 transition hover:-translate-y-0.5 hover:shadow-xl">
-                            Kembali
-                        </a>
+                        <div class="flex flex-col gap-3 sm:flex-row min-[1024px]:shrink-0">
+                            @if ($sale->status === 'selesai')
+                                <button type="button" @click="cancelOpen = true"
+                                    class="inline-flex h-12 items-center justify-center rounded-2xl bg-[#A92A35] px-5 text-sm font-black text-white shadow-lg shadow-[#A92A35]/20 transition hover:-translate-y-0.5 hover:shadow-xl">
+                                    Batalkan
+                                </button>
+                            @endif
 
-                        <a href="{{ route('admin.income-analysis.index') }}"
-                            class="inline-flex h-12 items-center justify-center rounded-2xl border border-white/15 bg-white/10 px-5 text-sm font-black text-white transition hover:bg-white/15">
-                            Analisis
-                        </a>
+                            <a href="{{ route('admin.transactions.index') }}"
+                                class="inline-flex h-12 items-center justify-center rounded-2xl bg-[#F4B044] px-5 text-sm font-black text-[#2B1A10] shadow-lg shadow-[#F4B044]/20 transition hover:-translate-y-0.5 hover:shadow-xl">
+                                Kembali
+                            </a>
+
+                        </div>
                     </div>
                 </div>
             </div>
@@ -91,7 +96,6 @@
             </div>
         </div>
 
-        {{-- Content --}}
         {{-- Content --}}
         <div class="space-y-6">
             {{-- Top Detail --}}
@@ -388,11 +392,80 @@
                         </p>
 
                         <p class="mt-2 text-sm font-semibold text-[#2B1A10]">
-                            {{ $sale->cancellation_reason ?: '-' }}
+                            {{ $sale->cancel_reason ?: '-' }}
                         </p>
                     </div>
                 </div>
             </div>
         @endif
+        @if ($sale->status === 'selesai')
+            <template x-teleport="body">
+                <div x-show="cancelOpen" x-cloak x-transition.opacity @keydown.escape.window="cancelOpen = false"
+                    @click.self="cancelOpen = false"
+                    class="fixed inset-0 z-[9999] flex min-h-screen items-center justify-center overflow-y-auto bg-[#2B1A10]/45 p-4 backdrop-blur-sm">
+
+                    <form method="POST" action="{{ route('admin.transactions.cancel', $sale) }}"
+                        class="relative w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl">
+                        @csrf
+                        @method('PATCH')
+
+                        <div class="flex items-start gap-4">
+                            <div
+                                class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#A92A35]/10 text-[#A92A35]">
+                                <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2.4"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                                </svg>
+                            </div>
+
+                            <div class="min-w-0">
+                                <h3 class="text-lg font-black text-[#2B1A10]">
+                                    Batalkan Transaksi?
+                                </h3>
+
+                                <p class="mt-1 text-sm font-semibold leading-relaxed text-[#6B3E12]">
+                                    Transaksi {{ $sale->kode_transaksi }} akan dibatalkan dan stok produk akan
+                                    dikembalikan.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="mt-5 rounded-2xl border border-[#A92A35]/20 bg-[#A92A35]/10 p-4">
+                            <p class="text-sm font-bold leading-relaxed text-[#A92A35]">
+                                Tindakan ini tidak menghapus transaksi. Status transaksi akan berubah menjadi dibatalkan.
+                            </p>
+                        </div>
+
+                        <div class="mt-5">
+                            <label class="mb-2 block text-sm font-black text-[#2B1A10]">
+                                Alasan Pembatalan
+                            </label>
+
+                            <textarea name="cancel_reason" rows="4" required
+                                placeholder="Contoh: Kasir salah input produk / jumlah transaksi salah"
+                                class="block w-full rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-4 py-3 text-sm font-bold text-[#2B1A10] shadow-sm transition placeholder:text-[#6B3E12]/45 focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20"></textarea>
+
+                            @error('cancel_reason')
+                                <p class="mt-2 text-sm font-bold text-[#A92A35]">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                            <button type="button" @click="cancelOpen = false"
+                                class="inline-flex h-12 items-center justify-center rounded-2xl border border-[#F4D3B0] bg-white px-5 text-sm font-black text-[#6B3E12] transition hover:bg-[#F7F6F4]">
+                                Batal
+                            </button>
+
+                            <button type="submit"
+                                class="inline-flex h-12 items-center justify-center rounded-2xl bg-[#A92A35] px-5 text-sm font-black text-white shadow-lg shadow-[#A92A35]/20 transition hover:-translate-y-0.5 hover:shadow-xl">
+                                Ya, Batalkan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </template>
+        @endif
     </div>
+
 @endsection

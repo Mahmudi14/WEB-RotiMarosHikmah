@@ -12,6 +12,8 @@
         @endif
     </title>
 
+    <link rel="icon" type="image/png" href="{{ asset('images/icons/icon-512.png') }}">
+
     <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
 
     <meta name="theme-color" content="#1F444C">

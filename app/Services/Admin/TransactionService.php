@@ -9,6 +9,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use App\Models\Product;
+use App\Models\StockMovement;
+use Exception;
+use Illuminate\Support\Facades\DB;
 
 class TransactionService
 {
@@ -115,5 +119,82 @@ class TransactionService
             ->when($request->filled('status'), function ($query) use ($request) {
                 $query->where('status', $request->status);
             });
+    }
+
+    public function cancelSale(Sale $sale, User $admin, string $reason): Sale
+    {
+        return DB::transaction(function () use ($sale, $admin, $reason) {
+            $sale = Sale::query()
+                ->with(['items'])
+                ->whereKey($sale->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($sale->status === 'dibatalkan') {
+                throw new Exception('Transaksi sudah dibatalkan sebelumnya.');
+            }
+
+            if ($sale->status !== 'selesai') {
+                throw new Exception('Hanya transaksi selesai yang dapat dibatalkan.');
+            }
+
+            foreach ($sale->items as $item) {
+                if (! $item->product_id) {
+                    throw new Exception("Produk {$item->nama_produk} tidak ditemukan. Stok tidak dapat dikembalikan.");
+                }
+
+                $product = Product::query()
+                    ->whereKey($item->product_id)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $product) {
+                    throw new Exception("Produk {$item->nama_produk} tidak ditemukan. Stok tidak dapat dikembalikan.");
+                }
+
+                $qty = (int) $item->qty;
+
+                if ($qty <= 0) {
+                    continue;
+                }
+
+                $stockBefore = (int) $product->stock;
+                $stockAfter = $stockBefore + $qty;
+
+                $product->update([
+                    'stock' => $stockAfter,
+                    'status_ketersediaan' => $stockAfter > 0 ? 'tersedia' : 'habis',
+                ]);
+
+                StockMovement::create([
+                    'product_id' => $product->id,
+                    'type' => 'in',
+                    'quantity' => $qty,
+                    'stock_before' => $stockBefore,
+                    'stock_after' => $stockAfter,
+                    'source' => 'sale_cancel',
+                    'reference_type' => Sale::class,
+                    'reference_id' => $sale->id,
+                    'note' => 'Pengembalian stok dari pembatalan transaksi ' . $sale->kode_transaksi . '. Alasan: ' . $reason,
+                    'created_by' => $admin->id,
+                ]);
+            }
+
+            $sale->update([
+                'status' => 'dibatalkan',
+                'cancelled_by' => $admin->id,
+                'cancelled_at' => now(),
+                'cancel_reason' => $reason,
+            ]);
+
+            return $sale->load([
+                'cashier',
+                'terminal',
+                'shift',
+                'items',
+                'cancelledBy',
+                'printJobs' => fn($query) => $query->latest('created_at'),
+            ]);
+        });
     }
 }

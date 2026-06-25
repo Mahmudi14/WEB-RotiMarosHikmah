@@ -16,9 +16,15 @@ class Product extends Model
         'slug',
         'deskripsi',
         'harga_jual',
+        'stock',
         'gambar',
         'status_ketersediaan',
         'status',
+    ];
+
+    protected $casts = [
+        'harga_jual' => 'decimal:2',
+        'stock' => 'integer',
     ];
 
     public function category(): BelongsTo
@@ -40,5 +46,10 @@ class Product extends Model
     public function saleItems(): HasMany
     {
         return $this->hasMany(SaleItem::class);
+    }
+
+    public function stockMovements(): HasMany
+    {
+        return $this->hasMany(StockMovement::class);
     }
 }

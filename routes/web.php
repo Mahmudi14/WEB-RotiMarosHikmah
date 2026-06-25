@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\TaxController as AdminTaxController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\TransactionController as AdminTransactionController;
 use App\Http\Controllers\Admin\IncomeAnalysisController as AdminIncomeAnalysisController;
+use App\Http\Controllers\Admin\StockController as AdminStockController;
 use App\Http\Controllers\Cashier\CashierDashboardController;
 use App\Http\Controllers\Cashier\CashierExpenseController;
 use App\Http\Controllers\Cashier\CashierPosController;
@@ -16,10 +17,9 @@ use App\Http\Controllers\Cashier\CashierShiftController;
 use App\Http\Controllers\Cashier\CashierTransactionController;
 use App\Http\Controllers\DashboardRedirectController;
 use App\Http\Controllers\Finance\KeuanganDashboardController;
+use App\Http\Controllers\Finance\StockController as FinanceStockController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\SuperAdmin\ActivityLogController;
 use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboardController;
-use App\Http\Controllers\SuperAdmin\LoginHistoryController;
 use App\Http\Controllers\SuperAdmin\UserController as SuperAdminUserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -112,6 +112,8 @@ Route::middleware(['auth', 'verified', 'role:admin,super_admin'])
 
         Route::get('transactions/{sale}', [AdminTransactionController::class, 'show'])
             ->name('transactions.show');
+        Route::patch('transactions/{sale}/cancel', [AdminTransactionController::class, 'cancel'])
+            ->name('transactions.cancel');
 
         Route::get('income-analysis', [AdminIncomeAnalysisController::class, 'index'])
             ->name('income-analysis.index');
@@ -148,6 +150,13 @@ Route::middleware(['auth', 'verified', 'role:admin,super_admin'])
             ->name('cashiers.reset-password');
         Route::resource('cashiers', AdminCashierController::class)
             ->except(['destroy']);
+
+        Route::get('stocks', [AdminStockController::class, 'index'])
+            ->name('stocks.index');
+        Route::get('stocks/{product}/movements', [AdminStockController::class, 'movements'])
+            ->name('stocks.movements');
+        Route::post('stocks/{product}/adjust', [AdminStockController::class, 'adjust'])
+            ->name('stocks.adjust');
     });
 
 /*
@@ -162,6 +171,11 @@ Route::middleware(['auth', 'verified', 'role:keuangan,super_admin'])
     ->group(function () {
         Route::get('/dashboard', [KeuanganDashboardController::class, 'index'])
             ->name('dashboard');
+
+        Route::get('stocks', [FinanceStockController::class, 'index'])
+            ->name('stocks.index');
+        Route::get('stocks/{product}/movements', [FinanceStockController::class, 'movements'])
+            ->name('stocks.movements');
     });
 
 /*
