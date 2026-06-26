@@ -32,8 +32,8 @@
             $dashboardUrl = match (auth()->user()->role) {
                 'super_admin' => route('super-admin.dashboard'),
                 'admin' => route('admin.dashboard'),
-                'kasir' => route('kasir.dashboard'),
-                'keuangan' => route('keuangan.dashboard'),
+                'kasir' => route('cashier.dashboard'),
+                'keuangan' => route('finance.dashboard'),
                 default => route('profile.edit'),
             };
         }
