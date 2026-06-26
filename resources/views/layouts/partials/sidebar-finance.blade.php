@@ -1,5 +1,4 @@
-<aside
-    class="flex h-screen min-h-0 w-72 flex-col overflow-hidden bg-[#1F444C] text-white shadow-2xl shadow-[#1F444C]/20">
+<aside class="flex h-full min-h-0 w-72 flex-col overflow-hidden bg-[#1F444C] text-white shadow-2xl shadow-[#1F444C]/20">
     {{-- Brand --}}
     <div class="flex h-20 shrink-0 items-center border-b border-white/10 px-6">
         <div class="flex items-center gap-4">
@@ -55,7 +54,7 @@ flex h-9 w-9 items-center justify-center rounded-xl transition">
     </nav>
 
     {{-- Footer --}}
-    <div class="shrink-0 border-t border-white/10 px-6 py-2">
+    <div class="shrink-0 border-t border-white/10 px-6 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
         <p class="text-center text-xs leading-relaxed text-[#F4D3B0]/85">
             © {{ date('Y') }} Roti Maros Hikmah.
             <br>

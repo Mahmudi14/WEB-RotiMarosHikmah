@@ -34,6 +34,11 @@
             display: none !important;
         }
 
+        .app-viewport {
+            height: 100vh;
+            height: 100dvh;
+        }
+
         .sidebar-scroll::-webkit-scrollbar {
             width: 6px;
         }
@@ -54,7 +59,7 @@
     </style>
 </head>
 
-<body class="h-screen overflow-hidden bg-[#F7F6F4] text-[#2B1A10] antialiased">
+<body class="app-viewport overflow-hidden bg-[#F7F6F4] text-[#2B1A10] antialiased">
     @php
         $role = auth()->user()->role;
 
@@ -67,7 +72,7 @@
         };
     @endphp
 
-    <div x-data="{ sidebarOpen: false }" class="h-screen overflow-hidden">
+    <div x-data="{ sidebarOpen: false }" class="app-viewport overflow-hidden">
 
         @php
             $toastType = null;
@@ -202,7 +207,7 @@
         @endif
         {{-- Overlay untuk layar 1024px ke bawah --}}
         <div x-show="sidebarOpen" x-transition.opacity x-cloak
-            class="fixed inset-0 z-40 bg-[#1F444C]/50 backdrop-blur-sm min-[1025px]:hidden"
+            class="fixed inset-0 z-40 bg-[#1F444C]/50 backdrop-blur-sm min-[1366px]:hidden"
             @click="sidebarOpen = false">
         </div>
 
@@ -211,7 +216,8 @@
             x-transition:enter-start="-translate-x-full opacity-0" x-transition:enter-end="translate-x-0 opacity-100"
             x-transition:leave="transition ease-in duration-150" x-transition:leave-start="translate-x-0 opacity-100"
             x-transition:leave-end="-translate-x-full opacity-0" x-cloak
-            class="fixed inset-y-0 left-0 z-50 min-[1025px]:hidden">
+            class="fixed inset-y-0 left-0 z-50 min-[1366px]:hidden"
+            @click="if ($event.target.closest('a')) sidebarOpen = false">
             @if ($sidebarView)
                 @include($sidebarView)
             @else
@@ -221,9 +227,9 @@
             @endif
         </div>
 
-        <div class="flex h-screen overflow-hidden">
+        <div class="flex app-viewport overflow-hidden">
             {{-- Desktop Sidebar --}}
-            <div class="hidden h-screen shrink-0 min-[1025px]:block">
+            <div class="hidden h-full shrink-0 min-[1366px]:block">
                 @if ($sidebarView)
                     @include($sidebarView)
                 @else
@@ -234,14 +240,14 @@
             </div>
 
             {{-- Main Area --}}
-            <div class="flex h-screen min-w-0 flex-1 flex-col overflow-hidden">
+            <div class="flex h-full min-w-0 flex-1 flex-col overflow-hidden">
                 {{-- Topbar --}}
                 <header class="z-30 shrink-0 border-b border-[#F4D3B0]/70 bg-white/90 backdrop-blur-xl">
                     <div class="flex h-20 items-center justify-between px-4 sm:px-6 lg:px-8">
                         <div class="flex items-center gap-4">
                             {{-- Tombol sidebar: tampil sampai 1024px --}}
                             <button type="button"
-                                class="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#F4D3B0] bg-[#F7F6F4] text-[#1F444C] shadow-sm transition hover:bg-[#F4D3B0]/60 min-[1025px]:hidden"
+                                class="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#F4D3B0] bg-[#F7F6F4] text-[#1F444C] shadow-sm transition hover:bg-[#F4D3B0]/60 min-[1366px]:hidden"
                                 @click="sidebarOpen = true">
                                 <span class="sr-only">Buka sidebar</span>
                                 <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2"
@@ -415,7 +421,8 @@
                 {{-- Content --}}
                 <main
                     class="min-h-0 flex-1 overflow-y-auto bg-gradient-to-br from-[#F7F6F4] via-[#F7F6F4] to-[#F4D3B0]/35">
-                    <div class="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                    <div
+                        class="mx-auto w-full max-w-7xl px-4 py-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:px-6 lg:px-8">
                         <div
                             class="rounded-3xl border border-[#F4D3B0]/70 bg-white/80 p-5 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)] backdrop-blur-xl sm:p-6">
                             @yield('content')
