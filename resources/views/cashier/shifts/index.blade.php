@@ -3,7 +3,7 @@
 @section('page_title', 'Shift Kasir')
 
 @section('content')
-    <div class="flex min-h-0 flex-col gap-4 min-[1024px]:h-[calc(100dvh-12rem)]" x-data="{
+    <div class="flex min-h-0 flex-col gap-4 xl:h-[calc(100dvh-10rem)]" x-data="{
         copied: false,
         openedAt: @js($activeShift?->opened_at?->toIso8601String()),
         durationText: '-',
@@ -32,17 +32,15 @@
     
             this.durationText = `${hours} jam ${minutes} menit`;
         }
-    }"
-        x-init="updateDuration();
-        setInterval(() => updateDuration(), 60000)">
+    }" x-init="updateDuration();
+    setInterval(() => updateDuration(), 60000)">
         {{-- Header --}}
         <div class="shrink-0 overflow-hidden rounded-3xl bg-[#1F444C] p-5 text-white shadow-lg shadow-[#1F444C]/10">
             <div class="relative">
                 <div class="absolute -right-10 -top-12 h-28 w-28 rounded-full bg-[#F4B044]/20"></div>
                 <div class="absolute -bottom-14 -left-10 h-28 w-28 rounded-full bg-white/10"></div>
 
-                <div
-                    class="relative flex flex-col gap-4 min-[1024px]:flex-row min-[1024px]:items-center min-[1024px]:justify-between">
+                <div class="relative flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
                     <div class="min-w-0">
                         <p class="text-xs font-bold uppercase tracking-[0.28em] text-[#F4D3B0]">
                             Kasir / Shift
@@ -59,7 +57,7 @@
 
                     @if ($activeShift)
                         <div
-                            class="w-full rounded-2xl border border-white/10 bg-white/10 p-3 backdrop-blur-sm min-[1024px]:w-[360px]">
+                            class="w-full rounded-2xl border border-white/10 bg-white/10 p-3 backdrop-blur-sm xl:w-[360px]">
                             <div class="flex items-center justify-between gap-3">
                                 <div class="min-w-0">
                                     <p class="text-xs font-black uppercase tracking-[0.18em] text-[#F4D3B0]">
@@ -89,7 +87,7 @@
 
         @if (!$activeShift)
             {{-- Belum buka shift --}}
-            <div class="grid min-h-0 flex-1 gap-4 min-[1024px]:grid-cols-[minmax(0,1fr)_380px]">
+            <div class="grid min-h-0 flex-1 gap-4 xl:grid-cols-[minmax(0,1fr)_380px]">
                 <div
                     class="flex min-h-0 items-center justify-center rounded-3xl border border-[#F4D3B0]/70 bg-white p-6 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
                     <div class="mx-auto max-w-md text-center">
@@ -139,7 +137,7 @@
                         </div>
                     </div>
 
-                    <div class="min-h-0 flex-1 overflow-y-auto">
+                    <div class="min-h-0 flex-1 overflow-visible xl:overflow-y-auto">
                         @forelse ($activeShifts as $shift)
                             <div
                                 class="border-b border-[#F4D3B0]/60 px-5 py-4 transition last:border-b-0 hover:bg-[#F7F6F4]">
@@ -166,7 +164,8 @@
                                 </div>
                             </div>
                         @empty
-                            <div class="flex h-full min-h-[220px] items-center justify-center px-6 py-10 text-center">
+                            <div
+                                class="flex min-h-[160px] items-center justify-center px-6 py-8 text-center xl:min-h-[220px]">
                                 <div>
                                     <h3 class="text-base font-black text-[#2B1A10]">
                                         Belum Ada Kasir Aktif
@@ -183,7 +182,7 @@
             </div>
         @else
             {{-- Shift aktif --}}
-            <div class="grid min-h-0 flex-1 gap-4 min-[1024px]:grid-cols-[400px_minmax(0,1fr)]">
+            <div class="grid min-h-0 flex-1 gap-4 xl:grid-cols-[400px_minmax(0,1fr)]">
                 {{-- Terminal & Token --}}
                 <div
                     class="flex min-h-0 flex-col overflow-hidden rounded-3xl border border-[#F4D3B0]/70 bg-white shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
@@ -202,7 +201,7 @@
                             Shift Berjalan
                         </span>
 
-                        <div class="mt-4 grid gap-3 sm:grid-cols-2 min-[1024px]:grid-cols-1 min-[1280px]:grid-cols-2">
+                        <div class="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-2">
 
                             <div class="rounded-2xl bg-[#F7F6F4] p-4">
                                 <p class="text-xs font-black uppercase tracking-[0.18em] text-[#6B3E12]">
@@ -274,7 +273,7 @@
                                 </span>
                             </div>
 
-                            <div class="max-h-[calc(100vh-28rem)] overflow-y-auto">
+                            <div class="max-h-80 overflow-y-auto xl:max-h-[calc(100dvh-28rem)]">
                                 @forelse ($activeShifts as $shift)
                                     @php
                                         $isMine = $activeShift && $activeShift->id === $shift->id;
