@@ -51,7 +51,7 @@ class ProductService
         $search = $request->query('search');
         $categoryId = $request->query('category_id');
         $status = $request->query('status');
-        $availability = $request->query('status_ketersediaan');
+        $stockCondition = $request->query('stock_condition');
 
         return Product::query()
             ->with('category')
@@ -71,8 +71,11 @@ class ProductService
             ->when($status && array_key_exists($status, $this->productStatuses()), function ($query) use ($status) {
                 $query->where('status', $status);
             })
-            ->when($availability && array_key_exists($availability, $this->availabilityStatuses()), function ($query) use ($availability) {
-                $query->where('status_ketersediaan', $availability);
+            ->when($stockCondition === 'available', function ($query) {
+                $query->where('stock', '>', 0);
+            })
+            ->when($stockCondition === 'out', function ($query) {
+                $query->where('stock', '<=', 0);
             })
             ->latest()
             ->paginate($perPage)

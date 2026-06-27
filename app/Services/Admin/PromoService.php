@@ -37,6 +37,8 @@ class PromoService
 
     public function getPaginatedPromos(Request $request, int $perPage = 10): LengthAwarePaginator
     {
+        $this->syncStatusesByPeriod();
+
         return Promo::query()
             ->withCount('products')
             ->when($request->filled('search'), function ($query) use ($request) {
@@ -51,11 +53,10 @@ class PromoService
                 $today = now()->toDateString();
 
                 if ($request->status === 'aktif') {
-                    $query->where('status', 'aktif')
-                        ->where(function ($query) use ($today) {
-                            $query->whereNull('tanggal_mulai')
-                                ->orWhereDate('tanggal_mulai', '<=', $today);
-                        })
+                    $query->where(function ($query) use ($today) {
+                        $query->whereNull('tanggal_mulai')
+                            ->orWhereDate('tanggal_mulai', '<=', $today);
+                    })
                         ->where(function ($query) use ($today) {
                             $query->whereNull('tanggal_selesai')
                                 ->orWhereDate('tanggal_selesai', '>=', $today);
@@ -64,8 +65,7 @@ class PromoService
 
                 if ($request->status === 'nonaktif') {
                     $query->where(function ($query) use ($today) {
-                        $query->where('status', 'nonaktif')
-                            ->orWhereDate('tanggal_mulai', '>', $today)
+                        $query->whereDate('tanggal_mulai', '>', $today)
                             ->orWhereDate('tanggal_selesai', '<', $today);
                     });
                 }
@@ -79,6 +79,44 @@ class PromoService
             ->latest()
             ->paginate($perPage)
             ->withQueryString();
+    }
+
+    public function syncStatusesByPeriod(): void
+    {
+        $today = now()->toDateString();
+
+        Promo::query()
+            ->whereDate('tanggal_mulai', '<=', $today)
+            ->whereDate('tanggal_selesai', '>=', $today)
+            ->where('status', '!=', 'aktif')
+            ->update([
+                'status' => 'aktif',
+            ]);
+
+        Promo::query()
+            ->where(function ($query) use ($today) {
+                $query->whereDate('tanggal_mulai', '>', $today)
+                    ->orWhereDate('tanggal_selesai', '<', $today);
+            })
+            ->where('status', '!=', 'nonaktif')
+            ->update([
+                'status' => 'nonaktif',
+            ]);
+    }
+
+    private function resolveStatusByDate(array $data): string
+    {
+        $today = now()->toDateString();
+
+        if ($today < $data['tanggal_mulai']) {
+            return 'nonaktif';
+        }
+
+        if ($today > $data['tanggal_selesai']) {
+            return 'nonaktif';
+        }
+
+        return 'aktif';
     }
 
     public function getProductsForForm(?Promo $promo = null): Collection
@@ -106,7 +144,7 @@ class PromoService
 
             unset($data['product_ids']);
 
-            $data['status'] = 'aktif';
+            $data['status'] = $this->resolveStatusByDate($data);
 
             $promo = Promo::create($data);
 
@@ -122,6 +160,9 @@ class PromoService
             $productIds = $data['product_ids'] ?? [];
 
             unset($data['product_ids']);
+            unset($data['status']);
+
+            $data['status'] = $this->resolveStatusByDate($data);
 
             $promo->update($data);
 
@@ -129,15 +170,6 @@ class PromoService
 
             return $promo->refresh();
         });
-    }
-
-    public function toggleStatus(Promo $promo): Promo
-    {
-        $promo->update([
-            'status' => $promo->status === 'aktif' ? 'nonaktif' : 'aktif',
-        ]);
-
-        return $promo->refresh();
     }
 
     public function deletePromo(Promo $promo): void

@@ -130,8 +130,6 @@ Route::middleware(['auth', 'verified', 'role:admin,super_admin'])
             ->name('products.update-status');
         Route::resource('products', AdminProductController::class);
 
-        Route::patch('promos/{promo}/status', [AdminPromoController::class, 'updateStatus'])
-            ->name('promos.update-status');
         Route::resource('promos', AdminPromoController::class);
 
         Route::patch('taxes/{tax}/status', [AdminTaxController::class, 'updateStatus'])

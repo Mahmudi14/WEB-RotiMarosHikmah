@@ -78,42 +78,27 @@ class Promo extends Model
     {
         return $this->status_efektif === 'aktif' ? 'Aktif' : 'Nonaktif';
     }
-
     public function getStatusEfektifDescriptionAttribute(): string
     {
         $today = now()->toDateString();
 
-        if ($this->status !== 'aktif') {
-            return 'Dinonaktifkan admin';
-        }
-
-        if ($this->tanggal_mulai && $today < $this->tanggal_mulai->toDateString()) {
+        if ($today < $this->tanggal_mulai->toDateString()) {
             return 'Belum mulai';
         }
 
-        if ($this->tanggal_selesai && $today > $this->tanggal_selesai->toDateString()) {
+        if ($today > $this->tanggal_selesai->toDateString()) {
             return 'Sudah berakhir';
         }
 
         return 'Sedang berlaku';
     }
 
+
     public function getIsBerjalanAttribute(): bool
     {
-        if ($this->status !== 'aktif') {
-            return false;
-        }
-
         $today = now()->toDateString();
 
-        if ($this->tanggal_mulai && $today < $this->tanggal_mulai->toDateString()) {
-            return false;
-        }
-
-        if ($this->tanggal_selesai && $today > $this->tanggal_selesai->toDateString()) {
-            return false;
-        }
-
-        return true;
+        return $today >= $this->tanggal_mulai->toDateString()
+            && $today <= $this->tanggal_selesai->toDateString();
     }
 }

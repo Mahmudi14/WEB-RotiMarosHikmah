@@ -23,7 +23,6 @@ class PosTerminalController extends Controller
         return view('admin.pos-terminals.index', [
             'terminals' => $this->posTerminalService->getPaginatedTerminals($request),
             'statuses' => $this->posTerminalService->statuses(),
-            'bridgeStatuses' => $this->posTerminalService->bridgeStatuses(),
         ]);
     }
 

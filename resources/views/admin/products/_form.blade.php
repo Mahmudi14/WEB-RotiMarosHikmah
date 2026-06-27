@@ -1,9 +1,7 @@
 <form method="POST" action="{{ $action }}" enctype="multipart/form-data" class="space-y-5" x-data="{
     categoryOpen: false,
-    statusOpen: false,
 
     selectedCategory: @js((string) old('category_id', $product->category_id ?? '')),
-    selectedStatus: @js(old('status', $product->status ?? 'aktif')),
 
     categories: @js(
     $categories
@@ -15,16 +13,10 @@
         ->toArray(),
 ),
 
-    productStatuses: @js($productStatuses ?? ['aktif' => 'Aktif', 'nonaktif' => 'Nonaktif']),
-
     imagePreview: @js(isset($product) && $product?->gambar ? asset('storage/' . $product->gambar) : null),
 
     get selectedCategoryLabel() {
         return this.selectedCategory ? this.categories[this.selectedCategory] : 'Pilih Kategori'
-    },
-
-    get selectedStatusLabel() {
-        return this.productStatuses[this.selectedStatus] ?? 'Pilih Status'
     },
 
     previewImage(event) {

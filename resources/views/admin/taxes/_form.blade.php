@@ -89,7 +89,7 @@
 
             {{-- Status --}}
             @if ($showStatus)
-                <div>
+                <div class="lg:col-span-2">
                     <label class="mb-2 block text-sm font-black text-[#2B1A10]">
                         Status
                     </label>

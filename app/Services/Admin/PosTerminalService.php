@@ -20,14 +20,6 @@ class PosTerminalService
         ];
     }
 
-    public function bridgeStatuses(): array
-    {
-        return [
-            'online' => 'Online',
-            'offline' => 'Offline',
-        ];
-    }
-
     public function getPaginatedTerminals(Request $request, int $perPage = 10): LengthAwarePaginator
     {
         return PosTerminal::query()
@@ -41,21 +33,6 @@ class PosTerminalService
             })
             ->when($request->filled('status'), function ($query) use ($request) {
                 $query->where('status', $request->status);
-            })
-            ->when($request->filled('bridge_status'), function ($query) use ($request) {
-                $limitTime = now()->subMinutes(2);
-
-                if ($request->bridge_status === 'online') {
-                    $query->whereNotNull('last_seen_at')
-                        ->where('last_seen_at', '>=', $limitTime);
-                }
-
-                if ($request->bridge_status === 'offline') {
-                    $query->where(function ($query) use ($limitTime) {
-                        $query->whereNull('last_seen_at')
-                            ->orWhere('last_seen_at', '<', $limitTime);
-                    });
-                }
             })
             ->latest()
             ->paginate($perPage)

@@ -43,7 +43,7 @@
             'action' => route('admin.promos.update', $promo),
             'method' => 'PUT',
             'submitLabel' => 'Simpan Perubahan',
-            'showStatus' => true,
+            'showStatus' => false,
         ])
     </div>
 @endsection

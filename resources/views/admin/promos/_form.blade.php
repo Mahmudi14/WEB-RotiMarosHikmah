@@ -1,6 +1,5 @@
 @php
     $isEdit = isset($promo);
-    $showStatus = $showStatus ?? $isEdit;
 
     $selectedProductIds = collect(old('product_ids', $isEdit ? $promo->products->pluck('id')->toArray() : []))
         ->map(fn($id) => (string) $id)
@@ -18,22 +17,18 @@
     );
 
     $initialScope = old('cakupan_promo', $isEdit ? $promo->cakupan_promo : 'semua_menu');
-    $initialStatus = old('status', $isEdit ? $promo->status : 'aktif');
 @endphp
 
 <div class="rounded-3xl border border-[#F4D3B0]/70 bg-white p-6 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]"
     x-data="{
         discountTypeOpen: false,
         scopeOpen: false,
-        statusOpen: false,
     
         selectedDiscountType: @js($initialDiscountType),
         selectedScope: @js($initialScope),
-        selectedStatus: @js($initialStatus),
     
         discountTypes: @js($discountTypes),
         scopes: @js($scopes),
-        statuses: @js($statuses ?? []),
     
         discountValue: @js((string) $initialDiscountValue),
     
@@ -43,10 +38,6 @@
     
         get selectedScopeLabel() {
             return this.scopes[this.selectedScope] ?? 'Pilih Cakupan Promo'
-        },
-    
-        get selectedStatusLabel() {
-            return this.statuses[this.selectedStatus] ?? 'Pilih Status'
         },
     
         formatNominal(value) {
@@ -216,96 +207,47 @@
                 @enderror
             </div>
 
+            {{-- Periode Promo --}}
+            <div class="lg:col-span-2">
+                <div class="grid gap-5 md:grid-cols-2">
+                    {{-- Tanggal Mulai --}}
+                    <div>
+                        <label class="mb-2 block text-sm font-black text-[#2B1A10]">
+                            Tanggal Mulai
+                            <span class="text-[#A92A35]">*</span>
+                        </label>
 
+                        <input type="date" name="tanggal_mulai" required
+                            value="{{ old('tanggal_mulai', isset($promo) && $promo->tanggal_mulai ? $promo->tanggal_mulai->format('Y-m-d') : '') }}"
+                            class="block h-12 w-full rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-4 py-0 text-sm font-medium text-[#2B1A10] shadow-sm transition focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
 
-            {{-- Tanggal Mulai --}}
-            <div>
-                <label class="mb-2 block text-sm font-black text-[#2B1A10]">
-                    Tanggal Mulai
-                    <span class="font-semibold text-[#6B3E12]/60">(Opsional)</span>
-                </label>
+                        @error('tanggal_mulai')
+                            <p class="mt-2 text-sm font-bold text-[#A92A35]">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                <input type="date" name="tanggal_mulai"
-                    value="{{ old('tanggal_mulai', isset($promo) && $promo->tanggal_mulai ? $promo->tanggal_mulai->format('Y-m-d') : '') }}"
-                    class="block h-12 w-full rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-4 py-0 text-sm font-medium text-[#2B1A10] shadow-sm transition focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
+                    {{-- Tanggal Selesai --}}
+                    <div>
+                        <label class="mb-2 block text-sm font-black text-[#2B1A10]">
+                            Tanggal Selesai
+                            <span class="text-[#A92A35]">*</span>
+                        </label>
 
-                @error('tanggal_mulai')
-                    <p class="mt-2 text-sm font-bold text-[#A92A35]">{{ $message }}</p>
-                @enderror
-            </div>
+                        <input type="date" name="tanggal_selesai" required
+                            value="{{ old('tanggal_selesai', isset($promo) && $promo->tanggal_selesai ? $promo->tanggal_selesai->format('Y-m-d') : '') }}"
+                            class="block h-12 w-full rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-4 py-0 text-sm font-medium text-[#2B1A10] shadow-sm transition focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
 
-            {{-- Tanggal Selesai --}}
-            <div>
-                <label class="mb-2 block text-sm font-black text-[#2B1A10]">
-                    Tanggal Selesai
-                    <span class="font-semibold text-[#6B3E12]/60">(Opsional)</span>
-                </label>
-
-                <input type="date" name="tanggal_selesai"
-                    value="{{ old('tanggal_selesai', isset($promo) && $promo->tanggal_selesai ? $promo->tanggal_selesai->format('Y-m-d') : '') }}"
-                    class="block h-12 w-full rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-4 py-0 text-sm font-medium text-[#2B1A10] shadow-sm transition focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
-
-                @error('tanggal_selesai')
-                    <p class="mt-2 text-sm font-bold text-[#A92A35]">{{ $message }}</p>
-                @enderror
-            </div>
-        </div>
-
-        {{-- Status --}}
-        @if ($showStatus)
-            <div>
-                <label class="mb-2 block text-sm font-black text-[#2B1A10]">
-                    Status
-                </label>
-
-                <input type="hidden" name="status" x-model="selectedStatus">
-
-                <div class="relative">
-                    <button type="button" @click="statusOpen = !statusOpen"
-                        class="flex h-12 w-full items-center justify-between rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-4 py-0 text-left text-sm font-bold text-[#2B1A10] shadow-sm transition hover:bg-white focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
-                        <span x-text="selectedStatusLabel"></span>
-
-                        <svg class="h-5 w-5 text-[#6B3E12] transition duration-200"
-                            :class="statusOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor"
-                            stroke-width="2.4" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </button>
-
-                    <div x-show="statusOpen" x-cloak @click.outside="statusOpen = false"
-                        x-transition:enter="transition ease-out duration-150"
-                        x-transition:enter-start="opacity-0 scale-95 translate-y-1"
-                        x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                        x-transition:leave="transition ease-in duration-100"
-                        x-transition:leave-start="opacity-100 scale-100 translate-y-0"
-                        x-transition:leave-end="opacity-0 scale-95 translate-y-1"
-                        class="absolute z-40 mt-3 w-full overflow-hidden rounded-2xl border border-[#F4D3B0]/80 bg-white shadow-[0_25px_70px_-35px_rgba(31,68,76,0.55)]">
-                        <div class="p-2">
-                            @foreach ($statuses as $value => $label)
-                                <button type="button"
-                                    @click="selectedStatus = '{{ $value }}'; statusOpen = false"
-                                    class="flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-bold transition"
-                                    :class="selectedStatus === '{{ $value }}'
-                                        ?
-                                        'bg-[#F4B044] text-[#2B1A10]' :
-                                        'text-[#2B1A10] hover:bg-[#F4B044]/15'">
-                                    <span>{{ $label }}</span>
-
-                                    <svg x-show="selectedStatus === '{{ $value }}'" x-cloak class="h-5 w-5"
-                                        fill="none" stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                </button>
-                            @endforeach
-                        </div>
+                        @error('tanggal_selesai')
+                            <p class="mt-2 text-sm font-bold text-[#A92A35]">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
 
-                @error('status')
-                    <p class="mt-2 text-sm font-bold text-[#A92A35]">{{ $message }}</p>
-                @enderror
+                <p class="mt-2 text-xs font-semibold text-[#6B3E12]/75">
+                    Status promo akan otomatis aktif jika tanggal hari ini berada dalam periode promo.
+                </p>
             </div>
-        @endif
+        </div>
 
         {{-- Cakupan Promo --}}
         <div>

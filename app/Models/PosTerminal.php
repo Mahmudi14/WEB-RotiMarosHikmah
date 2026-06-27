@@ -38,33 +38,6 @@ class PosTerminal extends Model
         return substr($this->bridge_token, 0, 8) . '••••••••' . substr($this->bridge_token, -8);
     }
 
-    public function getIsBridgeOnlineAttribute(): bool
-    {
-        if (! $this->last_seen_at) {
-            return false;
-        }
-
-        return $this->last_seen_at->greaterThanOrEqualTo(now()->subMinutes(2));
-    }
-
-    public function getBridgeStatusLabelAttribute(): string
-    {
-        return $this->is_bridge_online ? 'Online' : 'Offline';
-    }
-
-    public function getBridgeStatusDescriptionAttribute(): string
-    {
-        if (! $this->last_seen_at) {
-            return 'Belum pernah terhubung';
-        }
-
-        if ($this->is_bridge_online) {
-            return 'Terakhir aktif ' . $this->last_seen_at->diffForHumans();
-        }
-
-        return 'Terakhir aktif ' . $this->last_seen_at->format('d M Y, H:i');
-    }
-
     public function cashierShifts(): HasMany
     {
         return $this->hasMany(CashierShift::class, 'pos_terminal_id');

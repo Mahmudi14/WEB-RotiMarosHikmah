@@ -8,17 +8,6 @@
         deleteAction: '',
         deleteTerminalName: '',
     
-        copiedTerminalId: null,
-    
-        async copyToken(token, terminalId) {
-            await navigator.clipboard.writeText(token);
-            this.copiedTerminalId = terminalId;
-    
-            setTimeout(() => {
-                this.copiedTerminalId = null;
-            }, 1800);
-        },
-    
         openDeleteModal(action, name) {
             this.deleteAction = action;
             this.deleteTerminalName = name;
@@ -67,29 +56,22 @@
         <div class="rounded-3xl border border-[#F4D3B0]/70 bg-white p-5 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]"
             x-data="{
                 statusOpen: false,
-                bridgeOpen: false,
-            
                 selectedStatus: @js((string) request('status', '')),
-                selectedBridgeStatus: @js((string) request('bridge_status', '')),
-            
                 statuses: @js($statuses),
-                bridgeStatuses: @js($bridgeStatuses),
             
                 get selectedStatusLabel() {
                     return this.selectedStatus ? this.statuses[this.selectedStatus] : 'Semua Status'
-                },
-            
-                get selectedBridgeStatusLabel() {
-                    return this.selectedBridgeStatus ? this.bridgeStatuses[this.selectedBridgeStatus] : 'Semua Bridge'
                 }
             }">
             <form method="GET" action="{{ route('admin.pos-terminals.index') }}"
-                class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(150px,190px)_minmax(150px,190px)_auto] lg:items-center xl:grid-cols-[minmax(0,1fr)_220px_220px_auto]">
-                {{-- Search --}} <div class="relative">
+                class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_220px_auto] lg:items-center">
+
+                {{-- Search --}}
+                <div class="relative">
                     <span class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-[#6B3E12]/60">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M21 21l-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                d="M21 21l-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 01114 0z" />
                         </svg>
                     </span>
 
@@ -98,7 +80,7 @@
                         class="block h-12 w-full rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] py-0 pl-12 pr-4 text-sm font-medium text-[#2B1A10] shadow-sm transition placeholder:text-[#6B3E12]/45 focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
                 </div>
 
-                {{-- Custom Status Dropdown --}}
+                {{-- Status --}}
                 <div>
                     <input type="hidden" name="status" x-model="selectedStatus">
 
@@ -106,7 +88,7 @@
                         <button type="button" @click="statusOpen = !statusOpen"
                             class="flex h-12 w-full items-center justify-between rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-4 py-0 text-left text-sm font-bold text-[#2B1A10] shadow-sm transition hover:bg-white focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
 
-                            <div class="flex items-center gap-3">
+                            <div class="flex min-w-0 items-center gap-3">
                                 <span
                                     class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#F4B044]/20 text-[#6B3E12]">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2"
@@ -122,7 +104,7 @@
                                     :class="selectedStatus ? 'text-[#2B1A10]' : 'text-[#6B3E12]/60'"></span>
                             </div>
 
-                            <svg class="h-5 w-5 text-[#6B3E12] transition duration-200"
+                            <svg class="h-5 w-5 shrink-0 text-[#6B3E12] transition duration-200"
                                 :class="statusOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor"
                                 stroke-width="2.4" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
@@ -145,10 +127,7 @@
                                         ?
                                         'bg-[#F4B044] text-[#2B1A10]' :
                                         'text-[#2B1A10] hover:bg-[#F4B044]/15'">
-
-                                    <div>
-                                        <p>Semua Status</p>
-                                    </div>
+                                    <span>Semua Status</span>
 
                                     <svg x-show="selectedStatus === ''" x-cloak class="h-5 w-5" fill="none"
                                         stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
@@ -164,96 +143,10 @@
                                             ?
                                             'bg-[#F4B044] text-[#2B1A10]' :
                                             'text-[#2B1A10] hover:bg-[#F4B044]/15'">
-
-                                        <div>
-                                            <p>{{ $label }}</p>
-                                        </div>
+                                        <span>{{ $label }}</span>
 
                                         <svg x-show="selectedStatus === '{{ $value }}'" x-cloak class="h-5 w-5"
                                             fill="none" stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </button>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Custom Bridge Dropdown --}}
-                <div>
-                    <input type="hidden" name="bridge_status" x-model="selectedBridgeStatus">
-
-                    <div class="relative">
-                        <button type="button" @click="bridgeOpen = !bridgeOpen"
-                            class="flex h-12 w-full items-center justify-between rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-4 py-0 text-left text-sm font-bold text-[#2B1A10] shadow-sm transition hover:bg-white focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
-
-                            <div class="flex items-center gap-3">
-                                <span
-                                    class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#F4B044]/20 text-[#6B3E12]">
-                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0" />
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M12 18.75h.008v.008H12v-.008z" />
-                                    </svg>
-                                </span>
-
-                                <span x-text="selectedBridgeStatusLabel" class="truncate"
-                                    :class="selectedBridgeStatus ? 'text-[#2B1A10]' : 'text-[#6B3E12]/60'"></span>
-                            </div>
-
-                            <svg class="h-5 w-5 text-[#6B3E12] transition duration-200"
-                                :class="bridgeOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor"
-                                stroke-width="2.4" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-
-                        <div x-show="bridgeOpen" x-cloak @click.outside="bridgeOpen = false"
-                            x-transition:enter="transition ease-out duration-150"
-                            x-transition:enter-start="opacity-0 scale-95 translate-y-1"
-                            x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                            x-transition:leave="transition ease-in duration-100"
-                            x-transition:leave-start="opacity-100 scale-100 translate-y-0"
-                            x-transition:leave-end="opacity-0 scale-95 translate-y-1"
-                            class="absolute z-40 mt-3 w-full overflow-hidden rounded-2xl border border-[#F4D3B0]/80 bg-white shadow-[0_25px_70px_-35px_rgba(31,68,76,0.55)]">
-
-                            <div class="p-2">
-                                <button type="button" @click="selectedBridgeStatus = ''; bridgeOpen = false"
-                                    class="group flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-bold transition"
-                                    :class="selectedBridgeStatus === ''
-                                        ?
-                                        'bg-[#F4B044] text-[#2B1A10]' :
-                                        'text-[#2B1A10] hover:bg-[#F4B044]/15'">
-
-                                    <div>
-                                        <p>Semua Bridge</p>
-                                    </div>
-
-                                    <svg x-show="selectedBridgeStatus === ''" x-cloak class="h-5 w-5" fill="none"
-                                        stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                </button>
-
-                                @foreach ($bridgeStatuses as $value => $label)
-                                    <button type="button"
-                                        @click="selectedBridgeStatus = '{{ $value }}'; bridgeOpen = false"
-                                        class="group flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-bold transition"
-                                        :class="selectedBridgeStatus === '{{ $value }}'
-                                            ?
-                                            'bg-[#F4B044] text-[#2B1A10]' :
-                                            'text-[#2B1A10] hover:bg-[#F4B044]/15'">
-
-                                        <div>
-                                            <p>{{ $label }}</p>
-                                        </div>
-
-                                        <svg x-show="selectedBridgeStatus === '{{ $value }}'" x-cloak
-                                            class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.8"
-                                            viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                         </svg>
                                     </button>
@@ -267,21 +160,11 @@
                 <div class="flex shrink-0 gap-3">
                     <button type="submit"
                         class="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-2xl bg-[#1F444C] px-5 py-0 text-sm font-black text-white shadow-lg shadow-[#1F444C]/20 transition hover:-translate-y-0.5 hover:shadow-xl">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.3"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M21 21l-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
                         Cari
                     </button>
 
                     <a href="{{ route('admin.pos-terminals.index') }}"
                         class="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-2xl border border-[#F4D3B0] bg-white px-5 py-0 text-sm font-black text-[#6B3E12] transition hover:bg-[#F7F6F4]">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.3"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0013.803-3.7M7.977 14.652H2.985m18.03-5.304-3.181-3.183a8.25 8.25 0 00-13.803 3.7" />
-                        </svg>
                         Reset
                     </a>
                 </div>
@@ -299,15 +182,15 @@
                                 class="w-16 px-5 py-4 text-left text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
                                 No
                             </th>
+
                             <th class="px-5 py-4 text-left text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
                                 Terminal
                             </th>
-                            <th class="px-5 py-4 text-center text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
-                                Bridge
-                            </th>
+
                             <th class="px-5 py-4 text-center text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
                                 Status
                             </th>
+
                             <th class="px-5 py-4 text-right text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
                                 Aksi
                             </th>
@@ -321,10 +204,6 @@
                                     $terminal->status === 'aktif'
                                         ? 'bg-[#1F444C]/10 text-[#1F444C]'
                                         : 'bg-[#A92A35]/10 text-[#A92A35]';
-
-                                $bridgeClass = $terminal->is_bridge_online
-                                    ? 'bg-[#1F444C]/10 text-[#1F444C]'
-                                    : 'bg-[#A92A35]/10 text-[#A92A35]';
                             @endphp
 
                             <tr class="transition hover:bg-[#F7F6F4]/80">
@@ -338,17 +217,6 @@
                                     </p>
                                     <p class="mt-1 text-xs font-bold text-[#6B3E12]">
                                         {{ $terminal->kode_terminal }}
-                                    </p>
-                                </td>
-
-                                <td class="px-5 py-4 text-center">
-                                    <span
-                                        class="inline-flex rounded-full px-3 py-1 text-xs font-black {{ $bridgeClass }}">
-                                        {{ $terminal->bridge_status_label }}
-                                    </span>
-
-                                    <p class="mt-1 text-xs font-semibold text-[#6B3E12]/75">
-                                        {{ $terminal->bridge_status_description }}
                                     </p>
                                 </td>
 
@@ -381,7 +249,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-5 py-14 text-center">
+                                <td colspan="4" class="px-5 py-14 text-center">
                                     <div class="mx-auto flex max-w-sm flex-col items-center">
                                         <div
                                             class="flex h-16 w-16 items-center justify-center rounded-3xl bg-[#F4B044]/20 text-[#6B3E12]">

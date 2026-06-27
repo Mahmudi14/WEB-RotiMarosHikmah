@@ -76,19 +76,6 @@ class PromoController extends Controller
             ->with('success', 'Promo berhasil diperbarui.');
     }
 
-    public function updateStatus(Promo $promo): RedirectResponse
-    {
-        $promo = $this->promoService->toggleStatus($promo);
-
-        $message = $promo->status === 'aktif'
-            ? 'Promo berhasil diaktifkan.'
-            : 'Promo berhasil dinonaktifkan.';
-
-        return redirect()
-            ->back()
-            ->with('success', $message);
-    }
-
     public function destroy(Promo $promo): RedirectResponse
     {
         $this->promoService->deletePromo($promo);

@@ -50,10 +50,6 @@ class UpdateProductRequest extends FormRequest
                 'mimes:jpg,jpeg,png,webp',
                 'max:2048',
             ],
-            'status' => [
-                'required',
-                Rule::in(['aktif', 'nonaktif']),
-            ],
             'min_stock' => ['nullable', 'integer', 'min:0'],
         ];
     }
@@ -84,9 +80,6 @@ class UpdateProductRequest extends FormRequest
             'gambar.image' => 'File harus berupa gambar.',
             'gambar.mimes' => 'Gambar harus berformat jpg, jpeg, png, atau webp.',
             'gambar.max' => 'Ukuran gambar maksimal 2MB.',
-
-            'status.required' => 'Status produk wajib dipilih.',
-            'status.in' => 'Status produk tidak valid.',
         ];
     }
 }

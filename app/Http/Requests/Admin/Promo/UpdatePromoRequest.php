@@ -43,11 +43,8 @@ class UpdatePromoRequest extends FormRequest
 
             'product_ids' => ['nullable', 'array'],
             'product_ids.*' => ['integer', 'exists:products,id'],
-
-            'tanggal_mulai' => ['nullable', 'date'],
-            'tanggal_selesai' => ['nullable', 'date', 'after_or_equal:tanggal_mulai'],
-
-            'status' => ['required', 'in:aktif,nonaktif'],
+            'tanggal_mulai' => ['required', 'date'],
+            'tanggal_selesai' => ['required', 'date', 'after_or_equal:tanggal_mulai'],
 
             'deskripsi' => ['nullable', 'string'],
         ];
@@ -81,11 +78,11 @@ class UpdatePromoRequest extends FormRequest
             'cakupan_promo.required' => 'Cakupan promo wajib dipilih.',
             'cakupan_promo.in' => 'Cakupan promo tidak valid.',
             'product_ids.*.exists' => 'Produk yang dipilih tidak valid.',
+            'tanggal_mulai.required' => 'Tanggal mulai promo wajib diisi.',
+            'tanggal_selesai.required' => 'Tanggal selesai promo wajib diisi.',
             'tanggal_mulai.date' => 'Tanggal mulai tidak valid.',
             'tanggal_selesai.date' => 'Tanggal selesai tidak valid.',
             'tanggal_selesai.after_or_equal' => 'Tanggal selesai tidak boleh lebih awal dari tanggal mulai.',
-            'status.required' => 'Status promo wajib dipilih.',
-            'status.in' => 'Status promo tidak valid.',
         ];
     }
 }
