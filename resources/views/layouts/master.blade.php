@@ -37,6 +37,22 @@
             height: 100dvh;
         }
 
+        .layout-desktop-sidebar {
+            display: none;
+        }
+
+        @media (min-width: 1280px) and (hover: hover) and (pointer: fine) {
+            .layout-desktop-sidebar {
+                display: block;
+            }
+
+            .layout-drawer-sidebar,
+            .layout-drawer-overlay,
+            .layout-sidebar-toggle {
+                display: none !important;
+            }
+        }
+
         .app-scrollbar::-webkit-scrollbar {
             width: 8px;
             height: 8px;
@@ -218,7 +234,7 @@
 
         {{-- Mobile / Tablet Overlay --}}
         <div x-show="sidebarOpen" x-cloak x-transition.opacity
-            class="fixed inset-0 z-40 bg-[#1F444C]/55 backdrop-blur-sm min-[1180px]:hidden"
+            class="layout-drawer-overlay fixed inset-0 z-40 bg-[#1F444C]/55 backdrop-blur-sm"
             @click="sidebarOpen = false">
         </div>
 
@@ -226,7 +242,8 @@
         <aside x-show="sidebarOpen" x-cloak x-transition:enter="transition ease-out duration-200"
             x-transition:enter-start="-translate-x-full opacity-0" x-transition:enter-end="translate-x-0 opacity-100"
             x-transition:leave="transition ease-in duration-150" x-transition:leave-start="translate-x-0 opacity-100"
-            x-transition:leave-end="-translate-x-full opacity-0" class="fixed inset-y-0 left-0 z-50 min-[1180px]:hidden"
+            x-transition:leave-end="-translate-x-full opacity-0"
+            class="layout-drawer-sidebar fixed inset-y-0 left-0 z-50"
             @click="if ($event.target.closest('a')) sidebarOpen = false">
             @if ($sidebarView)
                 @include($sidebarView)
@@ -240,7 +257,7 @@
 
         <div class="flex app-viewport overflow-hidden">
             {{-- Desktop Sidebar --}}
-            <div class="hidden h-full shrink-0 min-[1180px]:block">
+            <div class="layout-desktop-sidebar h-full shrink-0">
                 @if ($sidebarView)
                     @include($sidebarView)
                 @else
@@ -258,7 +275,7 @@
                     <div class="flex h-16 items-center justify-between gap-4 px-4 sm:h-[4.5rem] sm:px-6 lg:px-8">
                         <div class="flex min-w-0 items-center gap-4">
                             <button type="button"
-                                class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#F4D3B0] bg-[#F7F6F4] text-[#1F444C] shadow-sm transition hover:bg-[#F4D3B0]/60 focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20 min-[1180px]:hidden"
+                                class="layout-sidebar-toggle inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#F4D3B0] bg-[#F7F6F4] text-[#1F444C] shadow-sm transition hover:bg-[#F4D3B0]/60 focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20"
                                 @click="sidebarOpen = true">
                                 <span class="sr-only">Buka sidebar</span>
                                 <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2"
