@@ -110,6 +110,7 @@ Route::middleware(['auth', 'active.user'])->group(function () {
                         Route::get('{cashier_shift}', 'show')->name('show');
                         Route::get('{cashier_shift}/close', 'closeForm')->name('close-form');
                         Route::patch('{cashier_shift}/close', 'closeShift')->name('close');
+                        Route::post('{cashierShift}/reprint-report', 'reprintReport')->name('reprint-report');
                     });
 
                 Route::resource('expenses', CashierExpenseController::class)

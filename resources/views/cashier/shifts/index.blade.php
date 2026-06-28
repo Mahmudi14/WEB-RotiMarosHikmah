@@ -313,5 +313,49 @@
                 </div>
             </div>
         @endif
+        @if ($recentClosedShift)
+            @php
+                $latestPrintJob = $recentClosedShift->printJobs->first();
+            @endphp
+
+            <div
+                class="overflow-hidden rounded-3xl border border-[#F4B044]/50 bg-[#F4B044]/10 p-5 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
+                <div class="flex flex-col gap-4 min-[900px]:flex-row min-[900px]:items-center min-[900px]:justify-between">
+                    <div>
+                        <p class="text-xs font-black uppercase tracking-[0.22em] text-[#6B3E12]">
+                            Struk Tutup Shift
+                        </p>
+
+                        <h2 class="mt-1 text-lg font-black text-[#2B1A10]">
+                            Shift berhasil ditutup
+                        </h2>
+
+                        <p class="mt-2 text-sm font-semibold text-[#6B3E12]">
+                            Laporan shift untuk terminal
+                            <span class="font-black text-[#2B1A10]">
+                                {{ $recentClosedShift->terminal?->kode_terminal }}
+                            </span>
+                            sudah masuk antrean print.
+
+                            @if ($latestPrintJob)
+                                Status:
+                                <span class="font-black text-[#1F444C]">
+                                    {{ $latestPrintJob->status_label }}
+                                </span>
+                            @endif
+                        </p>
+                    </div>
+
+                    <form method="POST" action="{{ route('cashier.shifts.reprint-report', $recentClosedShift) }}">
+                        @csrf
+
+                        <button type="submit"
+                            class="inline-flex h-11 items-center justify-center rounded-2xl bg-[#1F444C] px-5 text-sm font-black text-white shadow-lg shadow-[#1F444C]/20 transition hover:-translate-y-0.5 hover:shadow-xl">
+                            Cetak Ulang Struk Shift
+                        </button>
+                    </form>
+                </div>
+            </div>
+        @endif
     </div>
 @endsection

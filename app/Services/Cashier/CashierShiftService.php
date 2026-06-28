@@ -187,11 +187,11 @@ class CashierShiftService
         abort_if($shift->cashier_id !== $cashier->id, 404);
     }
 
-    private function createShiftReportPrintJob(CashierShift $shift): void
+    private function createShiftReportPrintJob(CashierShift $shift): PrintJob
     {
         $shift->loadMissing(['cashier', 'terminal']);
 
-        PrintJob::create([
+        return PrintJob::create([
             'pos_terminal_id' => $shift->pos_terminal_id,
             'sale_id' => null,
             'cashier_shift_id' => $shift->id,
@@ -200,6 +200,54 @@ class CashierShiftService
             'status' => 'pending',
             'attempts' => 0,
         ]);
+    }
+
+    public function reprintShiftReport(User $cashier, CashierShift $shift): PrintJob
+    {
+        return DB::transaction(function () use ($cashier, $shift) {
+            $shift = CashierShift::query()
+                ->whereKey($shift->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $this->ensureOwnShift($cashier, $shift);
+
+            if ($shift->status !== 'ditutup') {
+                throw new Exception('Struk shift hanya dapat dicetak ulang setelah shift ditutup.');
+            }
+
+            $existingPrintJob = PrintJob::query()
+                ->where('cashier_shift_id', $shift->id)
+                ->where('type', 'shift_report')
+                ->whereIn('status', ['pending', 'printing'])
+                ->latest('created_at')
+                ->first();
+
+            if ($existingPrintJob) {
+                return $existingPrintJob;
+            }
+
+            return $this->createShiftReportPrintJob($shift);
+        });
+    }
+
+    public function getRecentlyClosedShiftForPrint(User $cashier, mixed $shiftId): ?CashierShift
+    {
+        if (! $shiftId) {
+            return null;
+        }
+
+        return CashierShift::query()
+            ->with([
+                'terminal',
+                'printJobs' => fn($query) => $query
+                    ->where('type', 'shift_report')
+                    ->latest('created_at'),
+            ])
+            ->whereKey($shiftId)
+            ->where('cashier_id', $cashier->id)
+            ->where('status', 'ditutup')
+            ->first();
     }
 
     private function shiftReportPayload(CashierShift $shift): array
