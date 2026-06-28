@@ -8,6 +8,7 @@ use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class CashierExpenseService
 {
@@ -57,45 +58,57 @@ class CashierExpenseService
 
     public function createExpense(User $cashier, array $data): CashierExpense
     {
-        $activeShift = $this->getActiveShift($cashier);
+        return DB::transaction(function () use ($cashier, $data) {
+            $activeShift = CashierShift::query()
+                ->where('cashier_id', $cashier->id)
+                ->where('status', 'aktif')
+                ->latest('opened_at')
+                ->lockForUpdate()
+                ->first();
 
-        if (! $activeShift) {
-            throw new Exception('Kamu belum membuka shift. Buka shift terlebih dahulu sebelum mencatat pengeluaran.');
-        }
+            if (! $activeShift) {
+                throw new Exception('Kamu belum membuka shift. Buka shift terlebih dahulu sebelum mencatat pengeluaran.');
+            }
 
-        return CashierExpense::create([
-            'cashier_id' => $cashier->id,
-            'cashier_shift_id' => $activeShift->id,
-            'pos_terminal_id' => $activeShift->pos_terminal_id,
+            return CashierExpense::create([
+                'cashier_id' => $cashier->id,
+                'cashier_shift_id' => $activeShift->id,
+                'pos_terminal_id' => $activeShift->pos_terminal_id,
 
-            'tanggal_pengeluaran' => now()->toDateString(),
-            'kategori_pengeluaran' => $data['nama_pengeluaran'],
-            'nominal' => $data['harga'],
-            'keterangan' => $data['deskripsi'] ?? null,
-        ]);
+                'tanggal_pengeluaran' => now()->toDateString(),
+                'kategori_pengeluaran' => $data['nama_pengeluaran'],
+                'nominal' => $data['harga'],
+                'keterangan' => $data['deskripsi'] ?? null,
+            ]);
+        });
     }
 
     public function deleteExpense(User $cashier, CashierExpense $expense): void
     {
-        $this->ensureOwnExpense($cashier, $expense);
+        DB::transaction(function () use ($cashier, $expense) {
+            $expense = CashierExpense::query()
+                ->whereKey($expense->id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        $activeShift = $this->getActiveShift($cashier);
+            $this->ensureOwnExpense($cashier, $expense);
 
-        if (! $activeShift) {
-            throw new Exception('Tidak ada shift aktif.');
-        }
+            $shift = CashierShift::query()
+                ->whereKey($expense->cashier_shift_id)
+                ->where('cashier_id', $cashier->id)
+                ->lockForUpdate()
+                ->first();
 
-        if ((int) $expense->cashier_shift_id !== (int) $activeShift->id) {
-            throw new Exception('Pengeluaran ini bukan bagian dari shift aktif.');
-        }
+            if (! $shift) {
+                throw new Exception('Shift pengeluaran tidak ditemukan.');
+            }
 
-        $expense->loadMissing('shift');
+            if ($shift->status !== 'aktif') {
+                throw new Exception('Pengeluaran tidak dapat dihapus karena shift sudah ditutup.');
+            }
 
-        if ($expense->shift?->status !== 'aktif') {
-            throw new Exception('Pengeluaran tidak dapat dihapus karena shift sudah ditutup.');
-        }
-
-        $expense->delete();
+            $expense->delete();
+        });
     }
 
     public function ensureOwnExpense(User $cashier, CashierExpense $expense): void

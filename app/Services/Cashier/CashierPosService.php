@@ -14,8 +14,9 @@ use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use App\Models\StockMovement;
+use App\Models\TransactionCounter;
+use Illuminate\Database\QueryException;
 
 class CashierPosService
 {
@@ -419,22 +420,67 @@ class CashierPosService
 
     private function generateTransactionCode(): string
     {
-        $prefix = 'RMHKM-' . now()->format('ymd') . '-';
+        $date = now();
+        $counterDate = $date->toDateString();
+        $prefix = 'RMHKM-' . $date->format('ymd') . '-';
+
+        $counter = TransactionCounter::query()
+            ->where('counter_date', $counterDate)
+            ->lockForUpdate()
+            ->first();
+
+        if (! $counter) {
+            $lastNumber = $this->getLastTransactionNumberForDate($date);
+
+            try {
+                TransactionCounter::create([
+                    'counter_date' => $counterDate,
+                    'last_number' => $lastNumber,
+                ]);
+            } catch (QueryException $exception) {
+                if (! $this->isDuplicateCounterException($exception)) {
+                    throw $exception;
+                }
+            }
+
+            $counter = TransactionCounter::query()
+                ->where('counter_date', $counterDate)
+                ->lockForUpdate()
+                ->firstOrFail();
+        }
+
+        $nextNumber = ((int) $counter->last_number) + 1;
+
+        $counter->update([
+            'last_number' => $nextNumber,
+        ]);
+
+        return $prefix . str_pad((string) $nextNumber, 3, '0', STR_PAD_LEFT);
+    }
+
+    private function getLastTransactionNumberForDate($date): int
+    {
+        $prefix = 'RMHKM-' . $date->format('ymd') . '-';
 
         $lastCode = Sale::query()
-            ->whereDate('created_at', today())
+            ->whereDate('created_at', $date->toDateString())
             ->where('kode_transaksi', 'like', $prefix . '%')
-            ->lockForUpdate()
             ->orderByDesc('id')
             ->value('kode_transaksi');
 
-        $nextNumber = 1;
-
         if ($lastCode && preg_match('/^' . preg_quote($prefix, '/') . '(\d+)$/', $lastCode, $matches)) {
-            $nextNumber = ((int) $matches[1]) + 1;
+            return (int) $matches[1];
         }
 
-        return $prefix . str_pad((string) $nextNumber, 3, '0', STR_PAD_LEFT);
+        return 0;
+    }
+
+    private function isDuplicateCounterException(QueryException $exception): bool
+    {
+        $sqlState = $exception->errorInfo[0] ?? null;
+        $driverCode = $exception->errorInfo[1] ?? null;
+
+        return $sqlState === '23000' && in_array((int) $driverCode, [1062, 19], true);
     }
 
     public function getActivePromos(): Collection

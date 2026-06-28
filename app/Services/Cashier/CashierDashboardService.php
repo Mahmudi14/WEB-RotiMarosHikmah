@@ -83,9 +83,16 @@ class CashierDashboardService
 
     public function getRecentSales(User $cashier, int $limit = 6): Collection
     {
+        $activeShift = $this->getActiveShift($cashier);
+
+        if (! $activeShift) {
+            return collect();
+        }
+
         return Sale::query()
             ->with(['terminal'])
             ->where('cashier_id', $cashier->id)
+            ->where('cashier_shift_id', $activeShift->id)
             ->latest('created_at')
             ->limit($limit)
             ->get();

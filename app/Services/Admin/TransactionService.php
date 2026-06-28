@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use App\Models\CashierShift;
 use App\Models\Product;
 use App\Models\StockMovement;
 use Exception;
@@ -136,6 +137,23 @@ class TransactionService
 
             if ($sale->status !== 'selesai') {
                 throw new Exception('Hanya transaksi selesai yang dapat dibatalkan.');
+            }
+
+            if (! $sale->cashier_shift_id) {
+                throw new Exception('Transaksi tidak memiliki data shift, sehingga tidak dapat dibatalkan.');
+            }
+
+            $shift = CashierShift::query()
+                ->whereKey($sale->cashier_shift_id)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $shift) {
+                throw new Exception('Shift transaksi tidak ditemukan.');
+            }
+
+            if ($shift->status !== 'aktif') {
+                throw new Exception('Transaksi dari shift yang sudah ditutup tidak dapat dibatalkan.');
             }
 
             foreach ($sale->items as $item) {
