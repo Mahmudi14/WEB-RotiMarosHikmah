@@ -27,7 +27,7 @@ class CashierShiftController extends Controller
             'activeShifts' => $this->cashierShiftService->getActiveShifts(),
             'recentClosedShift' => $this->cashierShiftService->getRecentlyClosedShiftForPrint(
                 $cashier,
-                $request->session()->get('closed_shift_id')
+                $request->session()->get('cashier_last_closed_shift_id')
             ),
         ]);
     }
@@ -113,10 +113,11 @@ class CashierShiftController extends Controller
                 $request->validated()
             );
 
+            $request->session()->put('cashier_last_closed_shift_id', $shift->id);
+
             return redirect()
                 ->route('cashier.shifts.index')
-                ->with('success', 'Shift berhasil ditutup. Laporan shift masuk ke antrean print.')
-                ->with('closed_shift_id', $shift->id);
+                ->with('success', 'Shift berhasil ditutup. Laporan shift masuk ke antrean print.');
         } catch (Exception $exception) {
             return redirect()
                 ->back()
