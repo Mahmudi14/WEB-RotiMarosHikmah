@@ -37,11 +37,6 @@
                                 class="inline-flex h-12 items-center justify-center rounded-2xl border border-white/15 bg-white/10 px-5 text-sm font-black text-white transition hover:bg-white/15">
                                 Tutup Shift
                             </a>
-                        @else
-                            <a href="{{ route('cashier.shifts.create') }}"
-                                class="inline-flex h-12 items-center justify-center rounded-2xl bg-[#F4B044] px-5 text-sm font-black text-[#2B1A10] shadow-lg shadow-[#F4B044]/20 transition hover:-translate-y-0.5 hover:shadow-xl">
-                                Buka Shift
-                            </a>
                         @endif
                     </div>
                 </div>

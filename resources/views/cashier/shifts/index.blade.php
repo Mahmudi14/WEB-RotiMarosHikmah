@@ -243,10 +243,6 @@
                             </div>
 
                             <div class="flex flex-wrap gap-2">
-                                <a href="#"
-                                    class="inline-flex h-10 items-center justify-center rounded-xl bg-[#F4B044] px-4 text-xs font-black text-[#2B1A10] shadow-sm transition active:scale-95">
-                                    POS
-                                </a>
 
                                 <a href="{{ route('cashier.shifts.show', $activeShift) }}"
                                     class="inline-flex h-10 items-center justify-center rounded-xl bg-[#1F444C] px-4 text-xs font-black text-white shadow-sm transition active:scale-95">
@@ -313,7 +309,7 @@
                 </div>
             </div>
         @endif
-        @if ($recentClosedShift)
+        @if (isset($recentClosedShift) && $recentClosedShift)
             @php
                 $latestPrintJob = $recentClosedShift->printJobs->first();
             @endphp

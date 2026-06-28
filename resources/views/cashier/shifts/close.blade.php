@@ -10,7 +10,7 @@
         $totalExpenses = (float) $totals['total_expenses'];
         $netIncome = (float) ($totals['net_income'] ?? $totalIncome - $totalExpenses);
 
-        // Untuk selisih laci, tetap pakai uang kas di sistem
+        // Untuk selisih laci, tetap pakai uang kas di siste
         $cashInSystem = (float) ($totals['cash_in_system'] ?? $totals['expected_cash']);
     @endphp
 
@@ -229,11 +229,6 @@
                             Uang Fisik di Laci
                             <span class="text-[#A92A35]">*</span>
                         </label>
-
-                        <p class="mb-2 text-xs font-semibold text-[#6B3E12]">
-                            Isi sesuai uang tunai fisik yang benar-benar ada di laci kasir.
-                        </p>
-
                         <div class="relative">
                             <span
                                 class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-sm font-black text-[#6B3E12]">
