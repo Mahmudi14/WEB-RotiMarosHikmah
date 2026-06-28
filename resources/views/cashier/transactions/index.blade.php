@@ -4,35 +4,6 @@
 
 @section('content')
     <div class="space-y-6">
-        {{-- Header --}}
-        <div class="overflow-hidden rounded-3xl bg-[#1F444C] p-6 text-white shadow-lg shadow-[#1F444C]/10">
-            <div class="relative">
-                <div class="absolute -right-10 -top-12 h-32 w-32 rounded-full bg-[#F4B044]/20"></div>
-                <div class="absolute -bottom-16 -left-12 h-36 w-36 rounded-full bg-white/10"></div>
-
-                <div
-                    class="relative flex flex-col gap-5 min-[1024px]:flex-row min-[1024px]:items-center min-[1024px]:justify-between">
-                    <div class="min-w-0">
-                        <p class="text-xs font-bold uppercase tracking-[0.28em] text-[#F4D3B0]">
-                            Kasir / Transaksi
-                        </p>
-
-                        <h1 class="mt-2 text-2xl font-black tracking-tight">
-                            Riwayat Transaksi Saya
-                        </h1>
-
-                        <p class="mt-2 max-w-2xl text-sm font-medium leading-relaxed text-[#F7F6F4]/80">
-                            Lihat daftar transaksi yang dibuat oleh akun kasir ini.
-                        </p>
-                    </div>
-
-                    <a href="{{ route('cashier.pos.index') }}"
-                        class="inline-flex h-12 items-center justify-center rounded-2xl bg-[#F4B044] px-5 text-sm font-black text-[#2B1A10] shadow-lg shadow-[#F4B044]/20 transition hover:-translate-y-0.5 hover:shadow-xl">
-                        Buka POS
-                    </a>
-                </div>
-            </div>
-        </div>
 
         {{-- Summary --}}
         <div class="grid gap-4 md:grid-cols-2 min-[1280px]:grid-cols-4">

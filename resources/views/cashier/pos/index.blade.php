@@ -359,112 +359,80 @@
     }
     
     initDraft();">
-        {{-- Header --}}
-        <div class="overflow-hidden rounded-3xl bg-[#1F444C] p-6 text-white shadow-lg shadow-[#1F444C]/10">
-            <div class="relative">
-                <div class="absolute -right-10 -top-12 h-32 w-32 rounded-full bg-[#F4B044]/20"></div>
-                <div class="absolute -bottom-16 -left-12 h-36 w-36 rounded-full bg-white/10"></div>
-
-                <div
-                    class="relative flex flex-col gap-5 min-[1024px]:flex-row min-[1024px]:items-center min-[1024px]:justify-between">
-                    <div class="min-w-0">
-                        <p class="text-xs font-bold uppercase tracking-[0.28em] text-[#F4D3B0]">
-                            Kasir / POS
-                        </p>
-
-                        <h1 class="mt-2 text-2xl font-black tracking-tight">
-                            Point of Sale
-                        </h1>
-
-                        <p class="mt-2 max-w-2xl text-sm font-medium leading-relaxed text-[#F7F6F4]/80">
-                            {{ $activeShift->terminal?->kode_terminal }} - {{ $activeShift->terminal?->nama_terminal }}
-                        </p>
-                    </div>
-
-                    <div class="flex flex-col gap-3 sm:flex-row min-[1024px]:shrink-0">
-                        <a href="{{ route('cashier.expenses.index') }}"
-                            class="inline-flex h-12 items-center justify-center rounded-2xl bg-[#F4B044] px-5 text-sm font-black text-[#2B1A10] shadow-lg shadow-[#F4B044]/20 transition hover:-translate-y-0.5 hover:shadow-xl">
-                            Pengeluaran
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         {{-- POS Layout --}}
-        <div class="grid gap-6 min-[1024px]:grid-cols-[minmax(0,1fr)_360px] min-[1280px]:grid-cols-[minmax(0,1fr)_420px]">
-            {{-- Product Area --}}
-            <div class="space-y-6">
-                {{-- Filter --}}
-                <div
-                    class="rounded-3xl border border-[#F4D3B0]/70 bg-white p-5 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
-                    <div class="grid gap-3 min-[1024px]:grid-cols-[minmax(0,1fr)_220px_auto]">
-                        <div>
-                            <label class="sr-only" for="search">Cari produk</label>
 
-                            <input id="search" type="text" x-model="search"
-                                placeholder="Cari nama produk atau kode..."
-                                class="block h-12 w-full rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-4 text-sm font-medium text-[#2B1A10] shadow-sm transition placeholder:text-[#6B3E12]/45 focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
-                        </div>
+        {{-- Product Area --}}
+        <div class="space-y-6">
+            {{-- Filter --}}
+            <div class="rounded-3xl border border-[#F4D3B0]/70 bg-white p-5 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
+                <div class="grid gap-3 min-[1024px]:grid-cols-[minmax(0,1fr)_220px_auto]">
+                    <div>
+                        <label class="sr-only" for="search">Cari produk</label>
 
-                        <div class="relative">
-                            <button type="button" @click="categoryOpen = !categoryOpen"
-                                class="flex h-12 w-full items-center justify-between rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-4 text-left text-sm font-black text-[#2B1A10] shadow-sm transition hover:bg-white focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
-                                <span class="truncate" x-text="selectedCategoryLabel"></span>
+                        <input id="search" type="text" x-model="search" placeholder="Cari nama produk atau kode..."
+                            class="block h-12 w-full rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-4 text-sm font-medium text-[#2B1A10] shadow-sm transition placeholder:text-[#6B3E12]/45 focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
+                    </div>
 
-                                <svg class="h-5 w-5 shrink-0 text-[#6B3E12] transition"
-                                    :class="categoryOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor"
-                                    stroke-width="2.3" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="m19 9-7 7-7-7" />
-                                </svg>
+                    <div class="relative">
+                        <button type="button" @click="categoryOpen = !categoryOpen"
+                            class="flex h-12 w-full items-center justify-between rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-4 text-left text-sm font-black text-[#2B1A10] shadow-sm transition hover:bg-white focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
+                            <span class="truncate" x-text="selectedCategoryLabel"></span>
+
+                            <svg class="h-5 w-5 shrink-0 text-[#6B3E12] transition"
+                                :class="categoryOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor"
+                                stroke-width="2.3" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m19 9-7 7-7-7" />
+                            </svg>
+                        </button>
+
+                        <div x-show="categoryOpen" x-cloak @click.outside="categoryOpen = false" x-transition
+                            class="absolute left-0 right-0 z-40 mt-2 overflow-hidden rounded-2xl border border-[#F4D3B0] bg-white shadow-xl shadow-[#1F444C]/10">
+                            <button type="button" @click="chooseCategory('')"
+                                class="block w-full px-4 py-3 text-left text-sm font-black text-[#2B1A10] transition hover:bg-[#F7F6F4]">
+                                Semua kategori
                             </button>
 
-                            <div x-show="categoryOpen" x-cloak @click.outside="categoryOpen = false" x-transition
-                                class="absolute left-0 right-0 z-40 mt-2 overflow-hidden rounded-2xl border border-[#F4D3B0] bg-white shadow-xl shadow-[#1F444C]/10">
-                                <button type="button" @click="chooseCategory('')"
+                            <template x-for="category in categories" :key="category.id">
+                                <button type="button" @click="chooseCategory(category.id)"
                                     class="block w-full px-4 py-3 text-left text-sm font-black text-[#2B1A10] transition hover:bg-[#F7F6F4]">
-                                    Semua kategori
+                                    <span x-text="category.nama_kategori"></span>
                                 </button>
-
-                                <template x-for="category in categories" :key="category.id">
-                                    <button type="button" @click="chooseCategory(category.id)"
-                                        class="block w-full px-4 py-3 text-left text-sm font-black text-[#2B1A10] transition hover:bg-[#F7F6F4]">
-                                        <span x-text="category.nama_kategori"></span>
-                                    </button>
-                                </template>
-                            </div>
+                            </template>
                         </div>
-
-                        <button type="button" @click="resetFilter()"
-                            class="inline-flex h-12 items-center justify-center rounded-2xl border border-[#F4B044] bg-[#F4B044] px-5 text-sm font-black text-[#2B1A10] shadow-lg shadow-[#F4B044]/30 transition duration-150 hover:-translate-y-0.5 hover:bg-[#f7bd5f] hover:shadow-xl active:translate-y-0 active:scale-95 active:bg-[#d99a32] active:shadow-inner focus:outline-none focus:ring-4 focus:ring-[#F4B044]/35">
-                            Reset
-                        </button>
                     </div>
-                </div>
 
+                    <button type="button" @click="resetFilter()"
+                        class="inline-flex h-12 items-center justify-center rounded-2xl border border-[#F4B044] bg-[#F4B044] px-5 text-sm font-black text-[#2B1A10] shadow-lg shadow-[#F4B044]/30 transition duration-150 hover:-translate-y-0.5 hover:bg-[#f7bd5f] hover:shadow-xl active:translate-y-0 active:scale-95 active:bg-[#d99a32] active:shadow-inner focus:outline-none focus:ring-4 focus:ring-[#F4B044]/35">
+                        Reset
+                    </button>
+                </div>
+            </div>
+
+            <div
+                class="grid gap-6 min-[1024px]:grid-cols-[minmax(0,1fr)_360px] min-[1280px]:grid-cols-[minmax(0,1fr)_420px]">
                 {{-- Product List --}}
                 <div
                     class="overflow-hidden rounded-3xl border border-[#F4D3B0]/70 bg-white shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
-                    <div class="border-b border-[#F4D3B0]/70 bg-[#F7F6F4] px-5 py-4">
-                        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div class="border-b border-[#F4D3B0]/70 bg-[#F7F6F4] px-5 py-3">
+                        <div class="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
                             <div>
-                                <p class="text-xs font-black uppercase tracking-[0.22em] text-[#6B3E12]">
+                                <p class="text-[11px] font-black uppercase leading-none tracking-[0.22em] text-[#6B3E12]">
                                     Produk
                                 </p>
 
-                                <h2 class="mt-1 text-lg font-black text-[#2B1A10]">
+                                <h2 class="mt-0.5 text-base font-black leading-tight text-[#2B1A10]">
                                     Pilih Produk
                                 </h2>
                             </div>
 
                             <span
-                                class="inline-flex w-fit rounded-2xl bg-[#F4B044]/20 px-4 py-2 text-sm font-black text-[#6B3E12]">
+                                class="inline-flex w-fit rounded-xl bg-[#F4B044]/20 px-3 py-1.5 text-xs font-black leading-none text-[#6B3E12]">
                                 <span x-text="filteredProducts.length"></span>&nbsp;produk
                             </span>
                         </div>
                     </div>
 
-                    <div class="p-5">
+                    <div class="px-5">
                         <template x-if="filteredProducts.length > 0">
                             <div class="space-y-7">
                                 <template x-for="group in groupedProducts" :key="group.category">
@@ -548,127 +516,127 @@
                         </template>
                     </div>
                 </div>
-            </div>
+                {{-- Cart Area --}}
+                <div class="space-y-6 min-[1024px]:sticky min-[1024px]:top-6">
+                    <div
+                        class="flex max-h-[calc(100dvh-6rem)] min-h-[620px] flex-col overflow-hidden rounded-3xl border border-[#F4D3B0]/70 bg-white shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
 
-            {{-- Cart Area --}}
-            <div class="space-y-6 min-[1024px]:sticky min-[1024px]:top-6">
-                <div
-                    class="flex max-h-[calc(100dvh-6rem)] min-h-[520px] flex-col overflow-hidden rounded-3xl border border-[#F4D3B0]/70 bg-white shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
-
-                    {{-- Cart Header --}}
-                    <div class="shrink-0 border-b border-[#F4D3B0]/70 bg-[#F7F6F4] px-5 py-4">
-                        <div class="flex items-center justify-between gap-4">
-                            <div>
-                                <p class="text-xs font-black uppercase tracking-[0.22em] text-[#6B3E12]">
-                                    Keranjang
-                                </p>
-
-                                <h2 class="mt-1 text-lg font-black text-[#2B1A10]">
-                                    Pesanan
-                                </h2>
-                            </div>
-
-                            <span
-                                class="inline-flex rounded-2xl bg-[#1F444C]/10 px-4 py-2 text-sm font-black text-[#1F444C]">
-                                <span x-text="cartCount"></span>&nbsp;item
-                            </span>
-                        </div>
-                    </div>
-
-                    {{-- Cart Items Scroll Area --}}
-                    <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-                        <template x-if="cart.length > 0">
-                            <div class="divide-y divide-[#F4D3B0]/60">
-                                <template x-for="item in cart" :key="item.id">
-                                    <div class="px-4 py-3">
-                                        <div class="flex items-start justify-between gap-3">
-                                            <div class="min-w-0 flex-1">
-                                                <p class="truncate text-sm font-black leading-tight text-[#2B1A10]"
-                                                    x-text="item.nama_produk"></p>
-
-                                                <p class="mt-1 text-[11px] font-bold leading-none text-[#6B3E12]"
-                                                    x-text="rupiah(item.harga_jual)"></p>
-                                            </div>
-
-                                            <button type="button" @click="removeItem(item.id)"
-                                                class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-[#A92A35]/10 text-xs font-black text-[#A92A35] transition hover:bg-[#A92A35] hover:text-white">
-                                                ×
-                                            </button>
-                                        </div>
-
-                                        <div class="mt-3 flex items-center justify-between gap-3">
-                                            <div class="inline-flex items-center rounded-2xl bg-[#F7F6F4] p-1">
-                                                <button type="button" @click="decrement(item)"
-                                                    class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-white text-sm font-black text-[#6B3E12] shadow-sm transition hover:bg-[#F4D3B0]/40">
-                                                    -
-                                                </button>
-
-                                                <span
-                                                    class="inline-flex h-8 min-w-9 items-center justify-center px-2 text-sm font-black text-[#2B1A10]"
-                                                    x-text="item.qty"></span>
-
-                                                <button type="button" @click="increment(item)"
-                                                    class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-white text-sm font-black text-[#6B3E12] shadow-sm transition hover:bg-[#F4D3B0]/40">
-                                                    +
-                                                </button>
-                                            </div>
-
-                                            <p class="shrink-0 whitespace-nowrap text-sm font-black text-[#1F444C]"
-                                                x-text="rupiah(item.harga_jual * item.qty)"></p>
-                                        </div>
-                                    </div>
-                                </template>
-                            </div>
-                        </template>
-
-                        <template x-if="cart.length === 0">
-                            <div class="flex min-h-[260px] items-center justify-center px-5 py-12 text-center">
+                        {{-- Cart Header --}}
+                        <div class="shrink-0 border-b border-[#F4D3B0]/70 bg-[#F7F6F4] px-5 py-3">
+                            <div class="flex items-center justify-between gap-4">
                                 <div>
-                                    <h3 class="text-base font-black text-[#2B1A10]">
-                                        Keranjang Kosong
-                                    </h3>
-
-                                    <p class="mt-2 text-sm font-semibold text-[#6B3E12]">
-                                        Pilih produk untuk mulai transaksi.
-                                    </p>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
-
-                    {{-- Cart Footer --}}
-                    <div class="shrink-0 border-t border-[#F4D3B0]/70 bg-[#F7F6F4] p-5">
-                        <div class="rounded-3xl bg-[#1F444C] p-4 text-white">
-                            <div class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-                                <div class="min-w-0">
-                                    <p class="text-[11px] font-black uppercase tracking-[0.22em] text-[#F4D3B0]">
-                                        Total Bayar
+                                    <p
+                                        class="text-[11px] font-black uppercase leading-none tracking-[0.22em] text-[#6B3E12]">
+                                        Keranjang
                                     </p>
 
-                                    <p class="mt-1 text-sm font-semibold text-white/70">
-                                        <span x-text="cartCount"></span> item
-                                    </p>
+                                    <h2 class="mt-0.5 text-base font-black leading-tight text-[#2B1A10]">
+                                        Pesanan
+                                    </h2>
                                 </div>
 
-                                <p class="shrink-0 whitespace-nowrap text-right text-xl font-black leading-none text-[#F4B044] min-[1280px]:text-2xl"
-                                    x-text="rupiah(grandTotal)">
-                                </p>
+                                <span
+                                    class="inline-flex rounded-xl bg-[#1F444C]/10 px-3 py-1.5 text-xs font-black leading-none text-[#1F444C]">
+                                    <span x-text="cartCount"></span>&nbsp;item
+                                </span>
                             </div>
                         </div>
 
-                        <div class="mt-4 grid gap-3">
-                            <button type="button" @click="openPayment()" :disabled="cart.length === 0"
-                                class="inline-flex h-12 w-full items-center justify-center rounded-2xl px-6 text-sm font-black shadow-lg transition"
-                                :class="cart.length > 0 ?
-                                    'bg-[#F4B044] text-[#2B1A10] shadow-[#F4B044]/20 hover:-translate-y-0.5 hover:shadow-xl active:scale-95' :
-                                    'cursor-not-allowed bg-[#F4D3B0]/50 text-[#6B3E12]/50 shadow-none'">
-                                Bayar
-                            </button>
+                        {{-- Cart Items Scroll Area --}}
+                        <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+                            <template x-if="cart.length > 0">
+                                <div class="divide-y divide-[#F4D3B0]/60">
+                                    <template x-for="item in cart" :key="item.id">
+                                        <div class="px-4 py-3">
+                                            <div class="flex items-start justify-between gap-3">
+                                                <div class="min-w-0 flex-1">
+                                                    <p class="truncate text-sm font-black leading-tight text-[#2B1A10]"
+                                                        x-text="item.nama_produk"></p>
 
-                            <button type="button" x-show="cart.length > 0" x-cloak @click="clearCart()"
-                                class="inline-flex h-11 w-full items-center justify-center rounded-2xl border border-[#F4D3B0] bg-white px-5 text-sm font-black text-[#6B3E12] transition hover:bg-[#F7F6F4]">
-                                Kosongkan Keranjang
-                            </button>
+                                                    <p class="mt-1 text-[11px] font-bold leading-none text-[#6B3E12]"
+                                                        x-text="rupiah(item.harga_jual)"></p>
+                                                </div>
+
+                                                <button type="button" @click="removeItem(item.id)"
+                                                    class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-[#A92A35]/10 text-xs font-black text-[#A92A35] transition hover:bg-[#A92A35] hover:text-white">
+                                                    ×
+                                                </button>
+                                            </div>
+
+                                            <div class="mt-3 flex items-center justify-between gap-3">
+                                                <div class="inline-flex items-center rounded-2xl bg-[#F7F6F4] p-1">
+                                                    <button type="button" @click="decrement(item)"
+                                                        class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-white text-sm font-black text-[#6B3E12] shadow-sm transition hover:bg-[#F4D3B0]/40">
+                                                        -
+                                                    </button>
+
+                                                    <span
+                                                        class="inline-flex h-8 min-w-9 items-center justify-center px-2 text-sm font-black text-[#2B1A10]"
+                                                        x-text="item.qty"></span>
+
+                                                    <button type="button" @click="increment(item)"
+                                                        class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-white text-sm font-black text-[#6B3E12] shadow-sm transition hover:bg-[#F4D3B0]/40">
+                                                        +
+                                                    </button>
+                                                </div>
+
+                                                <p class="shrink-0 whitespace-nowrap text-sm font-black text-[#1F444C]"
+                                                    x-text="rupiah(item.harga_jual * item.qty)"></p>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+
+                            <template x-if="cart.length === 0">
+                                <div class="flex min-h-[260px] items-center justify-center px-5 py-12 text-center">
+                                    <div>
+                                        <h3 class="text-base font-black text-[#2B1A10]">
+                                            Keranjang Kosong
+                                        </h3>
+
+                                        <p class="mt-2 text-sm font-semibold text-[#6B3E12]">
+                                            Pilih produk untuk mulai transaksi.
+                                        </p>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        {{-- Cart Footer --}}
+                        <div class="shrink-0 border-t border-[#F4D3B0]/70 bg-[#F7F6F4] p-5">
+                            <div class="rounded-3xl bg-[#1F444C] p-4 text-white">
+                                <div class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+                                    <div class="min-w-0">
+                                        <p class="text-[11px] font-black uppercase tracking-[0.22em] text-[#F4D3B0]">
+                                            Total Bayar
+                                        </p>
+
+                                        <p class="mt-1 text-sm font-semibold text-white/70">
+                                            <span x-text="cartCount"></span> item
+                                        </p>
+                                    </div>
+
+                                    <p class="shrink-0 whitespace-nowrap text-right text-xl font-black leading-none text-[#F4B044] min-[1280px]:text-2xl"
+                                        x-text="rupiah(grandTotal)">
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 grid gap-3">
+                                <button type="button" @click="openPayment()" :disabled="cart.length === 0"
+                                    class="inline-flex h-12 w-full items-center justify-center rounded-2xl px-6 text-sm font-black shadow-lg transition"
+                                    :class="cart.length > 0 ?
+                                        'bg-[#F4B044] text-[#2B1A10] shadow-[#F4B044]/20 hover:-translate-y-0.5 hover:shadow-xl active:scale-95' :
+                                        'cursor-not-allowed bg-[#F4D3B0]/50 text-[#6B3E12]/50 shadow-none'">
+                                    Bayar
+                                </button>
+
+                                <button type="button" x-show="cart.length > 0" x-cloak @click="clearCart()"
+                                    class="inline-flex h-11 w-full items-center justify-center rounded-2xl border border-[#F4D3B0] bg-white px-5 text-sm font-black text-[#6B3E12] transition hover:bg-[#F7F6F4]">
+                                    Kosongkan Keranjang
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -897,7 +865,8 @@
                                         <circle class="opacity-25" cx="12" cy="12" r="10"
                                             stroke="currentColor" stroke-width="4"></circle>
                                         <path class="opacity-75" fill="currentColor"
-                                            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                                            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z">
+                                        </path>
                                     </svg>
 
                                     <span x-text="isSubmitting ? 'Memproses...' : 'Simpan Transaksi'"></span>
