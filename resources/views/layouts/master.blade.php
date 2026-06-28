@@ -32,9 +32,32 @@
             display: none !important;
         }
 
-        .app-viewport {
-            height: 100vh;
-            height: 100dvh;
+        html {
+            min-height: 100%;
+        }
+
+        body.app-layout-body {
+            min-height: 100vh;
+            min-height: 100svh;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        .app-layout-shell,
+        .app-layout-row,
+        .app-layout-main {
+            min-height: 100vh;
+            min-height: 100svh;
+            min-height: 100dvh;
+            height: auto;
+            overflow: visible;
+        }
+
+        .app-layout-content {
+            overflow: visible;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
         }
 
         .layout-desktop-sidebar {
@@ -42,6 +65,27 @@
         }
 
         @media (min-width: 1280px) and (hover: hover) and (pointer: fine) {
+            body.app-layout-body {
+                height: 100vh;
+                height: 100dvh;
+                min-height: 0;
+                overflow: hidden;
+            }
+
+            .app-layout-shell,
+            .app-layout-row,
+            .app-layout-main {
+                height: 100vh;
+                height: 100dvh;
+                min-height: 0;
+                overflow: hidden;
+            }
+
+            .app-layout-content {
+                min-height: 0;
+                overflow-y: auto;
+            }
+
             .layout-desktop-sidebar {
                 display: block;
             }
@@ -92,7 +136,7 @@
     </style>
 </head>
 
-<body class="app-viewport overflow-hidden bg-[#F7F6F4] text-[#2B1A10] antialiased">
+<body class="app-layout-body bg-[#F7F6F4] text-[#2B1A10] antialiased">
     @php
         $user = auth()->user();
         $role = $user?->role;
@@ -165,7 +209,7 @@
         };
     @endphp
 
-    <div x-data="{ sidebarOpen: false }" class="app-viewport overflow-hidden">
+    <div x-data="{ sidebarOpen: false }" class="app-layout-shell">
         {{-- Toast --}}
         @if ($toastMessage && $toastStyle)
             <div x-data="{ toastOpen: true }" x-show="toastOpen" x-cloak
@@ -255,7 +299,7 @@
             @endif
         </aside>
 
-        <div class="flex app-viewport overflow-hidden">
+        <div class="app-layout-row flex">
             {{-- Desktop Sidebar --}}
             <div class="layout-desktop-sidebar h-full shrink-0">
                 @if ($sidebarView)
@@ -269,9 +313,9 @@
             </div>
 
             {{-- Main Area --}}
-            <div class="flex h-full min-w-0 flex-1 flex-col overflow-hidden">
+            <div class="app-layout-main flex min-w-0 flex-1 flex-col">
                 {{-- Topbar --}}
-                <header class="z-30 shrink-0 border-b border-[#F4D3B0]/70 bg-white/90 backdrop-blur-xl">
+                <header class="sticky top-0 z-30 shrink-0 border-b border-[#F4D3B0]/70 bg-white/90 backdrop-blur-xl">
                     <div class="flex h-16 items-center justify-between gap-4 px-4 sm:h-[4.5rem] sm:px-6 lg:px-8">
                         <div class="flex min-w-0 items-center gap-4">
                             <button type="button"
@@ -421,7 +465,7 @@
 
                 {{-- Content --}}
                 <main
-                    class="app-scrollbar min-h-0 flex-1 overflow-y-auto bg-gradient-to-br from-[#F7F6F4] via-[#F7F6F4] to-[#F4D3B0]/35">
+                    class="app-layout-content app-scrollbar flex-1 bg-gradient-to-br from-[#F7F6F4] via-[#F7F6F4] to-[#F4D3B0]/35">
                     <div
                         class="mx-auto w-full max-w-[1500px] px-4 py-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:px-6 sm:py-6 lg:px-8">
                         @yield('content')
