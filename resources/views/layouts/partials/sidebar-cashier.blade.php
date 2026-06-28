@@ -48,7 +48,7 @@
                     Roti Maros
                 </h2>
 
-                <p class="mt-1.5 truncate text-2xl font-black leading-none tracking-[0.12em] text-[#F4B044]">
+                <p class="mt-1.5 truncate text-2xl font-black leading-none tracking-[0.06em] text-[#F4B044]">
                     Hikmah
                 </p>
             </div>

@@ -20,7 +20,7 @@
         </div>
     </header>
 
-    <form method="post" action="{{ route('password.update') }}" class="mt-6 space-y-5" x-data="{
+    <form method="post" action="{{ route('profile.password.update') }}" class="mt-6 space-y-5" x-data="{
         showCurrentPassword: false,
         showNewPassword: false,
         showConfirmPassword: false,

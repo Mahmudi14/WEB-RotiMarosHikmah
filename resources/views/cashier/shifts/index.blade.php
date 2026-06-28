@@ -3,7 +3,7 @@
 @section('page_title', 'Shift Kasir')
 
 @section('content')
-    <div class="flex min-h-0 flex-col gap-4 xl:h-[calc(100dvh-10rem)]" x-data="{
+    <div class="flex flex-col gap-4" x-data="{
         copied: false,
         openedAt: @js($activeShift?->opened_at?->toIso8601String()),
         durationText: '-',
@@ -40,13 +40,14 @@
                 <div class="absolute -right-10 -top-12 h-28 w-28 rounded-full bg-[#F4B044]/20"></div>
                 <div class="absolute -bottom-14 -left-10 h-28 w-28 rounded-full bg-white/10"></div>
 
-                <div class="relative flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                <div
+                    class="relative flex flex-col gap-4 min-[1024px]:flex-row min-[1024px]:items-center min-[1024px]:justify-between">
                     <div class="min-w-0">
                         <p class="text-xs font-bold uppercase tracking-[0.28em] text-[#F4D3B0]">
                             Kasir / Shift
                         </p>
 
-                        <h1 class="mt-1.5 text-2xl font-black tracking-tight">
+                        <h1 class="mt-1.5 text-2xl font-black tracking-tight text-white">
                             Shift Kasir
                         </h1>
 
@@ -57,7 +58,7 @@
 
                     @if ($activeShift)
                         <div
-                            class="w-full rounded-2xl border border-white/10 bg-white/10 p-3 backdrop-blur-sm xl:w-[360px]">
+                            class="w-full rounded-2xl border border-white/10 bg-white/10 p-3 backdrop-blur-sm min-[1024px]:w-[360px]">
                             <div class="flex items-center justify-between gap-3">
                                 <div class="min-w-0">
                                     <p class="text-xs font-black uppercase tracking-[0.18em] text-[#F4D3B0]">
@@ -87,9 +88,9 @@
 
         @if (!$activeShift)
             {{-- Belum buka shift --}}
-            <div class="grid min-h-0 flex-1 gap-4 xl:grid-cols-[minmax(0,1fr)_380px]">
+            <div class="grid gap-4 min-[1024px]:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_380px]">
                 <div
-                    class="flex min-h-0 items-center justify-center rounded-3xl border border-[#F4D3B0]/70 bg-white p-6 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
+                    class="flex min-h-[320px] items-center justify-center rounded-3xl border border-[#F4D3B0]/70 bg-white p-6 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
                     <div class="mx-auto max-w-md text-center">
                         <div
                             class="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-[#F4B044]/20 text-[#6B3E12]">
@@ -117,7 +118,7 @@
 
                 {{-- Kasir Aktif --}}
                 <div
-                    class="flex min-h-0 flex-col overflow-hidden rounded-3xl border border-[#F4D3B0]/70 bg-white shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
+                    class="flex flex-col overflow-hidden rounded-3xl border border-[#F4D3B0]/70 bg-white shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
                     <div class="shrink-0 border-b border-[#F4D3B0]/70 bg-[#F7F6F4] px-5 py-4">
                         <div class="flex items-center justify-between gap-4">
                             <div>
@@ -137,7 +138,7 @@
                         </div>
                     </div>
 
-                    <div class="min-h-0 flex-1 overflow-visible xl:overflow-y-auto">
+                    <div class="max-h-[420px] overflow-y-auto">
                         @forelse ($activeShifts as $shift)
                             <div
                                 class="border-b border-[#F4D3B0]/60 px-5 py-4 transition last:border-b-0 hover:bg-[#F7F6F4]">
@@ -182,10 +183,10 @@
             </div>
         @else
             {{-- Shift aktif --}}
-            <div class="grid min-h-0 flex-1 gap-4 xl:grid-cols-[400px_minmax(0,1fr)]">
+            <div class="grid gap-4 min-[1024px]:grid-cols-[360px_minmax(0,1fr)] xl:grid-cols-[400px_minmax(0,1fr)]">
                 {{-- Terminal & Token --}}
                 <div
-                    class="flex min-h-0 flex-col overflow-hidden rounded-3xl border border-[#F4D3B0]/70 bg-white shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
+                    class="flex flex-col overflow-hidden rounded-3xl border border-[#F4D3B0]/70 bg-white shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
                     <div class="shrink-0 border-b border-[#F4D3B0]/70 bg-[#F7F6F4] px-5 py-4">
                         <p class="text-xs font-black uppercase tracking-[0.22em] text-[#6B3E12]">
                             Terminal Aktif
@@ -196,7 +197,7 @@
                         </h2>
                     </div>
 
-                    <div class="min-h-0 flex-1 overflow-y-auto p-4">
+                    <div class="p-4">
                         <span class="inline-flex rounded-full bg-[#1F444C]/10 px-3 py-1 text-xs font-black text-[#1F444C]">
                             Shift Berjalan
                         </span>
@@ -228,7 +229,7 @@
 
                 {{-- Aksi & Kasir Aktif --}}
                 <div
-                    class="flex min-h-0 flex-col overflow-hidden rounded-3xl border border-[#F4D3B0]/70 bg-white shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
+                    class="flex flex-col overflow-hidden rounded-3xl border border-[#F4D3B0]/70 bg-white shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
                     <div class="shrink-0 border-b border-[#F4D3B0]/70 bg-[#F7F6F4] px-5 py-4">
                         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div>
@@ -260,9 +261,8 @@
                         </div>
                     </div>
 
-                    <div class="min-h-0 flex-1 overflow-hidden p-4">
-                        <div
-                            class="mt-4 flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border border-[#F4D3B0]/70">
+                    <div class="p-4">
+                        <div class="mt-4 flex flex-col overflow-hidden rounded-3xl border border-[#F4D3B0]/70">
                             <div class="flex shrink-0 items-center justify-between bg-[#F7F6F4] px-5 py-3">
                                 <p class="text-sm font-black text-[#2B1A10]">
                                     Kasir Sedang Aktif
@@ -273,7 +273,7 @@
                                 </span>
                             </div>
 
-                            <div class="max-h-80 overflow-y-auto xl:max-h-[calc(100dvh-28rem)]">
+                            <div class="max-h-[360px] overflow-y-auto">
                                 @forelse ($activeShifts as $shift)
                                     @php
                                         $isMine = $activeShift && $activeShift->id === $shift->id;

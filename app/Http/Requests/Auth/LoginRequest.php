@@ -14,6 +14,8 @@ use Illuminate\Validation\ValidationException;
 
 class LoginRequest extends FormRequest
 {
+    private const LOGIN_FAILED_MESSAGE = 'Email atau password salah.';
+
     public function authorize(): bool
     {
         return true;
@@ -41,23 +43,23 @@ class LoginRequest extends FormRequest
             ->where('email', $this->input('email'))
             ->first();
 
-        if (! $user) {
-            RateLimiter::hit($this->throttleKey());
+        if (! $user || ! Hash::check($this->input('password'), $user->password)) {
+            $this->hitRateLimiter();
 
             throw ValidationException::withMessages([
-                'email' => 'Akun belum terdaftar.',
+                'email' => self::LOGIN_FAILED_MESSAGE,
             ]);
         }
 
-        if (! Hash::check($this->input('password'), $user->password)) {
-            RateLimiter::hit($this->throttleKey());
+        if ($user->status !== 'aktif') {
+            $this->hitRateLimiter();
 
             throw ValidationException::withMessages([
-                'password' => 'Password salah.',
+                'email' => 'Akun tidak aktif. Hubungi administrator.',
             ]);
         }
 
-        Auth::login($user, $this->boolean('remember'));
+        Auth::login($user, false);
 
         RateLimiter::clear($this->throttleKey());
     }
@@ -86,5 +88,10 @@ class LoginRequest extends FormRequest
     public function throttleKey(): string
     {
         return Str::transliterate(Str::lower($this->string('email')) . '|' . $this->ip());
+    }
+
+    private function hitRateLimiter(): void
+    {
+        RateLimiter::hit($this->throttleKey());
     }
 }

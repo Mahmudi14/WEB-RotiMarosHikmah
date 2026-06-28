@@ -45,7 +45,7 @@ Route::get('/dashboard', [DashboardRedirectController::class, 'index'])
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'active.user'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])
         ->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])
@@ -60,7 +60,7 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'verified', 'role:kasir,super_admin'])
+Route::middleware(['auth', 'active.user', 'verified', 'role:kasir,super_admin'])
     ->prefix('cashier')
     ->name('cashier.')
     ->group(function () {
@@ -100,7 +100,7 @@ Route::middleware(['auth', 'verified', 'role:kasir,super_admin'])
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'verified', 'role:admin,super_admin'])
+Route::middleware(['auth', 'active.user', 'verified', 'role:admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
@@ -163,7 +163,7 @@ Route::middleware(['auth', 'verified', 'role:admin,super_admin'])
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'verified', 'role:keuangan,super_admin'])
+Route::middleware(['auth', 'active.user', 'verified', 'role:keuangan,super_admin'])
     ->prefix('finance')
     ->name('finance.')
     ->group(function () {
@@ -182,7 +182,7 @@ Route::middleware(['auth', 'verified', 'role:keuangan,super_admin'])
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'verified', 'role:super_admin'])
+Route::middleware(['auth', 'active.user', 'verified', 'role:super_admin'])
     ->prefix('super-admin')
     ->name('super-admin.')
     ->group(function () {
