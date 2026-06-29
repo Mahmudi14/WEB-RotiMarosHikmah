@@ -71,11 +71,6 @@
                             data.
                         </p>
                     </div>
-
-                    <a href="{{ route('admin.transactions.index') }}"
-                        class="inline-flex h-12 items-center justify-center rounded-2xl bg-[#F4B044] px-5 text-sm font-black text-[#2B1A10] shadow-lg shadow-[#F4B044]/20 transition hover:-translate-y-0.5 hover:shadow-xl min-[1024px]:shrink-0">
-                        Riwayat Transaksi
-                    </a>
                 </div>
             </div>
         </div>
