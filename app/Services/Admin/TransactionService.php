@@ -45,9 +45,10 @@ class TransactionService
 
     public function getTerminals(): Collection
     {
-        return PosTerminal::withTrashed()
+        return PosTerminal::query()
+            ->orderByRaw("CASE WHEN status = 'aktif' THEN 0 ELSE 1 END")
             ->orderBy('kode_terminal')
-            ->get(['id', 'kode_terminal', 'nama_terminal', 'deleted_at']);
+            ->get(['id', 'kode_terminal', 'nama_terminal', 'status']);
     }
 
     public function getPaginatedSales(Request $request, int $perPage = 10): LengthAwarePaginator
