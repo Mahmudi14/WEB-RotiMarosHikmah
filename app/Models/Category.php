@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Category extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'nama_kategori',
         'slug',
@@ -16,6 +19,7 @@ class Category extends Model
 
     protected $casts = [
         'sort_order' => 'integer',
+        'deleted_at' => 'datetime',
     ];
 
     public function products(): HasMany

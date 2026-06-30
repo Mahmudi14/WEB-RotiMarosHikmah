@@ -174,8 +174,6 @@ Route::middleware(['auth', 'active.user'])->group(function () {
                     ->name('pos-terminals.regenerate-token');
                 Route::resource('pos-terminals', AdminPosTerminalController::class);
 
-                Route::patch('cashiers/{cashier}/status', [AdminCashierController::class, 'updateStatus'])
-                    ->name('cashiers.update-status');
                 Route::patch('cashiers/{cashier}/reset-password', [AdminCashierController::class, 'resetPassword'])
                     ->name('cashiers.reset-password');
                 Route::resource('cashiers', AdminCashierController::class)
@@ -226,8 +224,11 @@ Route::middleware(['auth', 'active.user'])->group(function () {
                 Route::get('dashboard', [SuperAdminDashboardController::class, 'index'])
                     ->name('dashboard');
 
+                Route::patch('users/{user}/status', [SuperAdminUserController::class, 'updateStatus'])
+                    ->name('users.update-status');
+
                 Route::resource('users', SuperAdminUserController::class)
-                    ->except(['show']);
+                    ->except(['show', 'destroy']);
             });
     });
 });

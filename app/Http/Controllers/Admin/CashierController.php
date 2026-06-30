@@ -21,7 +21,6 @@ class CashierController extends Controller
     {
         return view('admin.cashiers.index', [
             'cashiers' => $this->cashierService->getPaginatedCashiers($request),
-            'statuses' => $this->cashierService->statuses(),
         ]);
     }
 
@@ -41,7 +40,7 @@ class CashierController extends Controller
 
     public function show(User $cashier): View
     {
-        abort_if($cashier->role !== 'kasir', 404);
+        $this->abortIfNotActiveCashier($cashier);
 
         return view('admin.cashiers.show', [
             'cashier' => $cashier,
@@ -50,16 +49,17 @@ class CashierController extends Controller
 
     public function edit(User $cashier): View
     {
-        abort_if($cashier->role !== 'kasir', 404);
+        $this->abortIfNotActiveCashier($cashier);
 
         return view('admin.cashiers.edit', [
             'cashier' => $cashier,
-            'statuses' => $this->cashierService->statuses(),
         ]);
     }
 
     public function update(UpdateCashierRequest $request, User $cashier): RedirectResponse
     {
+        $this->abortIfNotActiveCashier($cashier);
+
         $this->cashierService->updateCashier($cashier, $request->validated());
 
         return redirect()
@@ -67,25 +67,22 @@ class CashierController extends Controller
             ->with('success', 'Data kasir berhasil diperbarui.');
     }
 
-    public function updateStatus(User $cashier): RedirectResponse
-    {
-        $cashier = $this->cashierService->toggleStatus($cashier);
-
-        $message = $cashier->status === 'aktif'
-            ? 'Kasir berhasil diaktifkan.'
-            : 'Kasir berhasil dinonaktifkan.';
-
-        return redirect()
-            ->back()
-            ->with('success', $message);
-    }
-
     public function resetPassword(User $cashier): RedirectResponse
     {
+        $this->abortIfNotActiveCashier($cashier);
+
         $this->cashierService->resetPassword($cashier);
 
         return redirect()
             ->back()
             ->with('success', 'Password kasir berhasil direset ke default: ' . CashierService::DEFAULT_PASSWORD);
+    }
+
+    private function abortIfNotActiveCashier(User $cashier): void
+    {
+        abort_if(
+            $cashier->role !== 'kasir' || $cashier->status !== 'aktif',
+            404
+        );
     }
 }

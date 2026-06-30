@@ -18,7 +18,7 @@
                             Tambah Kategori
                         </h2>
                         <p class="mt-2 max-w-2xl text-sm leading-relaxed text-[#F4D3B0]">
-                            Tambahkan kategori baru untuk mengelompokkan menu dan produk.
+                            Tambahkan kategori baru untuk menu dan produk.
                         </p>
                     </div>
 

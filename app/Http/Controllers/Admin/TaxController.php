@@ -37,7 +37,7 @@ class TaxController extends Controller
 
         return redirect()
             ->route('admin.taxes.index')
-            ->with('success', 'Pajak berhasil ditambahkan dan diaktifkan.');
+            ->with('success', 'Pajak berhasil ditambahkan.');
     }
 
     public function show(Tax $tax): View

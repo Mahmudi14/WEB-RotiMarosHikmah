@@ -35,7 +35,7 @@
                             Produk
                         </h2>
                         <p class="mt-2 max-w-2xl text-sm leading-relaxed text-[#F4D3B0]">
-                            Kelola produk roti, harga jual, gambar, kategori, stok, dan status produk.
+                            Kelola produk Roti Maros Hikmah.
                         </p>
                     </div>
 

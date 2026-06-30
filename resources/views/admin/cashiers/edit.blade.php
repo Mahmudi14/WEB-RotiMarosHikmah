@@ -45,7 +45,7 @@
             'action' => route('admin.cashiers.update', $cashier),
             'method' => 'PUT',
             'submitLabel' => 'Simpan Perubahan',
-            'showStatus' => true,
+            'showStatus' => false,
         ])
     </div>
 @endsection

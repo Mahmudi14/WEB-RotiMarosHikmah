@@ -175,7 +175,10 @@ class PromoService
     public function deletePromo(Promo $promo): void
     {
         DB::transaction(function () use ($promo) {
-            $promo->products()->detach();
+            $promo->update([
+                'status' => 'nonaktif',
+            ]);
+
             $promo->delete();
         });
     }

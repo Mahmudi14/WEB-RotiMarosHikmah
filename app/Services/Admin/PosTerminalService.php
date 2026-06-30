@@ -7,7 +7,6 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class PosTerminalService
@@ -76,21 +75,28 @@ class PosTerminalService
 
     public function deleteTerminal(PosTerminal $terminal): void
     {
-        if ($this->hasBeenUsed($terminal)) {
-            throw new Exception('Terminal tidak dapat dihapus karena sudah pernah digunakan pada shift, transaksi, atau print job.');
-        }
+        DB::transaction(function () use ($terminal) {
+            if ($this->isUsedByActiveShift($terminal)) {
+                throw new Exception('Terminal tidak dapat dihapus karena sedang digunakan pada shift aktif.');
+            }
 
-        $terminal->delete();
+            $terminal->update([
+                'status' => 'nonaktif',
+                'last_seen_at' => null,
+            ]);
+
+            $terminal->delete();
+        });
     }
 
     private function generateTerminalCode(): string
     {
-        $lastId = (int) PosTerminal::query()->max('id') + 1;
+        $lastId = (int) PosTerminal::withTrashed()->max('id') + 1;
 
         do {
             $code = 'TRM-' . str_pad((string) $lastId, 3, '0', STR_PAD_LEFT);
             $lastId++;
-        } while (PosTerminal::query()->where('kode_terminal', $code)->exists());
+        } while (PosTerminal::withTrashed()->where('kode_terminal', $code)->exists());
 
         return $code;
     }
@@ -99,29 +105,16 @@ class PosTerminalService
     {
         do {
             $token = Str::random(80);
-        } while (PosTerminal::query()->where('bridge_token', $token)->exists());
+        } while (PosTerminal::withTrashed()->where('bridge_token', $token)->exists());
 
         return $token;
     }
 
-    private function hasBeenUsed(PosTerminal $terminal): bool
+    private function isUsedByActiveShift(PosTerminal $terminal): bool
     {
-        $checks = [
-            ['table' => 'cashier_shifts', 'column' => 'pos_terminal_id'],
-            ['table' => 'sales', 'column' => 'pos_terminal_id'],
-            ['table' => 'print_jobs', 'column' => 'pos_terminal_id'],
-        ];
-
-        foreach ($checks as $check) {
-            if (
-                Schema::hasTable($check['table']) &&
-                Schema::hasColumn($check['table'], $check['column']) &&
-                DB::table($check['table'])->where($check['column'], $terminal->id)->exists()
-            ) {
-                return true;
-            }
-        }
-
-        return false;
+        return DB::table('cashier_shifts')
+            ->where('pos_terminal_id', $terminal->id)
+            ->where('status', 'aktif')
+            ->exists();
     }
 }

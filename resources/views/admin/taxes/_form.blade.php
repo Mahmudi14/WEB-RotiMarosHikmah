@@ -77,11 +77,6 @@
                         %
                     </span>
                 </div>
-
-                <p class="mt-2 text-xs font-semibold text-[#6B3E12]/75">
-                    Pajak dihitung setelah subtotal dikurangi promo.
-                </p>
-
                 @error('persentase')
                     <p class="mt-2 text-sm font-bold text-[#A92A35]">{{ $message }}</p>
                 @enderror

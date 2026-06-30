@@ -18,6 +18,11 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
+
+
+    public const STATUS_AKTIF = 'aktif';
+    public const STATUS_NONAKTIF = 'nonaktif';
+
     protected $fillable = [
         'name',
         'email',
@@ -48,6 +53,26 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function isActive(): bool
+    {
+        return $this->status === self::STATUS_AKTIF;
+    }
+
+    public function isInactive(): bool
+    {
+        return $this->status === self::STATUS_NONAKTIF;
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', self::STATUS_AKTIF);
+    }
+
+    public function scopeInactive($query)
+    {
+        return $query->where('status', self::STATUS_NONAKTIF);
+    }
+
     public function cashierShifts(): HasMany
     {
         return $this->hasMany(CashierShift::class, 'cashier_id');

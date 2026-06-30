@@ -11,18 +11,11 @@ class CashierService
 {
     public const DEFAULT_PASSWORD = 'rotimaroshikmah111';
 
-    public function statuses(): array
-    {
-        return [
-            'aktif' => 'Aktif',
-            'nonaktif' => 'Nonaktif',
-        ];
-    }
-
     public function getPaginatedCashiers(Request $request, int $perPage = 10): LengthAwarePaginator
     {
         return User::query()
             ->where('role', 'kasir')
+            ->where('status', 'aktif')
             ->when($request->filled('search'), function ($query) use ($request) {
                 $search = $request->search;
 
@@ -30,9 +23,6 @@ class CashierService
                     $query->where('name', 'like', "%{$search}%")
                         ->orWhere('email', 'like', "%{$search}%");
                 });
-            })
-            ->when($request->filled('status'), function ($query) use ($request) {
-                $query->where('status', $request->status);
             })
             ->latest()
             ->paginate($perPage)
@@ -52,23 +42,11 @@ class CashierService
 
     public function updateCashier(User $cashier, array $data): User
     {
-        $this->ensureCashier($cashier);
+        $this->ensureActiveCashier($cashier);
 
         $cashier->update([
             'name' => $data['name'],
             'email' => $data['email'],
-            'status' => $data['status'],
-        ]);
-
-        return $cashier->refresh();
-    }
-
-    public function toggleStatus(User $cashier): User
-    {
-        $this->ensureCashier($cashier);
-
-        $cashier->update([
-            'status' => $cashier->status === 'aktif' ? 'nonaktif' : 'aktif',
         ]);
 
         return $cashier->refresh();
@@ -76,7 +54,7 @@ class CashierService
 
     public function resetPassword(User $cashier): User
     {
-        $this->ensureCashier($cashier);
+        $this->ensureActiveCashier($cashier);
 
         $cashier->update([
             'password' => Hash::make(self::DEFAULT_PASSWORD),
@@ -85,8 +63,11 @@ class CashierService
         return $cashier->refresh();
     }
 
-    private function ensureCashier(User $user): void
+    private function ensureActiveCashier(User $user): void
     {
-        abort_if($user->role !== 'kasir', 404);
+        abort_if(
+            $user->role !== 'kasir' || $user->status !== 'aktif',
+            404
+        );
     }
 }

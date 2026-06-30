@@ -329,9 +329,6 @@
                         <h2 class="text-lg font-black">
                             Hapus Pajak?
                         </h2>
-                        <p class="mt-1 text-sm font-medium text-white/80">
-                            Pajak yang sudah digunakan transaksi tidak dapat dihapus.
-                        </p>
                     </div>
 
                     <div class="p-6">

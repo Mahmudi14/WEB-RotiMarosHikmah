@@ -23,6 +23,9 @@ class UserService
             ->when($filters['role'] ?? null, function ($query, $role) {
                 $query->where('role', $role);
             })
+            ->when($filters['status'] ?? null, function ($query, $status) {
+                $query->where('status', $status);
+            })
             ->latest()
             ->paginate(10)
             ->withQueryString();
@@ -34,17 +37,14 @@ class UserService
             'name' => $data['name'],
             'email' => $data['email'],
             'role' => $data['role'],
+            'status' => 'aktif',
             'password' => Hash::make($data['password']),
         ]);
     }
 
     public function update(User $user, array $data): User
     {
-        if ($user->role === 'super_admin') {
-            throw ValidationException::withMessages([
-                'user' => 'Akun Super Admin tidak boleh diubah melalui halaman ini.',
-            ]);
-        }
+        $this->ensureNotSuperAdmin($user);
 
         $payload = [
             'name' => $data['name'],
@@ -53,25 +53,25 @@ class UserService
         ];
 
         if (! empty($data['reset_password'])) {
-            $payload['password'] = Hash::make('roti12345');
+            $payload['password'] = Hash::make('rotimaroshikmah111');
         } elseif (! empty($data['password'])) {
             $payload['password'] = Hash::make($data['password']);
         }
 
         $user->update($payload);
 
-        return $user;
+        return $user->refresh();
     }
 
-    public function delete(User $user): void
+    public function toggleStatus(User $user): User
     {
-        if ($user->role === 'super_admin') {
-            throw ValidationException::withMessages([
-                'user' => 'Akun Super Admin tidak boleh dihapus.',
-            ]);
-        }
+        $this->ensureNotSuperAdmin($user);
 
-        $user->delete();
+        $user->update([
+            'status' => $user->status === 'aktif' ? 'nonaktif' : 'aktif',
+        ]);
+
+        return $user->refresh();
     }
 
     public function roles(): array
@@ -81,5 +81,22 @@ class UserService
             'kasir' => 'Kasir',
             'keuangan' => 'Keuangan',
         ];
+    }
+
+    public function statuses(): array
+    {
+        return [
+            'aktif' => 'Aktif',
+            'nonaktif' => 'Nonaktif',
+        ];
+    }
+
+    private function ensureNotSuperAdmin(User $user): void
+    {
+        if ($user->role === 'super_admin') {
+            throw ValidationException::withMessages([
+                'user' => 'Akun Super Admin tidak boleh diubah melalui halaman ini.',
+            ]);
+        }
     }
 }

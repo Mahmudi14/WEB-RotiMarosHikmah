@@ -9,16 +9,7 @@
     @endphp
 
     <div class="space-y-6" x-data="{
-        statusModalOpen: false,
         resetModalOpen: false,
-    
-        openStatusModal() {
-            this.statusModalOpen = true;
-        },
-    
-        closeStatusModal() {
-            this.statusModalOpen = false;
-        },
     
         openResetModal() {
             this.resetModalOpen = true;
@@ -45,7 +36,7 @@
                         </h1>
 
                         <p class="mt-2 max-w-2xl text-sm font-medium leading-relaxed text-[#F7F6F4]/80">
-                            Detail akun kasir dan pengaturan status login.
+                            Detail akun kasir aktif dan pengaturan password.
                         </p>
                     </div>
 
@@ -157,27 +148,6 @@
                 <div
                     class="rounded-3xl border border-[#F4D3B0]/70 bg-white p-6 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
                     <h2 class="text-lg font-black text-[#2B1A10]">
-                        Pengaturan Status
-                    </h2>
-
-                    <p class="mt-2 text-sm font-semibold leading-relaxed text-[#6B3E12]">
-                        {{ $cashier->status === 'aktif'
-                            ? 'Kasir sedang aktif dan dapat login ke sistem.'
-                            : 'Kasir sedang nonaktif dan tidak dapat login ke sistem.' }}
-                    </p>
-
-                    <button type="button" @click="openStatusModal()"
-                        class="{{ $cashier->status === 'aktif'
-                            ? 'bg-[#A92A35] text-white shadow-[#A92A35]/20'
-                            : 'bg-[#F4B044] text-[#2B1A10] shadow-[#F4B044]/20' }}
-                        mt-5 inline-flex h-12 w-full items-center justify-center rounded-2xl px-5 text-sm font-black shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl">
-                        {{ $cashier->status === 'aktif' ? 'Nonaktifkan Kasir' : 'Aktifkan Kasir' }}
-                    </button>
-                </div>
-
-                <div
-                    class="rounded-3xl border border-[#F4D3B0]/70 bg-white p-6 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
-                    <h2 class="text-lg font-black text-[#2B1A10]">
                         Reset Password
                     </h2>
 
@@ -192,49 +162,6 @@
                 </div>
             </div>
         </div>
-
-        {{-- Status Modal --}}
-        <template x-teleport="body">
-            <div x-show="statusModalOpen" x-cloak x-transition.opacity
-                class="fixed inset-0 z-[9998] flex items-center justify-center bg-[#1F444C]/55 px-4 backdrop-blur-md">
-                <div @click.outside="closeStatusModal()"
-                    class="w-full max-w-md overflow-hidden rounded-3xl border border-[#F4D3B0]/70 bg-white shadow-[0_30px_90px_-35px_rgba(31,68,76,0.8)]">
-
-                    <div class="bg-[#1F444C] px-6 py-5 text-white">
-                        <h2 class="text-lg font-black">
-                            {{ $cashier->status === 'aktif' ? 'Nonaktifkan Kasir?' : 'Aktifkan Kasir?' }}
-                        </h2>
-                        <p class="mt-1 text-sm font-medium text-white/80">
-                            {{ $cashier->status === 'aktif'
-                                ? 'Kasir tidak bisa login sampai diaktifkan kembali.'
-                                : 'Kasir akan dapat login kembali ke sistem.' }}
-                        </p>
-                    </div>
-
-                    <div class="p-6">
-                        <div class="flex justify-end gap-3">
-                            <button type="button" @click="closeStatusModal()"
-                                class="inline-flex h-11 items-center justify-center rounded-2xl border border-[#F4D3B0] bg-white px-5 text-sm font-black text-[#6B3E12] transition hover:bg-[#F7F6F4]">
-                                Batal
-                            </button>
-
-                            <form method="POST" action="{{ route('admin.cashiers.update-status', $cashier) }}">
-                                @csrf
-                                @method('PATCH')
-
-                                <button type="submit"
-                                    class="{{ $cashier->status === 'aktif'
-                                        ? 'bg-[#A92A35] text-white shadow-[#A92A35]/20'
-                                        : 'bg-[#F4B044] text-[#2B1A10] shadow-[#F4B044]/20' }}
-                                    inline-flex h-11 items-center justify-center rounded-2xl px-5 text-sm font-black shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl">
-                                    {{ $cashier->status === 'aktif' ? 'Ya, Nonaktifkan' : 'Ya, Aktifkan' }}
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </template>
 
         {{-- Reset Modal --}}
         <template x-teleport="body">

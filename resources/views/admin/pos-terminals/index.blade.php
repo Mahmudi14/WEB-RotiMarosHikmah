@@ -298,9 +298,6 @@
                         <h2 class="text-lg font-black">
                             Hapus Terminal?
                         </h2>
-                        <p class="mt-1 text-sm font-medium text-white/80">
-                            Terminal yang sudah dipakai shift, transaksi, atau print job tidak dapat dihapus.
-                        </p>
                     </div>
 
                     <div class="p-6">

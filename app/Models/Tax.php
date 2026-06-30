@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Tax extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'nama_pajak',
         'persentase',
@@ -15,6 +18,7 @@ class Tax extends Model
 
     protected $casts = [
         'persentase' => 'decimal:2',
+        'deleted_at' => 'datetime',
     ];
 
     public function getPersentaseFormattedAttribute(): string

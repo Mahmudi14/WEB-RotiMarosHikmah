@@ -3,11 +3,9 @@
 namespace App\Services\Admin;
 
 use App\Models\Tax;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 class TaxService
 {
@@ -88,25 +86,12 @@ class TaxService
 
     public function deleteTax(Tax $tax): void
     {
-        if ($this->hasBeenUsedInSales($tax)) {
-            throw new Exception('Pajak tidak dapat dihapus karena sudah pernah digunakan pada transaksi.');
-        }
+        DB::transaction(function () use ($tax) {
+            $tax->update([
+                'status' => 'nonaktif',
+            ]);
 
-        $tax->delete();
-    }
-
-    private function hasBeenUsedInSales(Tax $tax): bool
-    {
-        if (! Schema::hasTable('sales')) {
-            return false;
-        }
-
-        if (! Schema::hasColumn('sales', 'tax_id')) {
-            return false;
-        }
-
-        return DB::table('sales')
-            ->where('tax_id', $tax->id)
-            ->exists();
+            $tax->delete();
+        });
     }
 }

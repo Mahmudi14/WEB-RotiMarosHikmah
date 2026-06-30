@@ -106,13 +106,27 @@
                 selectedPayment: @js((string) request('payment_method', '')),
                 selectedStatus: @js((string) request('status', '')),
             
-                cashiers: @js($cashiers->mapWithKeys(fn($cashier) => [(string) $cashier->id => $cashier->name])->toArray()),
+                cashiers: @js(
+    $cashiers
+        ->mapWithKeys(
+            fn($cashier) => [
+                (string) $cashier->id => [
+                    'name' => $cashier->name,
+                    'status' => $cashier->status,
+                    'label' => $cashier->name . ($cashier->status === 'nonaktif' ? ' (Nonaktif)' : ''),
+                ],
+            ],
+        )
+        ->toArray(),
+),
                 terminals: @js($terminals->mapWithKeys(fn($terminal) => [(string) $terminal->id => $terminal->kode_terminal . ' - ' . $terminal->nama_terminal])->toArray()),
                 paymentMethods: @js($paymentMethods),
                 statuses: @js($statuses),
             
                 get selectedCashierLabel() {
-                    return this.selectedCashier ? this.cashiers[this.selectedCashier] : 'Semua Kasir';
+                    return this.selectedCashier && this.cashiers[this.selectedCashier] ?
+                        this.cashiers[this.selectedCashier].label :
+                        'Semua Kasir';
                 },
             
                 get selectedTerminalLabel() {
@@ -251,7 +265,18 @@
                                             :class="selectedCashier === @js((string) $cashier->id) ?
                                                 'bg-[#F4B044] text-[#2B1A10]' :
                                                 'text-[#2B1A10] hover:bg-[#F4B044]/15'">
-                                            <span>{{ $cashier->name }}</span>
+                                            <div class="min-w-0">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="truncate">{{ $cashier->name }}</span>
+
+                                                    @if ($cashier->status === 'nonaktif')
+                                                        <span
+                                                            class="shrink-0 rounded-full bg-[#A92A35]/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-[#A92A35]">
+                                                            Nonaktif
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                            </div>
 
                                             <svg x-show="selectedCashier === @js((string) $cashier->id)" x-cloak
                                                 class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.8"

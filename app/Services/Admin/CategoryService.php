@@ -76,13 +76,19 @@ class CategoryService
 
     public function deleteCategory(Category $category): void
     {
-        if ($category->products()->exists()) {
-            throw new Exception('Kategori tidak dapat dihapus karena masih memiliki menu/produk.');
-        }
+        DB::transaction(function () use ($category) {
+            if ($this->hasNonDeletedProducts($category)) {
+                throw new Exception('Kategori tidak dapat dihapus karena masih memiliki produk yang belum dihapus.');
+            }
 
-        $category->delete();
+            $category->update([
+                'status' => 'nonaktif',
+            ]);
 
-        $this->normalizeSortOrder();
+            $category->delete();
+
+            $this->normalizeSortOrder();
+        });
     }
 
     public function reorderCategories(array $orders): void
@@ -98,6 +104,11 @@ class CategoryService
         });
 
         $this->normalizeSortOrder();
+    }
+
+    private function hasNonDeletedProducts(Category $category): bool
+    {
+        return $category->products()->exists();
     }
 
     private function getNextSortOrder(): int
@@ -126,7 +137,8 @@ class CategoryService
         $counter = 2;
 
         while (
-            Category::where('slug', $slug)
+            Category::withTrashed()
+            ->where('slug', $slug)
             ->when($ignoreId, fn($query) => $query->where('id', '!=', $ignoreId))
             ->exists()
         ) {

@@ -35,7 +35,7 @@
                             Kategori Produk
                         </h2>
                         <p class="mt-2 max-w-2xl text-sm leading-relaxed text-[#F4D3B0]">
-                            Kelola kategori untuk mengelompokkan menu dan produk Roti Maros Hikmah.
+                            Kelola kategori produk Roti Maros Hikmah.
                         </p>
                     </div>
 

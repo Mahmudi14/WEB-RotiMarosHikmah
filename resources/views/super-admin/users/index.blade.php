@@ -4,22 +4,25 @@
 
 @section('content')
     <div class="space-y-6" x-data="{
-        deleteModalOpen: false,
-        deleteAction: '',
-        deleteUserName: '',
+        statusModalOpen: false,
+        statusAction: '',
+        statusUserName: '',
+        statusCurrent: '',
     
-        openDeleteModal(action, name) {
-            this.deleteAction = action;
-            this.deleteUserName = name;
-            this.deleteModalOpen = true;
+        openStatusModal(action, name, currentStatus) {
+            this.statusAction = action;
+            this.statusUserName = name;
+            this.statusCurrent = currentStatus;
+            this.statusModalOpen = true;
         },
     
-        closeDeleteModal() {
-            this.deleteModalOpen = false;
-            this.deleteAction = '';
-            this.deleteUserName = '';
+        closeStatusModal() {
+            this.statusModalOpen = false;
+            this.statusAction = '';
+            this.statusUserName = '';
+            this.statusCurrent = '';
         }
-    }" @keydown.escape.window="closeDeleteModal()">
+    }" @keydown.escape.window="closeStatusModal()">
         {{-- Header --}}
         <div class="overflow-hidden rounded-3xl bg-[#1F444C] p-6 text-white shadow-lg shadow-[#1F444C]/10">
             <div class="relative">
@@ -270,6 +273,9 @@
                                 Role
                             </th>
                             <th class="px-6 py-4 text-left text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
+                                Status
+                            </th>
+                            <th class="px-6 py-4 text-left text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
                                 Dibuat
                             </th>
                             <th class="px-6 py-4 text-right text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
@@ -294,6 +300,11 @@
                                     'keuangan' => 'bg-[#A92A35]/10 text-[#A92A35]',
                                     default => 'bg-gray-100 text-gray-700',
                                 };
+
+                                $statusClass =
+                                    $user->status === 'aktif'
+                                        ? 'bg-[#1F444C]/10 text-[#1F444C]'
+                                        : 'bg-[#A92A35]/10 text-[#A92A35]';
                             @endphp
 
                             <tr class="transition hover:bg-[#F7F6F4]/70">
@@ -322,6 +333,13 @@
                                     </span>
                                 </td>
 
+                                <td class="px-6 py-4">
+                                    <span
+                                        class="inline-flex rounded-full px-3 py-1 text-xs font-black {{ $statusClass }}">
+                                        {{ $user->status_label }}
+                                    </span>
+                                </td>
+
                                 <td class="px-6 py-4 text-sm font-semibold text-[#6B3E12]">
                                     {{ $user->created_at?->format('d M Y') }}
                                 </td>
@@ -338,20 +356,19 @@
                                         </a>
 
                                         <button type="button"
-                                            @click="openDeleteModal(@js(route('super-admin.users.destroy', $user)), @js($user->name))"
-                                            class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#A92A35]/10 text-[#A92A35] transition hover:bg-[#A92A35] hover:text-white">
-                                            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.2"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166M19.228 5.79L18.16 19.673A2.25 2.25 0 0115.916 21.75H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .397c.34-.059.68-.114 1.022-.166m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916A2.25 2.25 0 0013.5 2.25h-3A2.25 2.25 0 008.25 4.5v.916" />
-                                            </svg>
+                                            @click="openStatusModal(@js(route('super-admin.users.update-status', $user)), @js($user->name), @js($user->status))"
+                                            class="{{ $user->status === 'aktif'
+                                                ? 'bg-[#A92A35]/10 text-[#A92A35] hover:bg-[#A92A35] hover:text-white'
+                                                : 'bg-[#F4B044]/20 text-[#6B3E12] hover:bg-[#F4B044] hover:text-[#2B1A10]' }}
+    inline-flex items-center justify-center rounded-xl px-4 py-2 text-xs font-black transition">
+                                            {{ $user->status === 'aktif' ? 'Nonaktifkan' : 'Aktifkan' }}
                                         </button>
                                     </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="px-6 py-14 text-center">
+                                <td colspan="5" class="px-6 py-14 text-center">
                                     <div class="mx-auto flex max-w-sm flex-col items-center">
                                         <div
                                             class="flex h-16 w-16 items-center justify-center rounded-3xl bg-[#F4B044]/20 text-[#6B3E12]">
@@ -382,19 +399,17 @@
             @endif
         </div>
 
-        {{-- Delete Confirmation Modal --}}
+        {{-- Status Confirmation Modal --}}
         <template x-teleport="body">
-            <div x-show="deleteModalOpen" x-cloak
+            <div x-show="statusModalOpen" x-cloak
                 class="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6" aria-modal="true"
                 role="dialog">
 
-                {{-- Overlay --}}
-                <div x-show="deleteModalOpen" x-transition.opacity
-                    class="absolute inset-0 bg-[#1F444C]/55 backdrop-blur-md" @click="closeDeleteModal()">
+                <div x-show="statusModalOpen" x-transition.opacity
+                    class="absolute inset-0 bg-[#1F444C]/55 backdrop-blur-md" @click="closeStatusModal()">
                 </div>
 
-                {{-- Modal Card --}}
-                <div x-show="deleteModalOpen" x-transition:enter="transition ease-out duration-200"
+                <div x-show="statusModalOpen" x-transition:enter="transition ease-out duration-200"
                     x-transition:enter-start="opacity-0 scale-95 translate-y-4"
                     x-transition:enter-end="opacity-100 scale-100 translate-y-0"
                     x-transition:leave="transition ease-in duration-150"
@@ -402,71 +417,43 @@
                     x-transition:leave-end="opacity-0 scale-95 translate-y-4"
                     class="relative z-10 w-full max-w-md overflow-hidden rounded-[1.75rem] border border-[#F4D3B0]/70 bg-white shadow-[0_35px_90px_-35px_rgba(31,68,76,0.65)]">
 
-                    {{-- Header --}}
-                    <div class="relative overflow-hidden bg-[#A92A35] px-6 py-6 text-white">
-                        <div class="absolute -right-10 -top-12 h-32 w-32 rounded-full bg-white/10"></div>
-                        <div class="absolute -bottom-16 -left-12 h-36 w-36 rounded-full bg-black/10"></div>
+                    <div class="relative overflow-hidden bg-[#1F444C] px-6 py-6 text-white">
+                        <h3 class="text-xl font-black text-white"
+                            x-text="statusCurrent === 'aktif' ? 'Nonaktifkan Pengguna?' : 'Aktifkan Pengguna?'">
+                        </h3>
 
-                        <div class="relative flex items-start gap-4">
-                            <div
-                                class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15 text-white ring-1 ring-white/20">
-                                <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2.4"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M12 9v3.75m0 3.75h.008v.008H12V16.5z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M10.29 3.86L1.82 18a1.5 1.5 0 001.29 2.25h17.78A1.5 1.5 0 0022.18 18L13.71 3.86a1.5 1.5 0 00-2.42 0z" />
-                                </svg>
-                            </div>
-
-                            <div>
-                                <p class="text-xs font-bold uppercase tracking-[0.24em] text-white/75">
-                                    Konfirmasi Hapus
-                                </p>
-                                <h3 class="mt-1 text-xl font-black text-white">
-                                    Hapus Pengguna?
-                                </h3>
-                            </div>
-                        </div>
+                        <p class="mt-2 text-sm font-medium text-white/80"
+                            x-text="statusCurrent === 'aktif'
+                        ? 'Pengguna tidak dapat login setelah dinonaktifkan.'
+                        : 'Pengguna akan dapat login kembali setelah diaktifkan.'">
+                        </p>
                     </div>
 
-                    {{-- Body --}}
                     <div class="px-6 py-5">
                         <p class="text-sm leading-relaxed text-[#6B3E12]">
-                            Kamu akan menghapus pengguna
-                            <span class="font-black text-[#2B1A10]" x-text="deleteUserName"></span>.
-                            Tindakan ini tidak dapat dibatalkan.
+                            Kamu akan mengubah status pengguna
+                            <span class="font-black text-[#2B1A10]" x-text="statusUserName"></span>.
                         </p>
-
-                        <div class="mt-5 rounded-2xl border border-[#A92A35]/20 bg-[#A92A35]/5 px-4 py-3">
-                            <p class="text-sm font-semibold text-[#A92A35]">
-                                Pastikan data pengguna ini memang sudah tidak dibutuhkan.
-                            </p>
-                        </div>
                     </div>
 
-                    {{-- Actions --}}
                     <div
                         class="flex flex-col-reverse gap-3 border-t border-[#F4D3B0]/70 bg-[#F7F6F4] px-6 py-5 sm:flex-row sm:justify-end">
-                        <button type="button" @click="closeDeleteModal()"
-                            class="inline-flex items-center justify-center rounded-2xl border border-[#F4D3B0] bg-white px-5 py-3 text-sm font-black text-[#6B3E12] transition hover:bg-[#F7F6F4] focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
+                        <button type="button" @click="closeStatusModal()"
+                            class="inline-flex items-center justify-center rounded-2xl border border-[#F4D3B0] bg-white px-5 py-3 text-sm font-black text-[#6B3E12] transition hover:bg-[#F7F6F4]">
                             Batal
                         </button>
 
-                        <form method="POST" :action="deleteAction">
+                        <form method="POST" :action="statusAction">
                             @csrf
-                            @method('DELETE')
+                            @method('PATCH')
 
                             <button type="submit"
-                                class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#A92A35] px-5 py-3 text-sm font-black text-white shadow-lg shadow-[#A92A35]/20 transition hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-[#A92A35]/20">
-                                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.3"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M14.74 9l-.346 9m-4.788 0L9.26 9" />
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M19.5 6h-15m4.5 0V4.5A1.5 1.5 0 0110.5 3h3A1.5 1.5 0 0115 4.5V6m2.25 0l-.75 13.5A1.5 1.5 0 0115 21H9a1.5 1.5 0 01-1.5-1.5L6.75 6" />
-                                </svg>
-                                Ya, Hapus
+                                class="inline-flex w-full items-center justify-center rounded-2xl px-5 py-3 text-sm font-black shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl"
+                                :class="statusCurrent === 'aktif'
+                                    ?
+                                    'bg-[#A92A35] text-white shadow-[#A92A35]/20' :
+                                    'bg-[#F4B044] text-[#2B1A10] shadow-[#F4B044]/20'"
+                                x-text="statusCurrent === 'aktif' ? 'Ya, Nonaktifkan' : 'Ya, Aktifkan'">
                             </button>
                         </form>
                     </div>

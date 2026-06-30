@@ -37,7 +37,7 @@ class PosTerminalController extends Controller
 
         return redirect()
             ->route('admin.pos-terminals.show', $terminal)
-            ->with('success', 'Terminal kasir berhasil ditambahkan. Token bridge otomatis dibuat.');
+            ->with('success', 'Terminal kasir berhasil ditambahkan.');
     }
 
     public function show(PosTerminal $posTerminal): View

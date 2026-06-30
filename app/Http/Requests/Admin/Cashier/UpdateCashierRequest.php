@@ -25,8 +25,6 @@ class UpdateCashierRequest extends FormRequest
                 'max:255',
                 Rule::unique('users', 'email')->ignore($cashier?->id),
             ],
-
-            'status' => ['required', 'in:aktif,nonaktif'],
         ];
     }
 
@@ -40,9 +38,6 @@ class UpdateCashierRequest extends FormRequest
             'email.email' => 'Format email tidak valid.',
             'email.max' => 'Email maksimal 255 karakter.',
             'email.unique' => 'Email sudah digunakan.',
-
-            'status.required' => 'Status kasir wajib dipilih.',
-            'status.in' => 'Status kasir tidak valid.',
         ];
     }
 }

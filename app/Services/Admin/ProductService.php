@@ -131,9 +131,10 @@ class ProductService
     public function updateProduct(Product $product, array $data, ?UploadedFile $image = null): Product
     {
         $storedImagePath = null;
+        $oldImageToDelete = null;
 
         try {
-            return DB::transaction(function () use ($product, $data, $image, &$storedImagePath) {
+            $updatedProduct = DB::transaction(function () use ($product, $data, $image, &$storedImagePath, &$oldImageToDelete) {
                 $data = $this->normalizeData($data);
 
                 unset($data['stock']);
@@ -148,18 +149,19 @@ class ProductService
                 if ($image) {
                     $storedImagePath = $this->storeImage($image);
                     $data['gambar'] = $storedImagePath;
+                    $oldImageToDelete = $product->gambar;
                 }
-
-                $oldImage = $product->gambar;
 
                 $product->update($data);
 
-                if ($image) {
-                    $this->deleteImage($oldImage);
-                }
-
-                return $product;
+                return $product->refresh();
             });
+
+            if ($oldImageToDelete) {
+                $this->deleteImage($oldImageToDelete);
+            }
+
+            return $updatedProduct;
         } catch (Throwable $e) {
             if ($storedImagePath) {
                 $this->deleteImage($storedImagePath);
@@ -203,9 +205,21 @@ class ProductService
 
     public function deleteProduct(Product $product): void
     {
-        $this->deleteImage($product->gambar);
+        $imageToDelete = $product->gambar;
 
-        $product->delete();
+        DB::transaction(function () use ($product) {
+            $product->update([
+                'status' => 'nonaktif',
+                'status_ketersediaan' => 'habis',
+                'gambar' => null,
+            ]);
+
+            $product->delete();
+        });
+
+        if ($imageToDelete) {
+            $this->deleteImage($imageToDelete);
+        }
     }
 
     private function normalizeData(array $data): array
@@ -242,7 +256,8 @@ class ProductService
         $counter = 2;
 
         while (
-            Product::where('slug', $slug)
+            Product::withTrashed()
+            ->where('slug', $slug)
             ->when($ignoreId, fn($query) => $query->where('id', '!=', $ignoreId))
             ->exists()
         ) {

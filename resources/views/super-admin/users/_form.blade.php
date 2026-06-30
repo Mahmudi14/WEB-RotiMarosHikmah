@@ -191,7 +191,7 @@
                     </p>
                     <p class="mt-1 text-sm leading-relaxed text-[#6B3E12]">
                         Jika dicentang, password pengguna akan diubah menjadi
-                        <span class="font-black text-[#2B1A10]">roti12345</span>.
+                        <span class="font-black text-[#2B1A10]">rotimaroshikmah111</span>.
                     </p>
                 </div>
             </label>

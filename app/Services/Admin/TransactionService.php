@@ -38,15 +38,16 @@ class TransactionService
     {
         return User::query()
             ->where('role', 'kasir')
+            ->orderByRaw("CASE WHEN status = 'aktif' THEN 0 ELSE 1 END")
             ->orderBy('name')
-            ->get(['id', 'name']);
+            ->get(['id', 'name', 'status']);
     }
 
     public function getTerminals(): Collection
     {
-        return PosTerminal::query()
+        return PosTerminal::withTrashed()
             ->orderBy('kode_terminal')
-            ->get(['id', 'kode_terminal', 'nama_terminal']);
+            ->get(['id', 'kode_terminal', 'nama_terminal', 'deleted_at']);
     }
 
     public function getPaginatedSales(Request $request, int $perPage = 10): LengthAwarePaginator
@@ -161,7 +162,7 @@ class TransactionService
                     throw new Exception("Produk {$item->nama_produk} tidak ditemukan. Stok tidak dapat dikembalikan.");
                 }
 
-                $product = Product::query()
+                $product = Product::withTrashed()
                     ->whereKey($item->product_id)
                     ->lockForUpdate()
                     ->first();

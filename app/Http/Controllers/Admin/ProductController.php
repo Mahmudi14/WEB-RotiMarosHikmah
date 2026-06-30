@@ -56,7 +56,7 @@ class ProductController extends Controller
 
         return redirect()
             ->route('admin.products.index')
-            ->with('success', 'Produk berhasil ditambahkan dan otomatis aktif.');
+            ->with('success', 'Produk berhasil ditambahkan.');
     }
 
     public function show(Product $product)

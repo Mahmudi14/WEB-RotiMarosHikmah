@@ -52,7 +52,7 @@ class Sale extends Model
 
     public function terminal(): BelongsTo
     {
-        return $this->belongsTo(PosTerminal::class, 'pos_terminal_id');
+        return $this->belongsTo(PosTerminal::class, 'pos_terminal_id')->withTrashed();
     }
 
     public function shift(): BelongsTo
@@ -62,12 +62,12 @@ class Sale extends Model
 
     public function promo(): BelongsTo
     {
-        return $this->belongsTo(Promo::class, 'promo_id');
+        return $this->belongsTo(Promo::class, 'promo_id')->withTrashed();
     }
 
     public function tax(): BelongsTo
     {
-        return $this->belongsTo(Tax::class, 'tax_id');
+        return $this->belongsTo(Tax::class, 'tax_id')->withTrashed();
     }
 
     public function cancelledBy(): BelongsTo

@@ -54,6 +54,7 @@ class CashierPosService
             ->where('products.status_ketersediaan', 'tersedia')
             ->where('products.stock', '>', 0)
             ->where('categories.status', 'aktif')
+            ->whereNull('categories.deleted_at')
             ->orderBy('categories.sort_order')
             ->orderBy('products.nama_produk')
             ->select('products.*')

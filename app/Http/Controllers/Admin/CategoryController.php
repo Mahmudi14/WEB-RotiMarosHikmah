@@ -45,7 +45,7 @@ class CategoryController extends Controller
 
         return redirect()
             ->route('admin.categories.index')
-            ->with('success', 'Kategori produk berhasil ditambahkan dan otomatis aktif.');
+            ->with('success', 'Kategori produk berhasil ditambahkan.');
     }
 
     public function show(Category $category)

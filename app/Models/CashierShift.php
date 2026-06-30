@@ -44,7 +44,7 @@ class CashierShift extends Model
 
     public function terminal(): BelongsTo
     {
-        return $this->belongsTo(PosTerminal::class, 'pos_terminal_id');
+        return $this->belongsTo(PosTerminal::class, 'pos_terminal_id')->withTrashed();
     }
 
     public function sales(): HasMany

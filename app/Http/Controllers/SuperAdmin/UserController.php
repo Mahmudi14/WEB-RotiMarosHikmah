@@ -18,12 +18,13 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $users = $this->userService->getAll(
-            $request->only('search', 'role')
+            $request->only('search', 'role', 'status')
         );
 
         $roles = $this->userService->roles();
+        $statuses = $this->userService->statuses();
 
-        return view('super-admin.users.index', compact('users', 'roles'));
+        return view('super-admin.users.index', compact('users', 'roles', 'statuses'));
     }
 
     public function create()
@@ -62,14 +63,25 @@ class UserController extends Controller
             ->with('success', 'Pengguna berhasil diperbarui. Jika reset password dicentang, password default adalah roti12345.');
     }
 
-    public function destroy(User $user)
+    public function updateStatus(User $user)
     {
         abort_if($user->role === 'super_admin', 403);
 
-        $this->userService->delete($user);
+        $user->update([
+            'status' => $user->status === 'aktif' ? 'nonaktif' : 'aktif',
+        ]);
+
+        $message = $user->status === 'aktif'
+            ? 'Pengguna berhasil diaktifkan.'
+            : 'Pengguna berhasil dinonaktifkan.';
 
         return redirect()
-            ->route('super-admin.users.index')
-            ->with('success', 'Pengguna berhasil dihapus.');
+            ->back()
+            ->with('success', $message);
+    }
+
+    public function destroy(User $user)
+    {
+        abort(403);
     }
 }

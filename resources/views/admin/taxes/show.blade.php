@@ -96,9 +96,6 @@
                 <p class="mt-3 text-lg font-black text-[#2B1A10]">
                     {{ $tax->persentase_formatted }}
                 </p>
-                <p class="mt-1 text-sm font-bold text-[#6B3E12]">
-                    Dihitung setelah promo
-                </p>
             </div>
 
             <div class="rounded-3xl border border-[#F4D3B0]/70 bg-white p-5 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">

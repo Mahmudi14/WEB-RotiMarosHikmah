@@ -309,7 +309,7 @@
                 </div>
             </div>
         @endif
-        @if (isset($recentClosedShift) && $recentClosedShift)
+        @if (!$activeShift && isset($recentClosedShift) && $recentClosedShift)
             @php
                 $latestPrintJob = $recentClosedShift->printJobs->first();
             @endphp

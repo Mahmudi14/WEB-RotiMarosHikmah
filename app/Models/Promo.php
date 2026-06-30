@@ -4,9 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Promo extends Model
 {
+
+    use SoftDeletes;
+
     protected $fillable = [
         'nama_promo',
         'kode_promo',
@@ -23,6 +27,7 @@ class Promo extends Model
         'nilai_diskon' => 'decimal:2',
         'tanggal_mulai' => 'date',
         'tanggal_selesai' => 'date',
+        'deleted_at' => 'datetime',
     ];
 
     public function products(): BelongsToMany
@@ -80,6 +85,10 @@ class Promo extends Model
     }
     public function getStatusEfektifDescriptionAttribute(): string
     {
+        if (! $this->tanggal_mulai || ! $this->tanggal_selesai) {
+            return 'Tidak dibatasi';
+        }
+
         $today = now()->toDateString();
 
         if ($today < $this->tanggal_mulai->toDateString()) {
@@ -93,9 +102,12 @@ class Promo extends Model
         return 'Sedang berlaku';
     }
 
-
     public function getIsBerjalanAttribute(): bool
     {
+        if (! $this->tanggal_mulai || ! $this->tanggal_selesai) {
+            return $this->status === 'aktif';
+        }
+
         $today = now()->toDateString();
 
         return $today >= $this->tanggal_mulai->toDateString()

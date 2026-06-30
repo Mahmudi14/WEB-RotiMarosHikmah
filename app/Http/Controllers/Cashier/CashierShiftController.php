@@ -22,13 +22,17 @@ class CashierShiftController extends Controller
     {
         $cashier = $request->user();
 
+        $activeShift = $this->cashierShiftService->getActiveShift($cashier);
+
         return view('cashier.shifts.index', [
-            'activeShift' => $this->cashierShiftService->getActiveShift($cashier),
+            'activeShift' => $activeShift,
             'activeShifts' => $this->cashierShiftService->getActiveShifts(),
-            'recentClosedShift' => $this->cashierShiftService->getRecentlyClosedShiftForPrint(
-                $cashier,
-                $request->session()->get('cashier_last_closed_shift_id')
-            ),
+            'recentClosedShift' => ! $activeShift
+                ? $this->cashierShiftService->getRecentlyClosedShiftForPrint(
+                    $cashier,
+                    $request->session()->get('cashier_last_closed_shift_id')
+                )
+                : null,
         ]);
     }
 
@@ -55,8 +59,10 @@ class CashierShiftController extends Controller
                 $request->validated()
             );
 
+            $request->session()->forget('cashier_last_closed_shift_id');
+
             return redirect()
-                ->route('cashier.shifts.index', $shift)
+                ->route('cashier.shifts.index')
                 ->with('success', 'Shift berhasil dibuka. Kamu sudah bisa mulai transaksi POS.');
         } catch (Exception $exception) {
             return redirect()
