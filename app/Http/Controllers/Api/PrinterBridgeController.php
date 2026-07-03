@@ -73,11 +73,6 @@ class PrinterBridgeController extends Controller
         $job = DB::transaction(function () use ($terminal) {
             $staleLimit = now()->subSeconds(30);
 
-            PosTerminal::query()
-                ->whereKey($terminal->id)
-                ->lockForUpdate()
-                ->firstOrFail();
-
             PrintJob::query()
                 ->where('pos_terminal_id', $terminal->id)
                 ->where('status', 'printing')
@@ -102,26 +97,14 @@ class PrinterBridgeController extends Controller
                 ->where('attempts', '>=', 5)
                 ->update([
                     'status' => 'failed',
-                    'locked_at' => null,
                     'failed_at' => now(),
                     'error_message' => 'Print job gagal setelah beberapa kali percobaan.',
                 ]);
-
-            $hasActivePrintingJob = PrintJob::query()
-                ->where('pos_terminal_id', $terminal->id)
-                ->where('status', 'printing')
-                ->where('locked_at', '>', $staleLimit)
-                ->exists();
-
-            if ($hasActivePrintingJob) {
-                return null;
-            }
 
             $job = PrintJob::query()
                 ->where('pos_terminal_id', $terminal->id)
                 ->where('status', 'pending')
                 ->orderBy('created_at')
-                ->orderBy('id')
                 ->lockForUpdate()
                 ->first();
 
@@ -160,119 +143,44 @@ class PrinterBridgeController extends Controller
     {
         $terminal = $request->attributes->get('terminal');
 
-        $printJob = DB::transaction(function () use ($terminal, $printJob) {
-            $printJob = PrintJob::query()
-                ->whereKey($printJob->id)
-                ->lockForUpdate()
-                ->firstOrFail();
+        $this->ensureTerminalOwnsJob($terminal->id, $printJob);
 
-            $this->ensureTerminalOwnsJob($terminal->id, $printJob);
-
-            if ($printJob->status === 'printed') {
-                return $printJob;
-            }
-
-            if (
-                $printJob->status !== 'printing' &&
-                ! ($printJob->status === 'pending' && (int) $printJob->attempts > 0)
-            ) {
-                abort(409, 'Print job tidak sedang dalam proses cetak.');
-            }
-
-            $printJob->update([
-                'status' => 'printed',
-                'printed_at' => now(),
-                'failed_at' => null,
-                'locked_at' => null,
-                'error_message' => null,
-            ]);
-
-            return $printJob->fresh();
-        });
+        $printJob->update([
+            'status' => 'printed',
+            'printed_at' => now(),
+            'failed_at' => null,
+            'error_message' => null,
+        ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Print job ditandai berhasil dicetak.',
-            'job' => $this->formatPrintJob($printJob),
+            'job' => $this->formatPrintJob($printJob->fresh()),
         ]);
     }
 
-    public function release(Request $request, PrintJob $printJob): JsonResponse
-    {
-        $terminal = $request->attributes->get('terminal');
 
-        $data = $request->validate([
-            'error_message' => ['nullable', 'string', 'max:1000'],
-        ]);
-
-        $printJob = DB::transaction(function () use ($terminal, $printJob, $data) {
-            $printJob = PrintJob::query()
-                ->whereKey($printJob->id)
-                ->lockForUpdate()
-                ->firstOrFail();
-
-            $this->ensureTerminalOwnsJob($terminal->id, $printJob);
-
-            if ($printJob->status !== 'printing') {
-                return $printJob;
-            }
-
-            $printJob->update([
-                'status' => 'pending',
-                'attempts' => max(((int) $printJob->attempts) - 1, 0),
-                'locked_at' => null,
-                'failed_at' => null,
-                'error_message' => $data['error_message']
-                    ?? 'Dikembalikan ke antrean karena printer belum siap.',
-            ]);
-
-            return $printJob->fresh();
-        });
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Print job dikembalikan ke antrean.',
-            'job' => $this->formatPrintJob($printJob),
-        ]);
-    }
 
     public function markFailed(Request $request, PrintJob $printJob): JsonResponse
     {
         $terminal = $request->attributes->get('terminal');
 
+        $this->ensureTerminalOwnsJob($terminal->id, $printJob);
+
         $data = $request->validate([
             'error_message' => ['required', 'string', 'max:1000'],
         ]);
 
-        $printJob = DB::transaction(function () use ($terminal, $printJob, $data) {
-            $printJob = PrintJob::query()
-                ->whereKey($printJob->id)
-                ->lockForUpdate()
-                ->firstOrFail();
-
-            $this->ensureTerminalOwnsJob($terminal->id, $printJob);
-
-            if (
-                $printJob->status !== 'printing' &&
-                ! ($printJob->status === 'pending' && (int) $printJob->attempts > 0)
-            ) {
-                abort(409, 'Print job tidak dapat ditandai gagal.');
-            }
-
-            $printJob->update([
-                'status' => 'failed',
-                'failed_at' => now(),
-                'locked_at' => null,
-                'error_message' => $data['error_message'],
-            ]);
-
-            return $printJob->fresh();
-        });
+        $printJob->update([
+            'status' => 'failed',
+            'failed_at' => now(),
+            'error_message' => $data['error_message'],
+        ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Print job ditandai gagal.',
-            'job' => $this->formatPrintJob($printJob),
+            'job' => $this->formatPrintJob($printJob->fresh()),
         ]);
     }
 
