@@ -197,6 +197,45 @@ class PrinterBridgeController extends Controller
         ]);
     }
 
+    public function release(Request $request, PrintJob $printJob): JsonResponse
+    {
+        $terminal = $request->attributes->get('terminal');
+
+        $data = $request->validate([
+            'error_message' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $printJob = DB::transaction(function () use ($terminal, $printJob, $data) {
+            $printJob = PrintJob::query()
+                ->whereKey($printJob->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $this->ensureTerminalOwnsJob($terminal->id, $printJob);
+
+            if ($printJob->status !== 'printing') {
+                return $printJob;
+            }
+
+            $printJob->update([
+                'status' => 'pending',
+                'attempts' => max(((int) $printJob->attempts) - 1, 0),
+                'locked_at' => null,
+                'failed_at' => null,
+                'error_message' => $data['error_message']
+                    ?? 'Dikembalikan ke antrean karena printer belum siap.',
+            ]);
+
+            return $printJob->fresh();
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Print job dikembalikan ke antrean.',
+            'job' => $this->formatPrintJob($printJob),
+        ]);
+    }
+
     public function markFailed(Request $request, PrintJob $printJob): JsonResponse
     {
         $terminal = $request->attributes->get('terminal');

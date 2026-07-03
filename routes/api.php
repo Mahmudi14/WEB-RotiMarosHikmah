@@ -12,4 +12,5 @@ Route::prefix('bridge')
         Route::get('print-jobs/next', [PrinterBridgeController::class, 'nextPrintJob']);
         Route::post('print-jobs/{print_job}/printed', [PrinterBridgeController::class, 'markPrinted']);
         Route::post('print-jobs/{print_job}/failed', [PrinterBridgeController::class, 'markFailed']);
+        Route::post('print-jobs/{print_job}/release', [PrinterBridgeController::class, 'release']);
     });
