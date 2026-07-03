@@ -202,6 +202,8 @@ class CashierTransactionService
             throw new Exception('Struk hanya dapat dicetak ulang untuk transaksi selesai.');
         }
 
+        $sale->loadMissing(['items', 'cashier', 'terminal', 'printJobs']);
+
         $latestReceiptJob = $sale->printJobs
             ->where('type', 'receipt')
             ->sortByDesc('created_at')
@@ -217,34 +219,58 @@ class CashierTransactionService
             'cashier_shift_id' => $sale->cashier_shift_id,
             'type' => 'receipt',
             'payload' => [
-                'kode_transaksi' => $sale->kode_transaksi,
-                'printed_at' => now()->format('d/m/Y H:i'),
+                'transaction_id' => $sale->kode_transaksi,
+                'created_at' => $sale->created_at?->toDateTimeString(),
+                'queued_at' => now()->toDateTimeString(),
                 'is_reprint' => true,
+                'reprinted_at' => now()->toDateTimeString(),
+
+                'customer_name' => null,
+                'cashier_name' => $sale->cashier?->name,
+                'note' => '',
 
                 'terminal' => [
+                    'id' => $sale->terminal?->id,
                     'kode_terminal' => $sale->terminal?->kode_terminal,
                     'nama_terminal' => $sale->terminal?->nama_terminal,
                 ],
 
-                'cashier' => [
-                    'name' => $sale->cashier?->name,
-                ],
+                'items' => $sale->items
+                    ->map(fn($item) => [
+                        'name' => $item->nama_produk,
+                        'category' => $item->nama_kategori,
+                        'qty' => (int) $item->qty,
+                        'price' => (float) $item->harga_satuan,
+                        'subtotal' => (float) $item->subtotal,
+                    ])
+                    ->values()
+                    ->all(),
 
-                'items' => $sale->items->map(fn($item) => [
-                    'nama_produk' => $item->nama_produk,
-                    'qty' => (int) $item->qty,
-                    'harga_satuan' => (float) $item->harga_satuan,
-                    'subtotal' => (float) $item->subtotal,
-                ])->values()->all(),
+                'payment_method' => match ($sale->payment_method) {
+                    'tunai' => 'cash',
+                    'qris' => 'qris',
+                    'transfer' => 'transfer',
+                    default => 'payment',
+                },
+
+                'subtotal' => (float) $sale->subtotal,
+                'promo_name' => $sale->nama_promo,
+                'discount' => (float) $sale->total_diskon,
+                'tax_name' => $sale->nama_pajak,
+                'tax_percentage' => (float) $sale->persentase_pajak,
+                'tax' => (float) $sale->total_pajak,
+                'total' => (float) $sale->grand_total,
+                'paid_amount' => (float) $sale->paid_amount,
+                'change_amount' => (float) $sale->change_amount,
 
                 'summary' => [
                     'subtotal' => (float) $sale->subtotal,
-                    'promo' => $sale->nama_promo,
-                    'total_diskon' => (float) $sale->total_diskon,
-                    'pajak' => $sale->nama_pajak,
-                    'total_pajak' => (float) $sale->total_pajak,
-                    'grand_total' => (float) $sale->grand_total,
-                    'payment_method' => $sale->payment_method,
+                    'promo_name' => $sale->nama_promo,
+                    'discount' => (float) $sale->total_diskon,
+                    'tax_name' => $sale->nama_pajak,
+                    'tax_percentage' => (float) $sale->persentase_pajak,
+                    'tax' => (float) $sale->total_pajak,
+                    'total' => (float) $sale->grand_total,
                     'paid_amount' => (float) $sale->paid_amount,
                     'change_amount' => (float) $sale->change_amount,
                 ],
