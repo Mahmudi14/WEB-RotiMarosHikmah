@@ -235,11 +235,13 @@
                                 Rp
                             </span>
 
-                            <input type="text" name="closing_cash" x-init="if (closingCash) {
-                                closingCash = formatCurrencyNumber(parseCurrency(closingCash));
-                                $el.value = closingCash;
-                            }"
-                                @input="formatCurrency($event)" placeholder="0" required
+                            <input type="text" name="closing_cash" inputmode="numeric" pattern="[0-9]*"
+                                autocomplete="off" x-init="if (closingCash) {
+                                    closingCash = formatCurrencyNumber(parseCurrency(closingCash));
+                                    $el.value = closingCash;
+                                }"
+                                @input="$event.target.value = $event.target.value.replace(/[^0-9]/g, ''); formatCurrency($event)"
+                                placeholder="0" required
                                 class="block h-12 w-full rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] py-0 pl-12 pr-4 text-sm font-medium text-[#2B1A10] shadow-sm transition placeholder:text-[#6B3E12]/45 focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
                         </div>
 
