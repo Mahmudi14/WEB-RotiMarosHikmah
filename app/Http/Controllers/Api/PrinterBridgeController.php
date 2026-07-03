@@ -71,7 +71,7 @@ class PrinterBridgeController extends Controller
         $terminal = $request->attributes->get('terminal');
 
         $job = DB::transaction(function () use ($terminal) {
-            $staleLimit = now()->subSeconds(30);
+            $staleLimit = now()->subSeconds(5);
 
             PrintJob::query()
                 ->where('pos_terminal_id', $terminal->id)
@@ -80,7 +80,7 @@ class PrinterBridgeController extends Controller
                     $query->whereNull('locked_at')
                         ->orWhere('locked_at', '<=', $staleLimit);
                 })
-                ->where('attempts', '<', 5)
+                ->where('attempts', '<', 10)
                 ->update([
                     'status' => 'pending',
                     'locked_at' => null,
@@ -94,7 +94,7 @@ class PrinterBridgeController extends Controller
                     $query->whereNull('locked_at')
                         ->orWhere('locked_at', '<=', $staleLimit);
                 })
-                ->where('attempts', '>=', 5)
+                ->where('attempts', '>=', 10)
                 ->update([
                     'status' => 'failed',
                     'failed_at' => now(),
