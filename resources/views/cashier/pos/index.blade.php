@@ -791,10 +791,8 @@
                                         Rp
                                     </span>
 
-                                    <input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off"
-                                        x-model="paidAmount"
-                                        @input="$event.target.value = $event.target.value.replace(/[^0-9]/g, ''); formatPaidAmount($event)"
-                                        placeholder="0"
+                                    <input type="text" inputmode="numeric" autocomplete="off" x-model="paidAmount"
+                                        @input="formatPaidAmount($event)" placeholder="0"
                                         class="block h-11 w-full rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] py-0 pl-12 pr-4 text-sm font-medium text-[#2B1A10] shadow-sm transition placeholder:text-[#6B3E12]/45 focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
                                 </div>
                             </div>
