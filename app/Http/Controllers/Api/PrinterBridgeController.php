@@ -71,7 +71,7 @@ class PrinterBridgeController extends Controller
         $terminal = $request->attributes->get('terminal');
 
         $job = DB::transaction(function () use ($terminal) {
-            $staleLimit = now()->subMinutes(1);
+            $staleLimit = now()->subSeconds(5);
 
             PrintJob::query()
                 ->where('pos_terminal_id', $terminal->id)
