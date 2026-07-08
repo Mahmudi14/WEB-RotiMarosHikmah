@@ -343,6 +343,29 @@
             return Math.max(0, this.paidAmountNumber - this.grandTotal);
         },
     
+        addPaidAmount(amount) {
+            if (this.paymentMethod !== 'tunai') {
+                return;
+            }
+    
+            const current = Number(this.paidAmountNumber || 0);
+            const next = current + Number(amount);
+    
+            this.paidAmount = new Intl.NumberFormat('id-ID').format(next);
+    
+            this.persistDraft();
+        },
+    
+        clearPaidAmount() {
+            if (this.paymentMethod !== 'tunai') {
+                return;
+            }
+    
+            this.paidAmount = '';
+    
+            this.persistDraft();
+        },
+    
         get canPay() {
             if (this.cart.length === 0) {
                 return false;
@@ -645,199 +668,281 @@
         {{-- Payment Modal --}}
         <template x-teleport="body">
             <div x-show="paymentOpen" x-cloak
-                class="fixed inset-0 z-[9998] flex items-center justify-center bg-[#1F444C]/55 px-4 backdrop-blur-md"
+                class="fixed inset-0 z-[9998] flex items-center justify-center bg-[#1F444C]/55 px-4 py-4 backdrop-blur-md"
                 x-transition.opacity @keydown.escape.window="closePayment()">
+
                 <div @click.outside="closePayment()" x-transition:enter="transition ease-out duration-200"
                     x-transition:enter-start="opacity-0 scale-95 translate-y-3"
                     x-transition:enter-end="opacity-100 scale-100 translate-y-0"
                     x-transition:leave="transition ease-in duration-150"
                     x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                     x-transition:leave-end="opacity-0 scale-95 translate-y-3"
-                    class="w-full max-w-2xl overflow-hidden rounded-3xl bg-white shadow-2xl shadow-[#1F444C]/25">
+                    class="w-full overflow-hidden rounded-3xl bg-white shadow-2xl shadow-[#1F444C]/25"
+                    style="max-width: min(900px, calc(100vw - 32px)); max-height: calc(100vh - 32px);">
 
                     {{-- Header --}}
-                    <div class="bg-[#1F444C] px-5 py-4 text-white">
+                    <div class="bg-[#1F444C] px-5 py-3 text-white">
                         <div class="flex items-start justify-between gap-4">
                             <div>
-                                <p class="text-xs font-black uppercase tracking-[0.22em] text-[#F4D3B0]">
+                                <p class="text-[11px] font-black uppercase tracking-[0.22em] text-[#F4D3B0]">
                                     Pembayaran
                                 </p>
 
-                                <h2 class="mt-1 text-xl font-black">
+                                <h2 class="text-lg font-black leading-tight">
                                     Ringkasan Bayar
                                 </h2>
                             </div>
 
                             <button type="button" @click="closePayment()"
-                                class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-xl font-black text-white transition hover:bg-white/15">
+                                class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-xl font-black text-white transition hover:bg-white/15">
                                 ×
                             </button>
                         </div>
                     </div>
 
                     {{-- Body --}}
-                    <div class="p-5">
-                        {{-- Summary --}}
-                        <div class="grid gap-3 sm:grid-cols-2">
-                            <div class="rounded-2xl bg-[#F7F6F4] p-4">
-                                <div class="flex items-center justify-between gap-3">
-                                    <p class="text-sm font-bold text-[#6B3E12]">
-                                        Subtotal
-                                    </p>
+                    <div class="p-4">
+                        <div class="grid grid-cols-[minmax(0,1fr)_minmax(280px,0.85fr)] gap-4">
+                            {{-- Kolom Kiri --}}
+                            <div class="min-w-0">
+                                {{-- Summary --}}
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div class="rounded-2xl bg-[#F7F6F4] p-3">
+                                        <div class="flex items-center justify-between gap-3">
+                                            <p class="text-sm font-bold text-[#6B3E12]">
+                                                Subtotal
+                                            </p>
 
-                                    <p class="shrink-0 whitespace-nowrap text-sm font-black text-[#2B1A10]"
-                                        x-text="rupiah(subtotal)">
-                                    </p>
+                                            <p class="shrink-0 whitespace-nowrap text-sm font-black text-[#2B1A10]"
+                                                x-text="rupiah(subtotal)">
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="rounded-2xl bg-[#F7F6F4] p-3">
+                                        <div class="flex items-center justify-between gap-3">
+                                            <div class="min-w-0">
+                                                <p class="text-sm font-bold text-[#6B3E12]">
+                                                    Diskon Promo
+                                                </p>
+
+                                                <p class="mt-0.5 truncate text-xs font-semibold text-[#6B3E12]/70"
+                                                    x-text="bestPromo ? bestPromo.nama_promo : 'Tidak ada promo'">
+                                                </p>
+                                            </div>
+
+                                            <p class="shrink-0 whitespace-nowrap text-sm font-black text-[#A92A35]">
+                                                - <span x-text="rupiah(totalDiscount)"></span>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="rounded-2xl bg-[#F7F6F4] p-3">
+                                        <div class="flex items-center justify-between gap-3">
+                                            <div class="min-w-0">
+                                                <p class="text-sm font-bold text-[#6B3E12]">
+                                                    Pajak
+                                                </p>
+
+                                                <p class="mt-0.5 truncate text-xs font-semibold text-[#6B3E12]/70"
+                                                    x-text="activeTax ? `${activeTax.nama_pajak} (${activeTax.persentase}%)` : 'Tidak ada pajak aktif'">
+                                                </p>
+                                            </div>
+
+                                            <p class="shrink-0 whitespace-nowrap text-sm font-black text-[#2B1A10]"
+                                                x-text="rupiah(taxTotal)">
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="rounded-2xl bg-[#1F444C] p-3 text-white">
+                                        <div class="flex h-full items-center justify-between gap-3">
+                                            <p class="text-sm font-black leading-tight">
+                                                Total Bayar
+                                            </p>
+
+                                            <p class="shrink-0 whitespace-nowrap text-lg font-black text-[#F4B044]"
+                                                x-text="rupiah(grandTotal)">
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="rounded-2xl bg-[#F7F6F4] p-4">
-                                <div class="flex items-center justify-between gap-3">
-                                    <div class="min-w-0">
-                                        <p class="text-sm font-bold text-[#6B3E12]">
-                                            Diskon Promo
+                                {{-- Payment Method --}}
+                                <div class="mt-3">
+                                    <label class="mb-2 block text-sm font-black text-[#2B1A10]">
+                                        Metode Pembayaran
+                                    </label>
+
+                                    <div class="grid grid-cols-3 gap-2">
+                                        <button type="button" @click="paymentMethod = 'tunai'; persistDraft()"
+                                            class="h-12 rounded-2xl text-sm font-black transition"
+                                            :class="paymentMethod === 'tunai'
+                                                ?
+                                                'bg-[#1F444C] text-white' :
+                                                'bg-[#F7F6F4] text-[#6B3E12]'">
+                                            Tunai
+                                        </button>
+
+                                        <button type="button"
+                                            @click="paymentMethod = 'qris'; paidAmount = ''; persistDraft()"
+                                            class="h-12 rounded-2xl text-sm font-black transition"
+                                            :class="paymentMethod === 'qris'
+                                                ?
+                                                'bg-[#1F444C] text-white' :
+                                                'bg-[#F7F6F4] text-[#6B3E12]'">
+                                            QRIS
+                                        </button>
+
+                                        <button type="button"
+                                            @click="paymentMethod = 'transfer'; paidAmount = ''; persistDraft()"
+                                            class="h-12 rounded-2xl text-sm font-black transition"
+                                            :class="paymentMethod === 'transfer'
+                                                ?
+                                                'bg-[#1F444C] text-white' :
+                                                'bg-[#F7F6F4] text-[#6B3E12]'">
+                                            Transfer
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {{-- Cash Summary --}}
+                                <div class="mt-3 grid grid-cols-2 gap-3">
+                                    <div class="rounded-2xl bg-[#F7F6F4] p-3">
+                                        <p class="text-[11px] font-black uppercase tracking-[0.18em] text-[#6B3E12]">
+                                            Uang Diterima
                                         </p>
 
-                                        <p class="mt-1 truncate text-xs font-semibold text-[#6B3E12]/70"
-                                            x-text="bestPromo ? bestPromo.nama_promo : 'Tidak ada promo'">
+                                        <p class="mt-1.5 whitespace-nowrap text-base font-black text-[#2B1A10]">
+                                            <span
+                                                x-text="paymentMethod === 'tunai' ? `Rp ${paidAmount || '0'}` : rupiah(grandTotal)">
+                                            </span>
                                         </p>
                                     </div>
 
-                                    <p class="shrink-0 whitespace-nowrap text-sm font-black text-[#A92A35]">
-                                        - <span x-text="rupiah(totalDiscount)"></span>
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="rounded-2xl bg-[#F7F6F4] p-4">
-                                <div class="flex items-center justify-between gap-3">
-                                    <div class="min-w-0">
-                                        <p class="text-sm font-bold text-[#6B3E12]">
-                                            Pajak
+                                    <div class="rounded-2xl bg-[#F7F6F4] p-3">
+                                        <p class="text-[11px] font-black uppercase tracking-[0.18em] text-[#6B3E12]">
+                                            Kembalian
                                         </p>
 
-                                        <p class="mt-1 truncate text-xs font-semibold text-[#6B3E12]/70"
-                                            x-text="activeTax ? `${activeTax.nama_pajak} (${activeTax.persentase}%)` : 'Tidak ada pajak aktif'">
+                                        <p class="mt-1.5 whitespace-nowrap text-base font-black text-[#1F444C]"
+                                            x-text="paymentMethod === 'tunai' ? rupiah(changeAmount) : rupiah(0)">
                                         </p>
                                     </div>
-
-                                    <p class="shrink-0 whitespace-nowrap text-sm font-black text-[#2B1A10]"
-                                        x-text="rupiah(taxTotal)">
-                                    </p>
                                 </div>
                             </div>
 
-                            <div class="rounded-2xl bg-[#1F444C] p-4 text-white">
-                                <div class="flex items-center justify-between gap-3">
-                                    <p class="text-sm font-black">
-                                        Total Bayar
-                                    </p>
-
-                                    <p class="shrink-0 whitespace-nowrap text-xl font-black text-[#F4B044]"
-                                        x-text="rupiah(grandTotal)">
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- Payment Method --}}
-                        <div class="mt-4 grid gap-4 min-[640px]:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-                            <div>
+                            {{-- Kolom Kanan --}}
+                            <div class="min-w-0 border-l border-[#F4D3B0]/70 pl-4">
                                 <label class="mb-2 block text-sm font-black text-[#2B1A10]">
-                                    Metode Pembayaran
+                                    Input Nominal
                                 </label>
 
-                                <div class="grid grid-cols-3 gap-2">
-                                    <button type="button" @click="paymentMethod = 'tunai'; persistDraft()"
-                                        class="h-11 rounded-2xl text-xs font-black transition"
-                                        :class="paymentMethod === 'tunai'
-                                            ?
-                                            'bg-[#1F444C] text-white' :
-                                            'bg-[#F7F6F4] text-[#6B3E12]'">
-                                        Tunai
-                                    </button>
-
-                                    <button type="button"
-                                        @click="paymentMethod = 'qris'; paidAmount = ''; persistDraft()"
-                                        class="h-11 rounded-2xl text-xs font-black transition"
-                                        :class="paymentMethod === 'qris'
-                                            ?
-                                            'bg-[#1F444C] text-white' :
-                                            'bg-[#F7F6F4] text-[#6B3E12]'">
-                                        QRIS
-                                    </button>
-
-                                    <button type="button"
-                                        @click="paymentMethod = 'transfer'; paidAmount = ''; persistDraft()"
-                                        class="h-11 rounded-2xl text-xs font-black transition"
-                                        :class="paymentMethod === 'transfer'
-                                            ?
-                                            'bg-[#1F444C] text-white' :
-                                            'bg-[#F7F6F4] text-[#6B3E12]'">
-                                        Transfer
-                                    </button>
-                                </div>
-                            </div>
-
-                            {{-- Tunai --}}
-                            <div x-show="paymentMethod === 'tunai'" x-cloak>
-                                <label class="mb-2 block text-sm font-black text-[#2B1A10]">
-                                    Uang Diterima
-                                </label>
-
-                                <div class="relative">
-                                    <span
-                                        class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-sm font-black text-[#6B3E12]">
+                                {{-- Display nominal, tidak perlu diklik --}}
+                                <div class="flex h-11 items-center rounded-2xl border px-4 transition"
+                                    :class="paymentMethod === 'tunai'
+                                        ?
+                                        'border-[#F4B044] bg-white text-[#2B1A10]' :
+                                        'border-[#E8DDD0] bg-[#F7F6F4] text-[#6B3E12]/40'">
+                                    <span class="mr-3 text-sm font-black">
                                         Rp
                                     </span>
 
-                                    <input type="text" inputmode="numeric" autocomplete="off" x-model="paidAmount"
-                                        @input="formatPaidAmount($event)" placeholder="0"
-                                        class="block h-11 w-full rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] py-0 pl-12 pr-4 text-sm font-medium text-[#2B1A10] shadow-sm transition placeholder:text-[#6B3E12]/45 focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
+                                    <span class="text-sm font-black"
+                                        x-text="paymentMethod === 'tunai' ? (paidAmount || '0') : rupiah(grandTotal).replace('Rp', '').trim()">
+                                    </span>
                                 </div>
-                            </div>
 
-                            <div x-show="paymentMethod !== 'tunai'" x-cloak class="rounded-2xl bg-[#F7F6F4] p-4">
-                                <p class="text-xs font-black uppercase tracking-[0.18em] text-[#6B3E12]">
-                                    Pembayaran Non Tunai
+                                <p class="mt-3 text-sm font-black text-[#2B1A10]">
+                                    Nominal Cepat
                                 </p>
 
-                                <p class="mt-2 text-sm font-semibold text-[#6B3E12]">
-                                    Nominal dianggap sesuai total bayar.
-                                </p>
-                            </div>
-                        </div>
+                                <div class="mt-2 grid grid-cols-2 gap-2">
+                                    <button type="button" @click="addPaidAmount(1000)"
+                                        :disabled="paymentMethod !== 'tunai'"
+                                        class="h-11 rounded-2xl text-sm font-black transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
+                                        :class="paymentMethod === 'tunai'
+                                            ?
+                                            'bg-[#E7EFE4] text-[#2B1A10] hover:-translate-y-0.5 hover:shadow-md' :
+                                            'bg-[#F7F6F4] text-[#6B3E12]/40'">
+                                        1.000
+                                    </button>
 
-                        {{-- Cash Summary --}}
-                        <div x-show="paymentMethod === 'tunai'" x-cloak class="mt-4 grid gap-3 sm:grid-cols-2">
-                            <div class="rounded-2xl bg-[#F7F6F4] p-4">
-                                <p class="text-xs font-black uppercase tracking-[0.18em] text-[#6B3E12]">
-                                    Uang Diterima
-                                </p>
+                                    <button type="button" @click="addPaidAmount(2000)"
+                                        :disabled="paymentMethod !== 'tunai'"
+                                        class="h-11 rounded-2xl text-sm font-black transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
+                                        :class="paymentMethod === 'tunai'
+                                            ?
+                                            'bg-[#ECECEC] text-[#2B1A10] hover:-translate-y-0.5 hover:shadow-md' :
+                                            'bg-[#F7F6F4] text-[#6B3E12]/40'">
+                                        2.000
+                                    </button>
 
-                                <p class="mt-2 whitespace-nowrap text-base font-black text-[#2B1A10]">
-                                    Rp <span x-text="paidAmount || '0'"></span>
-                                </p>
-                            </div>
+                                    <button type="button" @click="addPaidAmount(5000)"
+                                        :disabled="paymentMethod !== 'tunai'"
+                                        class="h-11 rounded-2xl text-sm font-black transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
+                                        :class="paymentMethod === 'tunai'
+                                            ?
+                                            'bg-[#E8D8C4] text-[#5A3512] hover:-translate-y-0.5 hover:shadow-md' :
+                                            'bg-[#F7F6F4] text-[#6B3E12]/40'">
+                                        5.000
+                                    </button>
 
-                            <div class="rounded-2xl bg-[#F7F6F4] p-4">
-                                <p class="text-xs font-black uppercase tracking-[0.18em] text-[#6B3E12]">
-                                    Kembalian
-                                </p>
+                                    <button type="button" @click="addPaidAmount(10000)"
+                                        :disabled="paymentMethod !== 'tunai'"
+                                        class="h-11 rounded-2xl text-sm font-black transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
+                                        :class="paymentMethod === 'tunai'
+                                            ?
+                                            'bg-[#E6DDF0] text-[#563A75] hover:-translate-y-0.5 hover:shadow-md' :
+                                            'bg-[#F7F6F4] text-[#6B3E12]/40'">
+                                        10.000
+                                    </button>
 
-                                <p class="mt-2 whitespace-nowrap text-base font-black text-[#1F444C]"
-                                    x-text="rupiah(changeAmount)">
-                                </p>
+                                    <button type="button" @click="addPaidAmount(20000)"
+                                        :disabled="paymentMethod !== 'tunai'"
+                                        class="h-11 rounded-2xl text-sm font-black transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
+                                        :class="paymentMethod === 'tunai'
+                                            ?
+                                            'bg-[#DDF2E4] text-[#176B3A] hover:-translate-y-0.5 hover:shadow-md' :
+                                            'bg-[#F7F6F4] text-[#6B3E12]/40'">
+                                        20.000
+                                    </button>
+
+                                    <button type="button" @click="addPaidAmount(50000)"
+                                        :disabled="paymentMethod !== 'tunai'"
+                                        class="h-11 rounded-2xl text-sm font-black transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
+                                        :class="paymentMethod === 'tunai'
+                                            ?
+                                            'bg-[#DCEFFC] text-[#155A8A] hover:-translate-y-0.5 hover:shadow-md' :
+                                            'bg-[#F7F6F4] text-[#6B3E12]/40'">
+                                        50.000
+                                    </button>
+
+                                    <button type="button" @click="addPaidAmount(100000)"
+                                        :disabled="paymentMethod !== 'tunai'"
+                                        class="h-11 rounded-2xl text-sm font-black transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
+                                        :class="paymentMethod === 'tunai'
+                                            ?
+                                            'bg-[#F8D7DA] text-[#A92A35] hover:-translate-y-0.5 hover:shadow-md' :
+                                            'bg-[#F7F6F4] text-[#6B3E12]/40'">
+                                        100.000
+                                    </button>
+
+                                    <button type="button" @click="clearPaidAmount()"
+                                        :disabled="paymentMethod !== 'tunai'"
+                                        class="h-11 rounded-2xl text-sm font-black transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
+                                        :class="paymentMethod === 'tunai'
+                                            ?
+                                            'bg-[#FBE4E6] text-[#A92A35] hover:-translate-y-0.5 hover:shadow-md' :
+                                            'bg-[#F7F6F4] text-[#6B3E12]/40'">
+                                        Hapus
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
                         {{-- Action --}}
-                        <div class="mt-4 grid gap-3 border-t border-[#F4D3B0]/70 pt-4 sm:grid-cols-2">
-                            <button type="button" @click="closePayment()"
-                                class="inline-flex h-12 items-center justify-center rounded-2xl border border-[#F4D3B0] bg-white px-5 text-sm font-black text-[#6B3E12] transition hover:bg-[#F7F6F4]">
-                                Batal
-                            </button>
-
+                        <div class="mt-4 border-t border-[#F4D3B0]/70 pt-3">
                             <form method="POST" action="{{ route('cashier.pos.sales.store') }}"
                                 @submit="
                             if (!canPay) {
@@ -855,10 +960,10 @@
                                     :value="paymentMethod === 'tunai' ? paidAmountNumber : grandTotal">
 
                                 <button type="submit" :disabled="!canPay || isSubmitting"
-                                    class="inline-flex h-12 w-full items-center justify-center gap-2 rounded-2xl px-5 text-sm font-black shadow-lg transition"
+                                    class="inline-flex h-11 w-full items-center justify-center gap-2 rounded-2xl px-5 text-sm font-black shadow-lg transition"
                                     :class="(!canPay || isSubmitting) ?
                                     'cursor-not-allowed bg-[#F4D3B0]/50 text-[#6B3E12]/50 shadow-none' :
-                                    'bg-[#F4B044] text-[#2B1A10] shadow-[#F4B044]/20 hover:-translate-y-0.5 hover:shadow-xl active:scale-95'">
+                                    'bg-[#1F444C] text-[#F4B044] shadow-[#1F444C]/20 hover:-translate-y-0.5 hover:shadow-xl active:scale-95'">
 
                                     <svg x-show="isSubmitting" x-cloak class="h-5 w-5 animate-spin" fill="none"
                                         viewBox="0 0 24 24">
