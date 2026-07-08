@@ -77,7 +77,9 @@ class ProductService
             ->when($stockCondition === 'out', function ($query) {
                 $query->where('stock', '<=', 0);
             })
-            ->latest()
+            ->orderBy('nama_produk', 'asc')
+            ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc')
             ->paginate($perPage)
             ->withQueryString();
     }
