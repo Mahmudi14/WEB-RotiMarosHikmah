@@ -601,9 +601,10 @@
                 </div>
 
                 {{-- Cart Area --}}
-                <div class="relative z-0 space-y-6 min-[1024px]:sticky min-[1024px]:top-[5.5rem] min-[1024px]:self-start">
+                <div
+                    class="relative z-0 space-y-6 pb-4 min-[1024px]:sticky min-[1024px]:top-[5.5rem] min-[1024px]:self-start">
                     <div
-                        class="relative z-0 flex h-[calc(100dvh-7rem)] max-h-[calc(100dvh-7rem)] min-h-[420px] flex-col overflow-hidden rounded-3xl border border-[#F4D3B0]/70 bg-white shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
+                        class="relative z-0 flex h-[calc(100svh-8.5rem)] max-h-[calc(100svh-8.5rem)] min-h-[360px] flex-col overflow-hidden rounded-3xl border border-[#F4D3B0]/70 bg-white shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
 
                         {{-- Cart Header --}}
                         <div class="shrink-0 border-b border-[#F4D3B0]/70 bg-[#F7F6F4] px-5 py-3">
@@ -688,7 +689,8 @@
                         </div>
 
                         {{-- Cart Footer --}}
-                        <div class="shrink-0 border-t border-[#F4D3B0]/70 bg-[#F7F6F4] p-4">
+                        <div
+                            class="shrink-0 border-t border-[#F4D3B0]/70 bg-[#F7F6F4] px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-4">
                             <div class="rounded-3xl bg-[#1F444C] p-3.5 text-white">
                                 <div class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
                                     <div class="min-w-0">
