@@ -3,7 +3,8 @@
 @section('page_title', 'POS Kasir')
 
 @section('content')
-    <div class="space-y-6" x-data="{
+    <audio id="cart-add-sound" src="{{ asset('sounds/add-cart.mp3') }}" preload="auto"></audio>
+    <div class="relative" x-data="{
         products: @js($products),
         categories: @js($categories),
         promos: @js($promos),
@@ -16,6 +17,9 @@
         paidAmount: '',
         paymentOpen: false,
         isSubmitting: false,
+        cartToastOpen: false,
+        cartToastMessage: '',
+        cartToastTimeout: null,
         storageKey: @js('pos_cart_shift_' . $activeShift->id),
     
         get cartJson() {
@@ -66,6 +70,19 @@
             } catch (error) {
                 localStorage.removeItem(this.storageKey);
             }
+        },
+    
+        showCartToast(product) {
+            this.cartToastMessage = `${product.nama_produk} ditambahkan ke keranjang`;
+            this.cartToastOpen = true;
+    
+            if (this.cartToastTimeout) {
+                clearTimeout(this.cartToastTimeout);
+            }
+    
+            this.cartToastTimeout = setTimeout(() => {
+                this.cartToastOpen = false;
+            }, 2000);
         },
     
         persistDraft() {
@@ -193,19 +210,19 @@
     
             if (existing) {
                 existing.qty++;
-                this.persistDraft();
-                return;
+            } else {
+                this.cart.push({
+                    id: product.id,
+                    nama_produk: product.nama_produk,
+                    kode_produk: product.kode_produk,
+                    harga_jual: Number(product.harga_jual),
+                    qty: 1
+                });
             }
     
-            this.cart.push({
-                id: product.id,
-                nama_produk: product.nama_produk,
-                kode_produk: product.kode_produk,
-                harga_jual: Number(product.harga_jual),
-                qty: 1
-            });
-    
             this.persistDraft();
+            this.playCartSound();
+            this.showCartToast(product);
         },
     
         increment(item) {
@@ -366,6 +383,21 @@
             this.persistDraft();
         },
     
+        playCartSound() {
+            const sound = document.getElementById('cart-add-sound');
+    
+            if (!sound) {
+                return;
+            }
+    
+            sound.currentTime = 0;
+            sound.volume = 0.7;
+    
+            sound.play().catch(() => {
+                // Audio bisa gagal jika browser/PWA belum mengizinkan suara.
+            });
+        },
+    
         get canPay() {
             if (this.cart.length === 0) {
                 return false;
@@ -382,8 +414,30 @@
     }
     
     initDraft();">
-        {{-- POS Layout --}}
 
+        {{-- Cart Toast Notification --}}
+        <div x-show="cartToastOpen" x-cloak x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="translate-y-2 opacity-0 scale-95"
+            x-transition:enter-end="translate-y-0 opacity-100 scale-100" x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="translate-y-0 opacity-100 scale-100"
+            x-transition:leave-end="translate-y-2 opacity-0 scale-95"
+            class="fixed right-4 top-[5.75rem] z-[70] w-[calc(100%-2rem)] max-w-sm rounded-3xl border border-[#F4D3B0]/70 bg-white p-4 shadow-[0_25px_80px_-35px_rgba(31,68,76,0.65)]">
+            <div class="flex items-start gap-3">
+                <div class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#1F444C] text-white">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+
+                <div class="min-w-0 flex-1">
+                    <p class="text-sm font-black text-[#2B1A10]">
+                        Berhasil ditambahkan
+                    </p>
+
+                    <p class="mt-1 truncate text-sm font-semibold text-[#6B3E12]" x-text="cartToastMessage"></p>
+                </div>
+            </div>
+        </div>
         {{-- Product Area --}}
         <div class="space-y-6">
             {{-- Filter --}}
@@ -466,7 +520,8 @@
                                             <span x-text="category.nama_kategori" class="truncate"></span>
 
                                             <svg x-show="selectedCategory == category.id" x-cloak class="h-5 w-5 shrink-0"
-                                                fill="none" stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
+                                                fill="none" stroke="currentColor" stroke-width="2.8"
+                                                viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                             </svg>
                                         </button>
@@ -602,9 +657,9 @@
 
                 {{-- Cart Area --}}
                 <div
-                    class="relative z-0 space-y-6 pb-4 min-[1024px]:sticky min-[1024px]:top-[5.5rem] min-[1024px]:self-start">
+                    class="relative z-0 space-y-6 pb-4 min-[1024px]:sticky min-[1024px]:top-[5.5rem] min-[1024px]:self-start min-[1280px]:top-4">
                     <div
-                        class="relative z-0 flex h-[calc(100svh-8.5rem)] max-h-[calc(100svh-8.5rem)] min-h-[360px] flex-col overflow-hidden rounded-3xl border border-[#F4D3B0]/70 bg-white shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
+                        class="relative z-0 flex h-[calc(100svh-6.5rem)] max-h-[calc(100svh-6.5rem)] min-h-[360px] flex-col overflow-hidden rounded-3xl border border-[#F4D3B0]/70 bg-white shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)] min-[1280px]:h-[calc(100dvh-8rem)] min-[1280px]:max-h-[calc(100dvh-8rem)]">
 
                         {{-- Cart Header --}}
                         <div class="shrink-0 border-b border-[#F4D3B0]/70 bg-[#F7F6F4] px-5 py-3">
@@ -691,19 +746,20 @@
                         {{-- Cart Footer --}}
                         <div
                             class="shrink-0 border-t border-[#F4D3B0]/70 bg-[#F7F6F4] px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-4">
-                            <div class="rounded-3xl bg-[#1F444C] p-3.5 text-white">
+                            <div class="rounded-2xl bg-[#1F444C] px-4 py-2.5 text-white">
                                 <div class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
                                     <div class="min-w-0">
-                                        <p class="text-[10px] font-black uppercase tracking-[0.22em] text-[#F4D3B0]">
+                                        <p
+                                            class="text-[9px] font-black uppercase leading-none tracking-[0.2em] text-[#F4D3B0]">
                                             Total Bayar
                                         </p>
 
-                                        <p class="mt-1 text-sm font-semibold text-white/70">
+                                        <p class="mt-1 text-xs font-semibold leading-none text-white/70">
                                             <span x-text="cartCount"></span> item
                                         </p>
                                     </div>
 
-                                    <p class="shrink-0 whitespace-nowrap text-right text-xl font-black leading-none text-[#F4B044] min-[1280px]:text-2xl"
+                                    <p class="shrink-0 whitespace-nowrap text-right text-lg font-black leading-none text-[#F4B044] min-[1280px]:text-xl"
                                         x-text="rupiah(grandTotal)">
                                     </p>
                                 </div>
