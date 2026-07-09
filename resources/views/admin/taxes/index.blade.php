@@ -53,17 +53,19 @@
         </div>
 
         {{-- Filter --}}
-        <div class="rounded-3xl border border-[#F4D3B0]/70 bg-white p-5 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]"
+        <div class="relative overflow-visible rounded-3xl border border-[#F4D3B0]/70 bg-white p-5 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]"
             x-data="{
                 statusOpen: false,
                 selectedStatus: @js((string) request('status', '')),
                 statuses: @js($statuses),
+            
                 get selectedStatusLabel() {
                     return this.selectedStatus ? this.statuses[this.selectedStatus] : 'Semua Status'
                 }
             }">
             <form method="GET" action="{{ route('admin.taxes.index') }}"
                 class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_230px_auto] lg:items-center xl:grid-cols-[minmax(0,1fr)_310px_auto]">
+
                 {{-- Search --}}
                 <div class="relative">
                     <span class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-[#6B3E12]/60">
@@ -85,7 +87,7 @@
                         <button type="button" @click="statusOpen = !statusOpen"
                             class="flex h-12 w-full items-center justify-between rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-4 py-0 text-left text-sm font-bold text-[#2B1A10] shadow-sm transition hover:bg-white focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
 
-                            <div class="flex items-center gap-3">
+                            <div class="flex min-w-0 items-center gap-3">
                                 <span
                                     class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#F4B044]/20 text-[#6B3E12]">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2"
@@ -101,7 +103,7 @@
                                     :class="selectedStatus ? 'text-[#2B1A10]' : 'text-[#6B3E12]/60'"></span>
                             </div>
 
-                            <svg class="h-5 w-5 text-[#6B3E12] transition duration-200"
+                            <svg class="h-5 w-5 shrink-0 text-[#6B3E12] transition duration-200"
                                 :class="statusOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor"
                                 stroke-width="2.4" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
@@ -115,7 +117,7 @@
                             x-transition:leave="transition ease-in duration-100"
                             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                             x-transition:leave-end="opacity-0 scale-95 translate-y-1"
-                            class="absolute z-40 mt-3 w-full overflow-hidden rounded-2xl border border-[#F4D3B0]/80 bg-white shadow-[0_25px_70px_-35px_rgba(31,68,76,0.55)]">
+                            class="absolute left-0 top-full z-20 mt-3 w-full overflow-hidden rounded-2xl border border-[#F4D3B0]/80 bg-white shadow-[0_25px_70px_-35px_rgba(31,68,76,0.55)]">
 
                             <div class="p-2">
                                 <button type="button" @click="selectedStatus = ''; statusOpen = false"
@@ -124,9 +126,9 @@
                                         ?
                                         'bg-[#F4B044] text-[#2B1A10]' :
                                         'text-[#2B1A10] hover:bg-[#F4B044]/15'">
-                                    <span>Semua Status</span>
+                                    <span class="truncate">Semua Status</span>
 
-                                    <svg x-show="selectedStatus === ''" x-cloak class="h-5 w-5" fill="none"
+                                    <svg x-show="selectedStatus === ''" x-cloak class="h-5 w-5 shrink-0" fill="none"
                                         stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                     </svg>
@@ -134,16 +136,16 @@
 
                                 @foreach ($statuses as $value => $label)
                                     <button type="button"
-                                        @click="selectedStatus = '{{ $value }}'; statusOpen = false"
+                                        @click="selectedStatus = @js((string) $value); statusOpen = false"
                                         class="flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-bold transition"
-                                        :class="selectedStatus === '{{ $value }}'
-                                            ?
+                                        :class="selectedStatus === @js((string) $value) ?
                                             'bg-[#F4B044] text-[#2B1A10]' :
                                             'text-[#2B1A10] hover:bg-[#F4B044]/15'">
-                                        <span>{{ $label }}</span>
+                                        <span class="truncate">{{ $label }}</span>
 
-                                        <svg x-show="selectedStatus === '{{ $value }}'" x-cloak class="h-5 w-5"
-                                            fill="none" stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
+                                        <svg x-show="selectedStatus === @js((string) $value)" x-cloak
+                                            class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.8"
+                                            viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                         </svg>
                                     </button>
@@ -261,18 +263,18 @@
                                 <td class="px-5 py-4">
                                     <div class="flex flex-wrap items-center justify-end gap-2">
                                         <a href="{{ route('admin.taxes.show', $tax) }}"
-                                            class="inline-flex items-center justify-center rounded-xl bg-[#F4B044]/20 px-4 py-2 text-xs font-black text-[#6B3E12] transition hover:bg-[#F4B044] hover:text-[#2B1A10]">
+                                            class="inline-flex items-center justify-center rounded-xl bg-[#F4B044] px-4 py-2 text-xs font-black text-[#2B1A10] shadow-sm shadow-[#F4B044]/20 transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-[#F4B044]/25">
                                             Detail
                                         </a>
 
                                         <a href="{{ route('admin.taxes.edit', $tax) }}"
-                                            class="inline-flex items-center justify-center rounded-xl bg-[#1F444C]/10 px-4 py-2 text-xs font-black text-[#1F444C] transition hover:bg-[#1F444C] hover:text-white">
+                                            class="inline-flex items-center justify-center rounded-xl bg-[#1F444C] px-4 py-2 text-xs font-black text-white shadow-sm shadow-[#1F444C]/20 transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-[#1F444C]/20">
                                             Edit
                                         </a>
 
                                         <button type="button"
                                             @click="openDeleteModal(@js(route('admin.taxes.destroy', $tax)), @js($tax->nama_pajak))"
-                                            class="inline-flex items-center justify-center rounded-xl bg-[#A92A35]/10 px-4 py-2 text-xs font-black text-[#A92A35] transition hover:bg-[#A92A35] hover:text-white">
+                                            class="inline-flex items-center justify-center rounded-xl bg-[#A92A35] px-4 py-2 text-xs font-black text-white shadow-sm shadow-[#A92A35]/20 transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-[#A92A35]/20">
                                             Hapus
                                         </button>
                                     </div>

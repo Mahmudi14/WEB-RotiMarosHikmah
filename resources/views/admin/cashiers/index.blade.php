@@ -181,12 +181,12 @@
                                 <td class="px-5 py-4">
                                     <div class="flex flex-wrap items-center justify-end gap-2">
                                         <a href="{{ route('admin.cashiers.show', $cashier) }}"
-                                            class="inline-flex items-center justify-center rounded-xl bg-[#F4B044]/20 px-4 py-2 text-xs font-black text-[#6B3E12] transition hover:bg-[#F4B044] hover:text-[#2B1A10]">
+                                            class="inline-flex items-center justify-center rounded-xl bg-[#F4B044] px-4 py-2 text-xs font-black text-[#2B1A10] shadow-sm shadow-[#F4B044]/20 transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-[#F4B044]/25">
                                             Detail
                                         </a>
 
                                         <a href="{{ route('admin.cashiers.edit', $cashier) }}"
-                                            class="inline-flex items-center justify-center rounded-xl bg-[#1F444C]/10 px-4 py-2 text-xs font-black text-[#1F444C] transition hover:bg-[#1F444C] hover:text-white">
+                                            class="inline-flex items-center justify-center rounded-xl bg-[#1F444C] px-4 py-2 text-xs font-black text-white shadow-sm shadow-[#1F444C]/20 transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-[#1F444C]/20">
                                             Edit
                                         </a>
                                     </div>

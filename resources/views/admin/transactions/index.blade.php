@@ -94,7 +94,7 @@
         </div>
 
         {{-- Filter --}}
-        <div class="rounded-3xl border border-[#F4D3B0]/70 bg-white p-5 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]"
+        <div class="relative z-0 overflow-visible rounded-3xl border border-[#F4D3B0]/70 bg-white p-5 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]"
             x-data="{
                 cashierOpen: false,
                 terminalOpen: false,
@@ -119,6 +119,7 @@
         )
         ->toArray(),
 ),
+            
                 terminals: @js($terminals->mapWithKeys(fn($terminal) => [(string) $terminal->id => $terminal->kode_terminal . ' - ' . $terminal->nama_terminal])->toArray()),
                 paymentMethods: @js($paymentMethods),
                 statuses: @js($statuses),
@@ -169,14 +170,12 @@
 
                     {{-- Tanggal Mulai --}}
                     <div class="relative min-w-0">
-
                         <input type="date" name="tanggal_mulai" value="{{ request('tanggal_mulai') }}"
                             class="block h-12 w-full min-w-[190px] rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-3 text-sm font-medium text-[#2B1A10] shadow-sm transition [color-scheme:light] focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
                     </div>
 
                     {{-- Tanggal Selesai --}}
                     <div class="relative min-w-0">
-
                         <input type="date" name="tanggal_selesai" value="{{ request('tanggal_selesai') }}"
                             class="block h-12 w-full min-w-[190px] rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-3 text-sm font-medium text-[#2B1A10] shadow-sm transition [color-scheme:light] focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
                     </div>
@@ -242,7 +241,7 @@
                                 x-transition:leave="transition ease-in duration-100"
                                 x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                                 x-transition:leave-end="opacity-0 scale-95 translate-y-1"
-                                class="absolute z-40 mt-3 max-h-72 w-full overflow-y-auto rounded-2xl border border-[#F4D3B0]/80 bg-white shadow-[0_25px_70px_-35px_rgba(31,68,76,0.55)]">
+                                class="absolute left-0 top-full z-10 mt-3 max-h-72 w-full overflow-y-auto rounded-2xl border border-[#F4D3B0]/80 bg-white shadow-[0_25px_70px_-35px_rgba(31,68,76,0.55)]">
                                 <div class="p-2">
                                     <button type="button" @click="selectedCashier = ''; cashierOpen = false"
                                         class="group flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-bold transition"
@@ -252,8 +251,8 @@
                                             'text-[#2B1A10] hover:bg-[#F4B044]/15'">
                                         <span>Semua Kasir</span>
 
-                                        <svg x-show="selectedCashier === ''" x-cloak class="h-5 w-5" fill="none"
-                                            stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
+                                        <svg x-show="selectedCashier === ''" x-cloak class="h-5 w-5 shrink-0"
+                                            fill="none" stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                         </svg>
                                     </button>
@@ -279,8 +278,8 @@
                                             </div>
 
                                             <svg x-show="selectedCashier === @js((string) $cashier->id)" x-cloak
-                                                class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.8"
-                                                viewBox="0 0 24 24">
+                                                class="h-5 w-5 shrink-0" fill="none" stroke="currentColor"
+                                                stroke-width="2.8" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                             </svg>
                                         </button>
@@ -325,7 +324,7 @@
                                 x-transition:leave="transition ease-in duration-100"
                                 x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                                 x-transition:leave-end="opacity-0 scale-95 translate-y-1"
-                                class="absolute z-40 mt-3 max-h-72 w-full overflow-y-auto rounded-2xl border border-[#F4D3B0]/80 bg-white shadow-[0_25px_70px_-35px_rgba(31,68,76,0.55)]">
+                                class="absolute left-0 top-full z-10 mt-3 max-h-72 w-full overflow-y-auto rounded-2xl border border-[#F4D3B0]/80 bg-white shadow-[0_25px_70px_-35px_rgba(31,68,76,0.55)]">
                                 <div class="p-2">
                                     <button type="button" @click="selectedTerminal = ''; terminalOpen = false"
                                         class="group flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-bold transition"
@@ -335,8 +334,8 @@
                                             'text-[#2B1A10] hover:bg-[#F4B044]/15'">
                                         <span>Semua Terminal</span>
 
-                                        <svg x-show="selectedTerminal === ''" x-cloak class="h-5 w-5" fill="none"
-                                            stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
+                                        <svg x-show="selectedTerminal === ''" x-cloak class="h-5 w-5 shrink-0"
+                                            fill="none" stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                         </svg>
                                     </button>
@@ -402,7 +401,7 @@
                                 x-transition:leave="transition ease-in duration-100"
                                 x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                                 x-transition:leave-end="opacity-0 scale-95 translate-y-1"
-                                class="absolute z-40 mt-3 max-h-72 w-full overflow-y-auto rounded-2xl border border-[#F4D3B0]/80 bg-white shadow-[0_25px_70px_-35px_rgba(31,68,76,0.55)]">
+                                class="absolute left-0 top-full z-10 mt-3 max-h-72 w-full overflow-y-auto rounded-2xl border border-[#F4D3B0]/80 bg-white shadow-[0_25px_70px_-35px_rgba(31,68,76,0.55)]">
                                 <div class="p-2">
                                     <button type="button" @click="selectedPayment = ''; paymentOpen = false"
                                         class="group flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-bold transition"
@@ -412,24 +411,24 @@
                                             'text-[#2B1A10] hover:bg-[#F4B044]/15'">
                                         <span>Semua Bayar</span>
 
-                                        <svg x-show="selectedPayment === ''" x-cloak class="h-5 w-5" fill="none"
-                                            stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
+                                        <svg x-show="selectedPayment === ''" x-cloak class="h-5 w-5 shrink-0"
+                                            fill="none" stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                         </svg>
                                     </button>
 
                                     @foreach ($paymentMethods as $value => $label)
                                         <button type="button"
-                                            @click="selectedPayment = @js($value); paymentOpen = false"
+                                            @click="selectedPayment = @js((string) $value); paymentOpen = false"
                                             class="group flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-bold transition"
-                                            :class="selectedPayment === @js($value) ?
+                                            :class="selectedPayment === @js((string) $value) ?
                                                 'bg-[#F4B044] text-[#2B1A10]' :
                                                 'text-[#2B1A10] hover:bg-[#F4B044]/15'">
                                             <span>{{ $label }}</span>
 
-                                            <svg x-show="selectedPayment === @js($value)" x-cloak
-                                                class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.8"
-                                                viewBox="0 0 24 24">
+                                            <svg x-show="selectedPayment === @js((string) $value)" x-cloak
+                                                class="h-5 w-5 shrink-0" fill="none" stroke="currentColor"
+                                                stroke-width="2.8" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                             </svg>
                                         </button>
@@ -474,7 +473,7 @@
                                 x-transition:leave="transition ease-in duration-100"
                                 x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                                 x-transition:leave-end="opacity-0 scale-95 translate-y-1"
-                                class="absolute z-40 mt-3 max-h-72 w-full overflow-y-auto rounded-2xl border border-[#F4D3B0]/80 bg-white shadow-[0_25px_70px_-35px_rgba(31,68,76,0.55)]">
+                                class="absolute left-0 top-full z-10 mt-3 max-h-72 w-full overflow-y-auto rounded-2xl border border-[#F4D3B0]/80 bg-white shadow-[0_25px_70px_-35px_rgba(31,68,76,0.55)]">
                                 <div class="p-2">
                                     <button type="button" @click="selectedStatus = ''; statusOpen = false"
                                         class="group flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-bold transition"
@@ -484,24 +483,24 @@
                                             'text-[#2B1A10] hover:bg-[#F4B044]/15'">
                                         <span>Semua Status</span>
 
-                                        <svg x-show="selectedStatus === ''" x-cloak class="h-5 w-5" fill="none"
-                                            stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
+                                        <svg x-show="selectedStatus === ''" x-cloak class="h-5 w-5 shrink-0"
+                                            fill="none" stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                         </svg>
                                     </button>
 
                                     @foreach ($statuses as $value => $label)
                                         <button type="button"
-                                            @click="selectedStatus = @js($value); statusOpen = false"
+                                            @click="selectedStatus = @js((string) $value); statusOpen = false"
                                             class="group flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-bold transition"
-                                            :class="selectedStatus === @js($value) ?
+                                            :class="selectedStatus === @js((string) $value) ?
                                                 'bg-[#F4B044] text-[#2B1A10]' :
                                                 'text-[#2B1A10] hover:bg-[#F4B044]/15'">
                                             <span>{{ $label }}</span>
 
-                                            <svg x-show="selectedStatus === @js($value)" x-cloak
-                                                class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.8"
-                                                viewBox="0 0 24 24">
+                                            <svg x-show="selectedStatus === @js((string) $value)" x-cloak
+                                                class="h-5 w-5 shrink-0" fill="none" stroke="currentColor"
+                                                stroke-width="2.8" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                             </svg>
                                         </button>
@@ -627,7 +626,7 @@
 
                                 <td class="whitespace-nowrap px-5 py-4 text-right">
                                     <a href="{{ route('admin.transactions.show', $sale) }}"
-                                        class="inline-flex h-9 items-center justify-center rounded-xl bg-[#F4B044]/20 px-3 text-xs font-black text-[#6B3E12] transition hover:bg-[#F4B044] hover:text-[#2B1A10]">
+                                        class="inline-flex h-9 items-center justify-center rounded-xl bg-[#F4B044] px-3 text-xs font-black text-[#2B1A10] shadow-sm shadow-[#F4B044]/20 transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-[#F4B044]/25">
                                         Detail
                                     </a>
                                 </td>

@@ -19,7 +19,7 @@ class CategoryService
         ];
     }
 
-    public function getPaginatedCategories(Request $request, int $perPage = 10): LengthAwarePaginator
+    public function getPaginatedCategories(Request $request, int $perPage = 15): LengthAwarePaginator
     {
         $search = $request->query('search');
         $status = $request->query('status');

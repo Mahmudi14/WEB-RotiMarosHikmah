@@ -387,47 +387,107 @@
         {{-- Product Area --}}
         <div class="space-y-6">
             {{-- Filter --}}
-            <div class="rounded-3xl border border-[#F4D3B0]/70 bg-white p-5 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
-                <div class="grid gap-3 min-[1024px]:grid-cols-[minmax(0,1fr)_220px_auto]">
-                    <div>
+            <div
+                class="relative z-20 overflow-visible rounded-3xl border border-[#F4D3B0]/70 bg-white p-5 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
+                <div class="grid gap-3 min-[1024px]:grid-cols-[minmax(0,1fr)_240px_auto] min-[1024px]:items-center">
+                    {{-- Search --}}
+                    <div class="relative">
                         <label class="sr-only" for="search">Cari produk</label>
 
+                        <span class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-[#6B3E12]/60">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.2"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M21 21l-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </span>
+
                         <input id="search" type="text" x-model="search" placeholder="Cari nama produk atau kode..."
-                            class="block h-12 w-full rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-4 text-sm font-medium text-[#2B1A10] shadow-sm transition placeholder:text-[#6B3E12]/45 focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
+                            class="block h-12 w-full rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] py-0 pl-12 pr-4 text-sm font-medium text-[#2B1A10] shadow-sm transition placeholder:text-[#6B3E12]/45 focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
                     </div>
 
-                    <div class="relative">
-                        <button type="button" @click="categoryOpen = !categoryOpen"
-                            class="flex h-12 w-full items-center justify-between rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-4 text-left text-sm font-black text-[#2B1A10] shadow-sm transition hover:bg-white focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
-                            <span class="truncate" x-text="selectedCategoryLabel"></span>
+                    {{-- Category Dropdown --}}
+                    <div>
+                        <div class="relative">
+                            <button type="button" @click="categoryOpen = !categoryOpen"
+                                class="flex h-12 w-full items-center justify-between rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-4 py-0 text-left text-sm font-bold text-[#2B1A10] shadow-sm transition hover:bg-white focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
 
-                            <svg class="h-5 w-5 shrink-0 text-[#6B3E12] transition"
-                                :class="categoryOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor"
-                                stroke-width="2.3" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="m19 9-7 7-7-7" />
-                            </svg>
-                        </button>
+                                <div class="flex min-w-0 items-center gap-3">
+                                    <span
+                                        class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#F4B044]/20 text-[#6B3E12]">
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
+                                        </svg>
+                                    </span>
 
-                        <div x-show="categoryOpen" x-cloak @click.outside="categoryOpen = false" x-transition
-                            class="absolute left-0 right-0 z-40 mt-2 overflow-hidden rounded-2xl border border-[#F4D3B0] bg-white shadow-xl shadow-[#1F444C]/10">
-                            <button type="button" @click="chooseCategory('')"
-                                class="block w-full px-4 py-3 text-left text-sm font-black text-[#2B1A10] transition hover:bg-[#F7F6F4]">
-                                Semua kategori
+                                    <span x-text="selectedCategoryLabel" class="truncate"
+                                        :class="selectedCategory ? 'text-[#2B1A10]' : 'text-[#6B3E12]/60'"></span>
+                                </div>
+
+                                <svg class="h-5 w-5 shrink-0 text-[#6B3E12] transition duration-200"
+                                    :class="categoryOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor"
+                                    stroke-width="2.4" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                </svg>
                             </button>
 
-                            <template x-for="category in categories" :key="category.id">
-                                <button type="button" @click="chooseCategory(category.id)"
-                                    class="block w-full px-4 py-3 text-left text-sm font-black text-[#2B1A10] transition hover:bg-[#F7F6F4]">
-                                    <span x-text="category.nama_kategori"></span>
-                                </button>
-                            </template>
+                            <div x-show="categoryOpen" x-cloak @click.outside="categoryOpen = false"
+                                x-transition:enter="transition ease-out duration-150"
+                                x-transition:enter-start="opacity-0 scale-95 translate-y-1"
+                                x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                                x-transition:leave="transition ease-in duration-100"
+                                x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                                x-transition:leave-end="opacity-0 scale-95 translate-y-1"
+                                class="absolute left-0 top-full z-10 mt-3 max-h-72 w-full overflow-y-auto rounded-2xl border border-[#F4D3B0]/80 bg-white shadow-[0_25px_70px_-35px_rgba(31,68,76,0.55)]">
+
+                                <div class="p-2">
+                                    <button type="button" @click="chooseCategory(''); categoryOpen = false"
+                                        class="group flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-bold transition"
+                                        :class="!selectedCategory
+                                            ?
+                                            'bg-[#F4B044] text-[#2B1A10]' :
+                                            'text-[#2B1A10] hover:bg-[#F4B044]/15'">
+                                        <span class="truncate">Semua Kategori</span>
+
+                                        <svg x-show="!selectedCategory" x-cloak class="h-5 w-5 shrink-0" fill="none"
+                                            stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </button>
+
+                                    <template x-for="category in categories" :key="category.id">
+                                        <button type="button" @click="chooseCategory(category.id); categoryOpen = false"
+                                            class="group flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-bold transition"
+                                            :class="selectedCategory == category.id ?
+                                                'bg-[#F4B044] text-[#2B1A10]' :
+                                                'text-[#2B1A10] hover:bg-[#F4B044]/15'">
+                                            <span x-text="category.nama_kategori" class="truncate"></span>
+
+                                            <svg x-show="selectedCategory == category.id" x-cloak class="h-5 w-5 shrink-0"
+                                                fill="none" stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <button type="button" @click="resetFilter()"
-                        class="inline-flex h-12 items-center justify-center rounded-2xl border border-[#F4B044] bg-[#F4B044] px-5 text-sm font-black text-[#2B1A10] shadow-lg shadow-[#F4B044]/30 transition duration-150 hover:-translate-y-0.5 hover:bg-[#f7bd5f] hover:shadow-xl active:translate-y-0 active:scale-95 active:bg-[#d99a32] active:shadow-inner focus:outline-none focus:ring-4 focus:ring-[#F4B044]/35">
-                        Reset
-                    </button>
+                    {{-- Reset --}}
+                    <div class="flex shrink-0">
+                        <button type="button" @click="resetFilter(); categoryOpen = false"
+                            class="inline-flex h-12 w-full shrink-0 items-center justify-center gap-2 rounded-2xl bg-[#F4B044] px-5 py-0 text-sm font-black text-[#2B1A10] shadow-lg shadow-[#F4B044]/25 transition hover:-translate-y-0.5 hover:bg-[#f7bd5f] hover:shadow-xl active:translate-y-0 active:scale-95 focus:outline-none focus:ring-4 focus:ring-[#F4B044]/25 min-[1024px]:w-auto">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.3"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0013.803-3.7M7.977 14.652H2.985m18.03-5.304-3.181-3.183a8.25 8.25 0 00-13.803 3.7" />
+                            </svg>
+                            Reset
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -539,10 +599,11 @@
                         </template>
                     </div>
                 </div>
+
                 {{-- Cart Area --}}
-                <div class="space-y-6 min-[1024px]:sticky min-[1024px]:top-6">
+                <div class="relative z-0 space-y-6 min-[1024px]:sticky min-[1024px]:top-[5.5rem] min-[1024px]:self-start">
                     <div
-                        class="flex max-h-[calc(100dvh-6rem)] min-h-[620px] flex-col overflow-hidden rounded-3xl border border-[#F4D3B0]/70 bg-white shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
+                        class="relative z-0 flex h-[calc(100dvh-7rem)] max-h-[calc(100dvh-7rem)] min-h-[420px] flex-col overflow-hidden rounded-3xl border border-[#F4D3B0]/70 bg-white shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
 
                         {{-- Cart Header --}}
                         <div class="shrink-0 border-b border-[#F4D3B0]/70 bg-[#F7F6F4] px-5 py-3">
@@ -558,10 +619,10 @@
                                     </h2>
                                 </div>
 
-                                <span
-                                    class="inline-flex rounded-xl bg-[#1F444C]/10 px-3 py-1.5 text-xs font-black leading-none text-[#1F444C]">
-                                    <span x-text="cartCount"></span>&nbsp;item
-                                </span>
+                                <button type="button" x-show="cart.length > 0" x-cloak @click="clearCart()"
+                                    class="inline-flex h-9 shrink-0 items-center justify-center rounded-xl bg-[#A92A35]/10 px-3 text-xs font-black text-[#A92A35] transition hover:bg-[#A92A35] hover:text-white focus:outline-none focus:ring-4 focus:ring-[#A92A35]/20">
+                                    Kosongkan
+                                </button>
                             </div>
                         </div>
 
@@ -570,35 +631,35 @@
                             <template x-if="cart.length > 0">
                                 <div class="divide-y divide-[#F4D3B0]/60">
                                     <template x-for="item in cart" :key="item.id">
-                                        <div class="px-4 py-3">
+                                        <div class="px-4 py-2.5">
                                             <div class="flex items-start justify-between gap-3">
                                                 <div class="min-w-0 flex-1">
                                                     <p class="truncate text-sm font-black leading-tight text-[#2B1A10]"
                                                         x-text="item.nama_produk"></p>
 
-                                                    <p class="mt-1 text-[11px] font-bold leading-none text-[#6B3E12]"
+                                                    <p class="mt-0.5 text-[11px] font-bold leading-none text-[#6B3E12]"
                                                         x-text="rupiah(item.harga_jual)"></p>
                                                 </div>
 
                                                 <button type="button" @click="removeItem(item.id)"
-                                                    class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-[#A92A35]/10 text-xs font-black text-[#A92A35] transition hover:bg-[#A92A35] hover:text-white">
+                                                    class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-[#A92A35]/10 text-xs font-black leading-none text-[#A92A35] transition hover:bg-[#A92A35] hover:text-white">
                                                     ×
                                                 </button>
                                             </div>
 
-                                            <div class="mt-3 flex items-center justify-between gap-3">
+                                            <div class="mt-2 flex items-center justify-between gap-3">
                                                 <div class="inline-flex items-center rounded-2xl bg-[#F7F6F4] p-1">
                                                     <button type="button" @click="decrement(item)"
-                                                        class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-white text-sm font-black text-[#6B3E12] shadow-sm transition hover:bg-[#F4D3B0]/40">
+                                                        class="inline-flex h-7 w-7 items-center justify-center rounded-xl bg-white text-sm font-black text-[#6B3E12] shadow-sm transition hover:bg-[#F4D3B0]/40">
                                                         -
                                                     </button>
 
                                                     <span
-                                                        class="inline-flex h-8 min-w-9 items-center justify-center px-2 text-sm font-black text-[#2B1A10]"
+                                                        class="inline-flex h-7 min-w-8 items-center justify-center px-2 text-sm font-black text-[#2B1A10]"
                                                         x-text="item.qty"></span>
 
                                                     <button type="button" @click="increment(item)"
-                                                        class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-white text-sm font-black text-[#6B3E12] shadow-sm transition hover:bg-[#F4D3B0]/40">
+                                                        class="inline-flex h-7 w-7 items-center justify-center rounded-xl bg-white text-sm font-black text-[#6B3E12] shadow-sm transition hover:bg-[#F4D3B0]/40">
                                                         +
                                                     </button>
                                                 </div>
@@ -627,11 +688,11 @@
                         </div>
 
                         {{-- Cart Footer --}}
-                        <div class="shrink-0 border-t border-[#F4D3B0]/70 bg-[#F7F6F4] p-5">
-                            <div class="rounded-3xl bg-[#1F444C] p-4 text-white">
+                        <div class="shrink-0 border-t border-[#F4D3B0]/70 bg-[#F7F6F4] p-4">
+                            <div class="rounded-3xl bg-[#1F444C] p-3.5 text-white">
                                 <div class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
                                     <div class="min-w-0">
-                                        <p class="text-[11px] font-black uppercase tracking-[0.22em] text-[#F4D3B0]">
+                                        <p class="text-[10px] font-black uppercase tracking-[0.22em] text-[#F4D3B0]">
                                             Total Bayar
                                         </p>
 
@@ -646,20 +707,13 @@
                                 </div>
                             </div>
 
-                            <div class="mt-4 grid gap-3">
-                                <button type="button" @click="openPayment()" :disabled="cart.length === 0"
-                                    class="inline-flex h-12 w-full items-center justify-center rounded-2xl px-6 text-sm font-black shadow-lg transition"
-                                    :class="cart.length > 0 ?
-                                        'bg-[#F4B044] text-[#2B1A10] shadow-[#F4B044]/20 hover:-translate-y-0.5 hover:shadow-xl active:scale-95' :
-                                        'cursor-not-allowed bg-[#F4D3B0]/50 text-[#6B3E12]/50 shadow-none'">
-                                    Bayar
-                                </button>
-
-                                <button type="button" x-show="cart.length > 0" x-cloak @click="clearCart()"
-                                    class="inline-flex h-11 w-full items-center justify-center rounded-2xl border border-[#F4D3B0] bg-white px-5 text-sm font-black text-[#6B3E12] transition hover:bg-[#F7F6F4]">
-                                    Kosongkan Keranjang
-                                </button>
-                            </div>
+                            <button type="button" @click="openPayment()" :disabled="cart.length === 0"
+                                class="mt-3 inline-flex h-11 w-full items-center justify-center rounded-2xl px-6 text-sm font-black shadow-lg transition"
+                                :class="cart.length > 0 ?
+                                    'bg-[#F4B044] text-[#2B1A10] shadow-[#F4B044]/20 hover:-translate-y-0.5 hover:shadow-xl active:scale-95' :
+                                    'cursor-not-allowed bg-[#F4D3B0]/50 text-[#6B3E12]/50 shadow-none'">
+                                Bayar
+                            </button>
                         </div>
                     </div>
                 </div>

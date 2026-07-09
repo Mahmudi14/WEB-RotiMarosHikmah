@@ -44,33 +44,6 @@
             </div>
         </div>
 
-        <div class="rounded-3xl border border-[#F4D3B0]/70 bg-white p-5 shadow-sm">
-            <form method="GET" action="{{ route($routePrefix . '.movements', $product) }}"
-                class="grid gap-4 md:grid-cols-[220px_220px_auto]">
-                <select name="type"
-                    class="h-12 rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-4 text-sm font-bold text-[#2B1A10]">
-                    <option value="">Semua Tipe</option>
-                    <option value="in" @selected(request('type') === 'in')>Masuk</option>
-                    <option value="out" @selected(request('type') === 'out')>Keluar</option>
-                    <option value="adjustment" @selected(request('type') === 'adjustment')>Koreksi</option>
-                </select>
-
-                <select name="source"
-                    class="h-12 rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-4 text-sm font-bold text-[#2B1A10]">
-                    <option value="">Semua Sumber</option>
-                    <option value="initial" @selected(request('source') === 'initial')>Stok Awal</option>
-                    <option value="manual" @selected(request('source') === 'manual')>Manual</option>
-                    <option value="sale" @selected(request('source') === 'sale')>Penjualan</option>
-                    <option value="correction" @selected(request('source') === 'correction')>Koreksi</option>
-                </select>
-
-                <button type="submit"
-                    class="inline-flex h-12 items-center justify-center rounded-2xl bg-[#1F444C] px-5 text-sm font-black text-white">
-                    Filter
-                </button>
-            </form>
-        </div>
-
         <div
             class="overflow-hidden rounded-3xl border border-[#F4D3B0]/70 bg-white shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
             <div class="overflow-x-auto">

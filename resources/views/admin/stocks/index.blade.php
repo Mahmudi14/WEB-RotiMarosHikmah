@@ -23,7 +23,8 @@
             </div>
         </div>
 
-        <div class="rounded-3xl border border-[#F4D3B0]/70 bg-white p-5 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]"
+        {{-- Filter --}}
+        <div class="relative overflow-visible rounded-3xl border border-[#F4D3B0]/70 bg-white p-5 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]"
             x-data="{
                 categoryOpen: false,
                 conditionOpen: false,
@@ -45,6 +46,11 @@
             
                 get selectedConditionLabel() {
                     return this.conditions[this.selectedCondition] ?? 'Semua Kondisi'
+                },
+            
+                closeDropdowns(except = '') {
+                    if (except !== 'category') this.categoryOpen = false;
+                    if (except !== 'condition') this.conditionOpen = false;
                 }
             }">
 
@@ -70,7 +76,7 @@
                     <input type="hidden" name="category_id" x-model="selectedCategory">
 
                     <div class="relative">
-                        <button type="button" @click="categoryOpen = !categoryOpen; conditionOpen = false"
+                        <button type="button" @click="categoryOpen = !categoryOpen; closeDropdowns('category')"
                             class="flex h-12 w-full items-center justify-between rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-4 py-0 text-left text-sm font-bold text-[#2B1A10] shadow-sm transition hover:bg-white focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
 
                             <div class="flex min-w-0 items-center gap-3">
@@ -101,7 +107,7 @@
                             x-transition:leave="transition ease-in duration-100"
                             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                             x-transition:leave-end="opacity-0 scale-95 translate-y-1"
-                            class="absolute z-40 mt-3 max-h-72 w-full overflow-y-auto rounded-2xl border border-[#F4D3B0]/80 bg-white shadow-[0_25px_70px_-35px_rgba(31,68,76,0.55)]">
+                            class="absolute left-0 top-full z-20 mt-3 max-h-72 w-full overflow-y-auto rounded-2xl border border-[#F4D3B0]/80 bg-white shadow-[0_25px_70px_-35px_rgba(31,68,76,0.55)]">
 
                             <div class="p-2">
                                 <button type="button" @click="selectedCategory = ''; categoryOpen = false"
@@ -110,10 +116,9 @@
                                         ?
                                         'bg-[#F4B044] text-[#2B1A10]' :
                                         'text-[#2B1A10] hover:bg-[#F4B044]/15'">
+                                    <span class="truncate">Semua Kategori</span>
 
-                                    <p>Semua Kategori</p>
-
-                                    <svg x-show="selectedCategory === ''" x-cloak class="h-5 w-5" fill="none"
+                                    <svg x-show="selectedCategory === ''" x-cloak class="h-5 w-5 shrink-0" fill="none"
                                         stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                     </svg>
@@ -121,17 +126,16 @@
 
                                 @foreach ($categories as $category)
                                     <button type="button"
-                                        @click="selectedCategory = '{{ $category->id }}'; categoryOpen = false"
+                                        @click="selectedCategory = @js((string) $category->id); categoryOpen = false"
                                         class="group flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-bold transition"
-                                        :class="selectedCategory === '{{ $category->id }}'
-                                            ?
+                                        :class="selectedCategory === @js((string) $category->id) ?
                                             'bg-[#F4B044] text-[#2B1A10]' :
                                             'text-[#2B1A10] hover:bg-[#F4B044]/15'">
+                                        <span class="truncate">{{ $category->nama_kategori }}</span>
 
-                                        <p>{{ $category->nama_kategori }}</p>
-
-                                        <svg x-show="selectedCategory === '{{ $category->id }}'" x-cloak class="h-5 w-5"
-                                            fill="none" stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
+                                        <svg x-show="selectedCategory === @js((string) $category->id)" x-cloak
+                                            class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.8"
+                                            viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                         </svg>
                                     </button>
@@ -146,7 +150,7 @@
                     <input type="hidden" name="condition" x-model="selectedCondition">
 
                     <div class="relative">
-                        <button type="button" @click="conditionOpen = !conditionOpen; categoryOpen = false"
+                        <button type="button" @click="conditionOpen = !conditionOpen; closeDropdowns('condition')"
                             class="flex h-12 w-full items-center justify-between rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-4 py-0 text-left text-sm font-bold text-[#2B1A10] shadow-sm transition hover:bg-white focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
 
                             <div class="flex min-w-0 items-center gap-3">
@@ -155,7 +159,7 @@
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2"
                                         viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z" />
+                                            d="M20 7.5 12 3 4 7.5m16 0L12 12m8-4.5v9L12 21m0-9L4 7.5m8 4.5v9M4 7.5v9L12 21" />
                                     </svg>
                                 </span>
 
@@ -177,7 +181,7 @@
                             x-transition:leave="transition ease-in duration-100"
                             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                             x-transition:leave-end="opacity-0 scale-95 translate-y-1"
-                            class="absolute z-40 mt-3 w-full overflow-hidden rounded-2xl border border-[#F4D3B0]/80 bg-white shadow-[0_25px_70px_-35px_rgba(31,68,76,0.55)]">
+                            class="absolute left-0 top-full z-20 mt-3 w-full overflow-hidden rounded-2xl border border-[#F4D3B0]/80 bg-white shadow-[0_25px_70px_-35px_rgba(31,68,76,0.55)]">
 
                             <div class="p-2">
                                 <button type="button" @click="selectedCondition = ''; conditionOpen = false"
@@ -188,8 +192,8 @@
                                         'text-[#2B1A10] hover:bg-[#F4B044]/15'">
                                     <span>Semua Kondisi</span>
 
-                                    <svg x-show="selectedCondition === ''" x-cloak class="h-5 w-5" fill="none"
-                                        stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
+                                    <svg x-show="selectedCondition === ''" x-cloak class="h-5 w-5 shrink-0"
+                                        fill="none" stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                     </svg>
                                 </button>
@@ -202,7 +206,7 @@
                                         'text-[#2B1A10] hover:bg-[#F4B044]/15'">
                                     <span>Ada Stok</span>
 
-                                    <svg x-show="selectedCondition === 'available'" x-cloak class="h-5 w-5"
+                                    <svg x-show="selectedCondition === 'available'" x-cloak class="h-5 w-5 shrink-0"
                                         fill="none" stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                     </svg>
@@ -216,8 +220,8 @@
                                         'text-[#2B1A10] hover:bg-[#F4B044]/15'">
                                     <span>Habis</span>
 
-                                    <svg x-show="selectedCondition === 'out'" x-cloak class="h-5 w-5" fill="none"
-                                        stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
+                                    <svg x-show="selectedCondition === 'out'" x-cloak class="h-5 w-5 shrink-0"
+                                        fill="none" stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                     </svg>
                                 </button>
@@ -251,22 +255,116 @@
             </form>
         </div>
 
+        @php
+            $currentSort = request('sort');
+            $currentDirection = request('direction', 'desc');
+
+            $sortUrl = function (string $column) use ($currentSort, $currentDirection) {
+                $nextDirection = $currentSort === $column && $currentDirection === 'asc' ? 'desc' : 'asc';
+
+                return request()->fullUrlWithQuery([
+                    'sort' => $column,
+                    'direction' => $nextDirection,
+                    'page' => 1,
+                ]);
+            };
+
+            $sortIcon = function (string $column) use ($currentSort, $currentDirection) {
+                $isActive = $currentSort === $column;
+
+                if (!$isActive) {
+                    return '
+                <svg class="h-3.5 w-3.5 opacity-45" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10 3.5a.75.75 0 01.53.22l3 3a.75.75 0 11-1.06 1.06L10 5.31 7.53 7.78a.75.75 0 01-1.06-1.06l3-3A.75.75 0 0110 3.5z"/>
+                    <path d="M10 16.5a.75.75 0 01-.53-.22l-3-3a.75.75 0 111.06-1.06L10 14.69l2.47-2.47a.75.75 0 111.06 1.06l-3 3a.75.75 0 01-.53.22z"/>
+                </svg>
+            ';
+                }
+
+                if ($currentDirection === 'asc') {
+                    return '
+                <svg class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10 3.5a.75.75 0 01.53.22l4 4a.75.75 0 11-1.06 1.06L10 5.31 6.53 8.78a.75.75 0 01-1.06-1.06l4-4A.75.75 0 0110 3.5z"/>
+                    <path d="M10 4.5a.75.75 0 01.75.75v10a.75.75 0 01-1.5 0v-10A.75.75 0 0110 4.5z"/>
+                </svg>
+            ';
+                }
+
+                return '
+            <svg class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10 16.5a.75.75 0 01-.53-.22l-4-4a.75.75 0 111.06-1.06L10 14.69l3.47-3.47a.75.75 0 111.06 1.06l-4 4a.75.75 0 01-.53.22z"/>
+                <path d="M10 3.75a.75.75 0 01.75.75v10a.75.75 0 01-1.5 0v-10A.75.75 0 0110 3.75z"/>
+            </svg>
+        ';
+            };
+        @endphp
         <div
             class="overflow-hidden rounded-3xl border border-[#F4D3B0]/70 bg-white shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-[#F4D3B0]/70">
                     <thead class="bg-[#F7F6F4]">
                         <tr>
-                            <th class="px-5 py-4 text-left text-xs font-black uppercase tracking-wider text-[#6B3E12]">
-                                Produk</th>
-                            <th class="px-5 py-4 text-left text-xs font-black uppercase tracking-wider text-[#6B3E12]">
-                                Kategori</th>
-                            <th class="px-5 py-4 text-left text-xs font-black uppercase tracking-wider text-[#6B3E12]">Stok
+                            <th class="px-5 py-4 text-left">
+                                <span class="text-[11px] font-black uppercase tracking-[0.22em] text-[#6B3E12]/80">
+                                    No
+                                </span>
                             </th>
-                            <th class="px-5 py-4 text-left text-xs font-black uppercase tracking-wider text-[#6B3E12]">
-                                Kondisi</th>
-                            <th class="px-5 py-4 text-right text-xs font-black uppercase tracking-wider text-[#6B3E12]">
-                                Aksi
+
+                            <th class="px-5 py-4 text-left">
+                                <a href="{{ $sortUrl('product') }}"
+                                    class="group inline-flex items-center gap-2 rounded-full px-3 py-2 text-[11px] font-black uppercase tracking-[0.22em] text-[#6B3E12]/80 transition hover:bg-white hover:text-[#1F444C] hover:shadow-sm">
+                                    <span>Produk</span>
+
+                                    <span
+                                        class="inline-flex h-6 w-6 items-center justify-center rounded-full transition
+                    {{ request('sort') === 'product'
+                        ? 'bg-[#1F444C] text-white shadow-sm'
+                        : 'bg-[#F4D3B0]/45 text-[#6B3E12] group-hover:bg-[#F4B044]/25' }}">
+                                        {!! $sortIcon('product') !!}
+                                    </span>
+                                </a>
+                            </th>
+
+                            <th class="px-5 py-4 text-left">
+                                <a href="{{ $sortUrl('category') }}"
+                                    class="group inline-flex items-center gap-2 rounded-full px-3 py-2 text-[11px] font-black uppercase tracking-[0.22em] text-[#6B3E12]/80 transition hover:bg-white hover:text-[#1F444C] hover:shadow-sm">
+                                    <span>Kategori</span>
+
+                                    <span
+                                        class="inline-flex h-6 w-6 items-center justify-center rounded-full transition
+                    {{ request('sort') === 'category'
+                        ? 'bg-[#1F444C] text-white shadow-sm'
+                        : 'bg-[#F4D3B0]/45 text-[#6B3E12] group-hover:bg-[#F4B044]/25' }}">
+                                        {!! $sortIcon('category') !!}
+                                    </span>
+                                </a>
+                            </th>
+
+                            <th class="px-5 py-4 text-left">
+                                <a href="{{ $sortUrl('stock') }}"
+                                    class="group inline-flex items-center gap-2 rounded-full px-3 py-2 text-[11px] font-black uppercase tracking-[0.22em] text-[#6B3E12]/80 transition hover:bg-white hover:text-[#1F444C] hover:shadow-sm">
+                                    <span>Stok</span>
+
+                                    <span
+                                        class="inline-flex h-6 w-6 items-center justify-center rounded-full transition
+                    {{ request('sort') === 'stock'
+                        ? 'bg-[#1F444C] text-white shadow-sm'
+                        : 'bg-[#F4D3B0]/45 text-[#6B3E12] group-hover:bg-[#F4B044]/25' }}">
+                                        {!! $sortIcon('stock') !!}
+                                    </span>
+                                </a>
+                            </th>
+
+                            <th class="px-5 py-4 text-left">
+                                <span class="text-[11px] font-black uppercase tracking-[0.22em] text-[#6B3E12]/80">
+                                    Kondisi
+                                </span>
+                            </th>
+
+                            <th class="w-[180px] px-5 py-4 text-right">
+                                <span class="text-[11px] font-black uppercase tracking-[0.22em] text-[#6B3E12]/80">
+                                    Aksi
+                                </span>
                             </th>
                         </tr>
                     </thead>
@@ -286,6 +384,10 @@
                             @endphp
 
                             <tr x-data="{ editOpen: false }">
+                                <td class="px-5 py-4 text-sm font-black text-[#6B3E12]">
+                                    {{ $products->firstItem() + $loop->index }}
+                                </td>
+
                                 <td class="px-5 py-4">
                                     <div class="font-black text-[#2B1A10]">
                                         {{ $product->nama_produk }}
@@ -310,16 +412,16 @@
                                     </span>
                                 </td>
 
-                                <td class="px-5 py-4 text-right">
-                                    <div class="flex flex-wrap justify-end gap-2">
+                                <td class="w-[180px] px-5 py-4 text-right">
+                                    <div class="flex flex-nowrap justify-end gap-2 whitespace-nowrap">
                                         <a href="{{ route($routePrefix . '.movements', $product) }}"
-                                            class="rounded-xl border border-[#F4D3B0] px-3 py-2 text-xs font-black text-[#6B3E12] transition hover:bg-[#F7F6F4]">
+                                            class="inline-flex items-center justify-center rounded-xl bg-[#F4B044] px-3 py-2 text-xs font-black text-[#2B1A10] shadow-sm shadow-[#F4B044]/25 transition hover:-translate-y-0.5 hover:bg-[#E7A33D] hover:shadow-md active:scale-95">
                                             Riwayat
                                         </a>
 
                                         @if ($canManage)
                                             <button type="button" @click="editOpen = true"
-                                                class="rounded-xl bg-[#F4B044] px-3 py-2 text-xs font-black text-[#2B1A10] transition hover:bg-[#f7bd5f]">
+                                                class="inline-flex items-center justify-center rounded-xl bg-[#1F444C] px-3 py-2 text-xs font-black text-white shadow-sm shadow-[#1F444C]/25 transition hover:-translate-y-0.5 hover:bg-[#183941] hover:shadow-md active:scale-95">
                                                 Edit
                                             </button>
 
@@ -400,7 +502,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-5 py-10 text-center text-sm font-bold text-[#6B3E12]">
+                                <td colspan="6" class="px-5 py-10 text-center text-sm font-bold text-[#6B3E12]">
                                     Data stok belum tersedia.
                                 </td>
                             </tr>

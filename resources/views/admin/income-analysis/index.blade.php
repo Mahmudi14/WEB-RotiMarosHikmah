@@ -81,7 +81,7 @@
         </div>
 
         {{-- Filter --}}
-        <div class="rounded-3xl border border-[#F4D3B0]/70 bg-white p-5 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]"
+        <div class="relative overflow-visible rounded-3xl border border-[#F4D3B0]/70 bg-white p-5 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]"
             x-data="{
                 cashierOpen: false,
                 chartViewOpen: false,
@@ -169,6 +169,7 @@
                             {{ $scopeLabel }}
                         </p>
                     </div>
+
                     {{-- Kasir --}}
                     <div class="min-w-0">
                         <input type="hidden" name="cashier_id" x-model="selectedCashier">
@@ -210,16 +211,16 @@
                                 x-transition:leave="transition ease-in duration-100"
                                 x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                                 x-transition:leave-end="opacity-0 scale-95 translate-y-1"
-                                class="absolute z-40 mt-3 max-h-72 w-full overflow-y-auto rounded-2xl border border-[#F4D3B0]/80 bg-white p-2 shadow-[0_25px_70px_-35px_rgba(31,68,76,0.55)]">
+                                class="absolute left-0 top-full z-20 mt-3 max-h-72 w-full overflow-y-auto rounded-2xl border border-[#F4D3B0]/80 bg-white p-2 shadow-[0_25px_70px_-35px_rgba(31,68,76,0.55)]">
                                 <button type="button" @click="selectedCashier = ''; cashierOpen = false"
                                     class="flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-bold transition"
                                     :class="selectedCashier === ''
                                         ?
                                         'bg-[#F4B044] text-[#2B1A10]' :
                                         'text-[#2B1A10] hover:bg-[#F4B044]/15'">
-                                    <span>Semua Kasir</span>
+                                    <span class="truncate">Semua Kasir</span>
 
-                                    <svg x-show="selectedCashier === ''" x-cloak class="h-5 w-5" fill="none"
+                                    <svg x-show="selectedCashier === ''" x-cloak class="h-5 w-5 shrink-0" fill="none"
                                         stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                     </svg>
@@ -232,10 +233,10 @@
                                         :class="selectedCashier === @js((string) $cashier->id) ?
                                             'bg-[#F4B044] text-[#2B1A10]' :
                                             'text-[#2B1A10] hover:bg-[#F4B044]/15'">
-                                        <span>{{ $cashier->name }}</span>
+                                        <span class="truncate">{{ $cashier->name }}</span>
 
                                         <svg x-show="selectedCashier === @js((string) $cashier->id)" x-cloak
-                                            class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.8"
+                                            class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.8"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                         </svg>
@@ -268,7 +269,7 @@
 
                 {{-- Row 2: Bulan | Tahun | Tampilan --}}
                 <div class="grid gap-3 md:grid-cols-3">
-                    {{-- Bulan - kiri --}}
+                    {{-- Bulan --}}
                     <div class="min-w-0 md:col-start-1" x-show="showMonthFilter" x-cloak>
                         <input type="hidden" name="month" x-model="selectedMonth">
 
@@ -309,7 +310,7 @@
                                 x-transition:leave="transition ease-in duration-100"
                                 x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                                 x-transition:leave-end="opacity-0 scale-95 translate-y-1"
-                                class="absolute z-40 mt-3 max-h-72 w-full overflow-y-auto rounded-2xl border border-[#F4D3B0]/80 bg-white p-2 shadow-[0_25px_70px_-35px_rgba(31,68,76,0.55)]">
+                                class="absolute left-0 top-full z-20 mt-3 max-h-72 w-full overflow-y-auto rounded-2xl border border-[#F4D3B0]/80 bg-white p-2 shadow-[0_25px_70px_-35px_rgba(31,68,76,0.55)]">
                                 <button type="button" x-show="selectedChartView === 'overall'"
                                     @click="selectedMonth = ''; monthOpen = false"
                                     class="flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-bold transition"
@@ -319,7 +320,7 @@
                                         'text-[#2B1A10] hover:bg-[#F4B044]/15'">
                                     <span>Semua Bulan</span>
 
-                                    <svg x-show="selectedMonth === ''" x-cloak class="h-5 w-5" fill="none"
+                                    <svg x-show="selectedMonth === ''" x-cloak class="h-5 w-5 shrink-0" fill="none"
                                         stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                     </svg>
@@ -332,11 +333,11 @@
                                         :class="selectedMonth === @js((string) $value) ?
                                             'bg-[#F4B044] text-[#2B1A10]' :
                                             'text-[#2B1A10] hover:bg-[#F4B044]/15'">
-                                        <span>{{ $label }}</span>
+                                        <span class="truncate">{{ $label }}</span>
 
                                         <svg x-show="selectedMonth === @js((string) $value)" x-cloak
-                                            class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.8"
-                                            viewBox="0 0 24 24">
+                                            class="h-5 w-5 shrink-0" fill="none" stroke="currentColor"
+                                            stroke-width="2.8" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                         </svg>
                                     </button>
@@ -345,7 +346,7 @@
                         </div>
                     </div>
 
-                    {{-- Tahun - tengah --}}
+                    {{-- Tahun --}}
                     <div class="min-w-0 md:col-start-2" x-show="showYearFilter" x-cloak>
                         <input type="hidden" name="year" x-model="selectedYear">
 
@@ -386,7 +387,7 @@
                                 x-transition:leave="transition ease-in duration-100"
                                 x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                                 x-transition:leave-end="opacity-0 scale-95 translate-y-1"
-                                class="absolute z-40 mt-3 max-h-72 w-full overflow-y-auto rounded-2xl border border-[#F4D3B0]/80 bg-white p-2 shadow-[0_25px_70px_-35px_rgba(31,68,76,0.55)]">
+                                class="absolute left-0 top-full z-20 mt-3 max-h-72 w-full overflow-y-auto rounded-2xl border border-[#F4D3B0]/80 bg-white p-2 shadow-[0_25px_70px_-35px_rgba(31,68,76,0.55)]">
                                 <button type="button" x-show="selectedChartView === 'overall'"
                                     @click="selectedYear = ''; selectedMonth = ''; yearOpen = false"
                                     class="flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-bold transition"
@@ -396,7 +397,7 @@
                                         'text-[#2B1A10] hover:bg-[#F4B044]/15'">
                                     <span>Semua Tahun</span>
 
-                                    <svg x-show="selectedYear === ''" x-cloak class="h-5 w-5" fill="none"
+                                    <svg x-show="selectedYear === ''" x-cloak class="h-5 w-5 shrink-0" fill="none"
                                         stroke="currentColor" stroke-width="2.8" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                     </svg>
@@ -412,8 +413,8 @@
                                         <span>{{ $year }}</span>
 
                                         <svg x-show="selectedYear === @js((string) $year)" x-cloak
-                                            class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.8"
-                                            viewBox="0 0 24 24">
+                                            class="h-5 w-5 shrink-0" fill="none" stroke="currentColor"
+                                            stroke-width="2.8" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                         </svg>
                                     </button>
@@ -422,7 +423,7 @@
                         </div>
                     </div>
 
-                    {{-- Tampilan - kanan --}}
+                    {{-- Tampilan --}}
                     <div class="min-w-0 md:col-start-3">
                         <input type="hidden" name="chart_view" x-model="selectedChartView">
 
@@ -463,18 +464,18 @@
                                 x-transition:leave="transition ease-in duration-100"
                                 x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                                 x-transition:leave-end="opacity-0 scale-95 translate-y-1"
-                                class="absolute z-40 mt-3 w-full overflow-hidden rounded-2xl border border-[#F4D3B0]/80 bg-white p-2 shadow-[0_25px_70px_-35px_rgba(31,68,76,0.55)]">
+                                class="absolute left-0 top-full z-20 mt-3 w-full overflow-hidden rounded-2xl border border-[#F4D3B0]/80 bg-white p-2 shadow-[0_25px_70px_-35px_rgba(31,68,76,0.55)]">
                                 @foreach ($chartViews as $value => $label)
                                     <button type="button" @click="chooseChartView(@js($value))"
                                         class="flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-sm font-bold transition"
                                         :class="selectedChartView === @js($value) ?
                                             'bg-[#F4B044] text-[#2B1A10]' :
                                             'text-[#2B1A10] hover:bg-[#F4B044]/15'">
-                                        <span>{{ $label }}</span>
+                                        <span class="truncate">{{ $label }}</span>
 
                                         <svg x-show="selectedChartView === @js($value)" x-cloak
-                                            class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.8"
-                                            viewBox="0 0 24 24">
+                                            class="h-5 w-5 shrink-0" fill="none" stroke="currentColor"
+                                            stroke-width="2.8" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                         </svg>
                                     </button>

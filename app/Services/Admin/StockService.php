@@ -20,33 +20,65 @@ class StockService
             ->get(['id', 'nama_kategori']);
     }
 
-    public function getPaginatedProducts(Request $request, int $perPage = 10): LengthAwarePaginator
+    public function getPaginatedProducts(Request $request, int $perPage = 15): LengthAwarePaginator
     {
         $search = $request->query('search');
         $categoryId = $request->query('category_id');
         $condition = $request->query('condition');
 
-        return Product::query()
+        $sort = $request->query('sort');
+        $direction = strtolower($request->query('direction', 'desc'));
+
+        if (! in_array($direction, ['asc', 'desc'], true)) {
+            $direction = 'desc';
+        }
+
+        $query = Product::query()
+            ->select('products.*')
             ->with(['category'])
+            ->leftJoin('categories', 'categories.id', '=', 'products.category_id')
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($query) use ($search) {
-                    $query->where('nama_produk', 'like', "%{$search}%")
-                        ->orWhere('kode_produk', 'like', "%{$search}%")
+                    $query->where('products.nama_produk', 'like', "%{$search}%")
+                        ->orWhere('products.kode_produk', 'like', "%{$search}%")
                         ->orWhereHas('category', function ($query) use ($search) {
                             $query->where('nama_kategori', 'like', "%{$search}%");
                         });
                 });
             })
             ->when($categoryId, function ($query) use ($categoryId) {
-                $query->where('category_id', $categoryId);
+                $query->where('products.category_id', $categoryId);
             })
             ->when($condition === 'available', function ($query) {
-                $query->where('stock', '>', 0);
+                $query->where('products.stock', '>', 0);
             })
             ->when($condition === 'out', function ($query) {
-                $query->where('stock', 0);
-            })
-            ->orderBy('nama_produk')
+                $query->where('products.stock', '<=', 0);
+            });
+
+        match ($sort) {
+            'product' => $query
+                ->orderBy('products.nama_produk', $direction)
+                ->orderBy('products.created_at', 'desc')
+                ->orderBy('products.id', 'desc'),
+
+            'category' => $query
+                ->orderByRaw('categories.nama_kategori IS NULL')
+                ->orderBy('categories.nama_kategori', $direction)
+                ->orderBy('products.nama_produk', 'asc')
+                ->orderBy('products.id', 'desc'),
+
+            'stock' => $query
+                ->orderBy('products.stock', $direction)
+                ->orderBy('products.nama_produk', 'asc')
+                ->orderBy('products.id', 'desc'),
+
+            default => $query
+                ->orderBy('products.created_at', 'desc')
+                ->orderBy('products.id', 'desc'),
+        };
+
+        return $query
             ->paginate($perPage)
             ->withQueryString();
     }
