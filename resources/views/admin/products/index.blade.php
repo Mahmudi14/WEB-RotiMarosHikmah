@@ -331,68 +331,68 @@
         @endphp
         <div
             class="overflow-hidden rounded-3xl border border-[#F4D3B0]/70 bg-white shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-[#F4D3B0]/70">
+            <div class="w-full overflow-x-auto overscroll-x-contain pb-2">
+                <table class="min-w-full table-auto divide-y divide-[#F4D3B0]/70">
                     <thead class="bg-[#F7F6F4]">
                         <tr>
-                            <th class="px-6 py-4 text-left">
+                            <th class="min-w-[80px] whitespace-nowrap px-6 py-4 text-left">
                                 <span class="text-[11px] font-black uppercase tracking-[0.22em] text-[#6B3E12]/80">
                                     No
                                 </span>
                             </th>
 
-                            <th class="px-6 py-4 text-left">
+                            <th class="min-w-[300px] px-6 py-4 text-left">
                                 <a href="{{ $sortUrl('product') }}"
                                     class="group inline-flex items-center gap-2 rounded-full px-3 py-2 text-[11px] font-black uppercase tracking-[0.22em] text-[#6B3E12]/80 transition hover:bg-white hover:text-[#1F444C] hover:shadow-sm">
                                     <span>Produk</span>
 
                                     <span
                                         class="inline-flex h-6 w-6 items-center justify-center rounded-full transition
-                    {{ request('sort') === 'product'
-                        ? 'bg-[#1F444C] text-white shadow-sm'
-                        : 'bg-[#F4D3B0]/45 text-[#6B3E12] group-hover:bg-[#F4B044]/25' }}">
+                            {{ request('sort') === 'product'
+                                ? 'bg-[#1F444C] text-white shadow-sm'
+                                : 'bg-[#F4D3B0]/45 text-[#6B3E12] group-hover:bg-[#F4B044]/25' }}">
                                         {!! $sortIcon('product') !!}
                                     </span>
                                 </a>
                             </th>
 
-                            <th class="px-6 py-4 text-left">
+                            <th class="min-w-[180px] px-6 py-4 text-left">
                                 <a href="{{ $sortUrl('category') }}"
                                     class="group inline-flex items-center gap-2 rounded-full px-3 py-2 text-[11px] font-black uppercase tracking-[0.22em] text-[#6B3E12]/80 transition hover:bg-white hover:text-[#1F444C] hover:shadow-sm">
                                     <span>Kategori</span>
 
                                     <span
                                         class="inline-flex h-6 w-6 items-center justify-center rounded-full transition
-                    {{ request('sort') === 'category'
-                        ? 'bg-[#1F444C] text-white shadow-sm'
-                        : 'bg-[#F4D3B0]/45 text-[#6B3E12] group-hover:bg-[#F4B044]/25' }}">
+                            {{ request('sort') === 'category'
+                                ? 'bg-[#1F444C] text-white shadow-sm'
+                                : 'bg-[#F4D3B0]/45 text-[#6B3E12] group-hover:bg-[#F4B044]/25' }}">
                                         {!! $sortIcon('category') !!}
                                     </span>
                                 </a>
                             </th>
 
-                            <th class="px-6 py-4 text-left">
+                            <th class="min-w-[160px] whitespace-nowrap px-6 py-4 text-left">
                                 <a href="{{ $sortUrl('price') }}"
                                     class="group inline-flex items-center gap-2 rounded-full px-3 py-2 text-[11px] font-black uppercase tracking-[0.22em] text-[#6B3E12]/80 transition hover:bg-white hover:text-[#1F444C] hover:shadow-sm">
                                     <span>Harga</span>
 
                                     <span
                                         class="inline-flex h-6 w-6 items-center justify-center rounded-full transition
-                    {{ request('sort') === 'price'
-                        ? 'bg-[#1F444C] text-white shadow-sm'
-                        : 'bg-[#F4D3B0]/45 text-[#6B3E12] group-hover:bg-[#F4B044]/25' }}">
+                            {{ request('sort') === 'price'
+                                ? 'bg-[#1F444C] text-white shadow-sm'
+                                : 'bg-[#F4D3B0]/45 text-[#6B3E12] group-hover:bg-[#F4B044]/25' }}">
                                         {!! $sortIcon('price') !!}
                                     </span>
                                 </a>
                             </th>
 
-                            <th class="px-2 py-4 text-center">
+                            <th class="min-w-[130px] whitespace-nowrap px-2 py-4 text-center">
                                 <span class="text-[11px] font-black uppercase tracking-[0.22em] text-[#6B3E12]/80">
                                     Status
                                 </span>
                             </th>
 
-                            <th class="w-[220px] px-6 py-4 text-right">
+                            <th class="w-[230px] min-w-[230px] whitespace-nowrap px-2 py-4 text-right">
                                 <span class="text-[11px] font-black uppercase tracking-[0.22em] text-[#6B3E12]/80">
                                     Aksi
                                 </span>
@@ -419,12 +419,14 @@
                             @endphp
 
                             <tr class="transition hover:bg-[#F7F6F4]/70">
-                                <td class="px-6 py-4 text-sm font-black text-[#6B3E12]">
+                                {{-- Nomor --}}
+                                <td class="min-w-[80px] whitespace-nowrap px-6 py-4 text-sm font-black text-[#6B3E12]">
                                     {{ $products->firstItem() + $loop->index }}
                                 </td>
 
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
+                                {{-- Produk --}}
+                                <td class="min-w-[300px] px-6 py-4">
+                                    <div class="flex min-w-0 items-center gap-4">
                                         @if ($product->gambar)
                                             <img src="{{ asset('storage/' . $product->gambar) }}"
                                                 alt="{{ $product->nama_produk }}"
@@ -436,55 +438,64 @@
                                             </div>
                                         @endif
 
-                                        <div>
-                                            <p class="font-black text-[#2B1A10]">
+                                        <div class="min-w-0 flex-1">
+                                            <p class="break-words text-base font-black leading-snug text-[#2B1A10]">
                                                 {{ $product->nama_produk }}
                                             </p>
 
-                                            <p class="mt-0.5 text-sm font-medium text-[#6B3E12]">
+                                            <p class="mt-1 break-words text-sm font-medium leading-snug text-[#6B3E12]">
                                                 {{ $product->kode_produk ?: $product->slug }}
                                             </p>
                                         </div>
                                     </div>
                                 </td>
 
-                                <td class="px-6 py-4 text-sm font-bold text-[#6B3E12]">
-                                    {{ $product->category?->nama_kategori ?? '-' }}
+                                {{-- Kategori --}}
+                                <td class="min-w-[180px] px-6 py-4 text-sm font-bold text-[#6B3E12]">
+                                    <span class="break-words">
+                                        {{ $product->category?->nama_kategori ?? '-' }}
+                                    </span>
                                 </td>
 
-                                <td class="px-6 py-4 text-sm font-black text-[#2B1A10]">
+                                {{-- Harga --}}
+                                <td class="min-w-[160px] whitespace-nowrap px-6 py-4 text-sm font-black text-[#2B1A10]">
                                     {{ $product->harga_jual_formatted }}
                                 </td>
 
-                                <td class="px-2 py-4">
+                                {{-- Status --}}
+                                <td class="min-w-[130px] px-2 py-4">
                                     <div class="flex flex-col items-center gap-2">
                                         <span
-                                            class="inline-flex w-fit justify-center rounded-full px-3 py-1 text-center text-xs font-black {{ $availabilityClass }}">
+                                            class="inline-flex w-fit whitespace-nowrap rounded-full px-3 py-1 text-center text-xs font-black {{ $availabilityClass }}">
                                             {{ $availabilityLabel }}
                                         </span>
 
                                         <span
-                                            class="inline-flex w-fit justify-center rounded-full px-3 py-1 text-center text-xs font-black {{ $statusClass }}">
+                                            class="inline-flex w-fit whitespace-nowrap rounded-full px-3 py-1 text-center text-xs font-black {{ $statusClass }}">
                                             {{ $statusLabel }}
                                         </span>
                                     </div>
                                 </td>
 
-                                <td class="w-[230px] px-2 py-4">
+                                {{-- Aksi --}}
+                                <td class="w-[230px] min-w-[230px] px-2 py-4">
                                     <div class="flex flex-nowrap items-center justify-end gap-2 whitespace-nowrap">
                                         <a href="{{ route('admin.products.show', $product) }}"
-                                            class="inline-flex items-center justify-center rounded-xl bg-[#F4B044] px-3 py-2 text-xs font-black text-[#2B1A10] shadow-sm shadow-[#F4B044]/25 transition hover:-translate-y-0.5 hover:bg-[#E7A33D] hover:shadow-md active:scale-95">
+                                            class="inline-flex shrink-0 items-center justify-center rounded-xl bg-[#F4B044] px-3 py-2 text-xs font-black text-[#2B1A10] shadow-sm shadow-[#F4B044]/25 transition hover:-translate-y-0.5 hover:bg-[#E7A33D] hover:shadow-md active:scale-95">
                                             Detail
                                         </a>
 
                                         <a href="{{ route('admin.products.edit', $product) }}"
-                                            class="inline-flex items-center justify-center rounded-xl bg-[#1F444C] px-3 py-2 text-xs font-black text-white shadow-sm shadow-[#1F444C]/25 transition hover:-translate-y-0.5 hover:bg-[#183941] hover:shadow-md active:scale-95">
+                                            class="inline-flex shrink-0 items-center justify-center rounded-xl bg-[#1F444C] px-3 py-2 text-xs font-black text-white shadow-sm shadow-[#1F444C]/25 transition hover:-translate-y-0.5 hover:bg-[#183941] hover:shadow-md active:scale-95">
                                             Edit
                                         </a>
 
                                         <button type="button"
-                                            @click="openDeleteModal(@js(route('admin.products.destroy', $product)), @js($product->nama_produk))"
-                                            class="inline-flex items-center justify-center rounded-xl bg-[#A92A35] px-3 py-2 text-xs font-black text-white shadow-sm shadow-[#A92A35]/25 transition hover:-translate-y-0.5 hover:bg-[#8F202A] hover:shadow-md active:scale-95">
+                                            @click="openDeleteModal(
+                                    @js(route('admin.products.destroy', $product)),
+                                    @js($product->nama_produk)
+                                )"
+                                            class="inline-flex shrink-0 items-center justify-center rounded-xl bg-[#A92A35] px-3 py-2 text-xs font-black text-white shadow-sm shadow-[#A92A35]/25 transition hover:-translate-y-0.5 hover:bg-[#8F202A] hover:shadow-md active:scale-95">
                                             Hapus
                                         </button>
                                     </div>

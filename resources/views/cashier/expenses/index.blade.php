@@ -38,7 +38,7 @@
                         </h1>
 
                         <p class="mt-2 max-w-2xl text-sm font-medium leading-relaxed text-[#F7F6F4]/80">
-                            Catat barang atau kebutuhan yang dibeli menggunakan uang laci kasir pada shift aktif.
+                            Catat barang atau kebutuhan yang dibeli menggunakan uang laci kasir.
                         </p>
                     </div>
 

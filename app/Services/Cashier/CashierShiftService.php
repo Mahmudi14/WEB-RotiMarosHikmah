@@ -70,8 +70,21 @@ class CashierShiftService
     public function openShift(User $cashier, array $data): CashierShift
     {
         return DB::transaction(function () use ($cashier, $data) {
-            if ($this->getActiveShift($cashier)) {
-                throw new Exception('Kamu masih memiliki shift aktif. Tutup shift terlebih dahulu sebelum membuka shift baru.');
+            User::query()
+                ->whereKey($cashier->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $hasActiveShift = CashierShift::query()
+                ->where('cashier_id', $cashier->id)
+                ->where('status', 'aktif')
+                ->lockForUpdate()
+                ->exists();
+
+            if ($hasActiveShift) {
+                throw new Exception(
+                    'Kamu masih memiliki shift aktif. Tutup shift terlebih dahulu sebelum membuka shift baru.'
+                );
             }
 
             $terminal = PosTerminal::query()
@@ -90,7 +103,9 @@ class CashierShiftService
                 ->exists();
 
             if ($terminalUsed) {
-                throw new Exception('Terminal kasir sedang digunakan pada shift aktif lain.');
+                throw new Exception(
+                    'Terminal kasir sedang digunakan pada shift aktif lain.'
+                );
             }
 
             return CashierShift::create([
@@ -101,7 +116,7 @@ class CashierShiftService
                 'status' => 'aktif',
                 'opening_note' => $data['opening_note'] ?? null,
             ]);
-        });
+        }, 3);
     }
 
     public function calculateTotals(CashierShift $shift): array
@@ -140,8 +155,11 @@ class CashierShiftService
         ];
     }
 
-    public function closeShift(User $cashier, CashierShift $shift, array $data): CashierShift
-    {
+    public function closeShift(
+        User $cashier,
+        CashierShift $shift,
+        array $data
+    ): CashierShift {
         return DB::transaction(function () use ($cashier, $shift, $data) {
             $shift = CashierShift::query()
                 ->whereKey($shift->id)
@@ -158,7 +176,6 @@ class CashierShiftService
 
             $closingCash = (float) $data['closing_cash'];
 
-            // Selisih = uang fisik di laci - uang kas menurut sistem
             $cashDifference = $closingCash - $totals['cash_in_system'];
 
             $shift->update([
@@ -173,7 +190,9 @@ class CashierShiftService
                 'closing_note' => $data['closing_note'] ?? null,
             ]);
 
-            $shift = $shift->refresh()->load(['cashier', 'terminal']);
+            $shift = $shift
+                ->refresh()
+                ->load(['cashier', 'terminal']);
 
             $this->createShiftReportPrintJob($shift);
 

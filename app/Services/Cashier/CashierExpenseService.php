@@ -67,20 +67,44 @@ class CashierExpenseService
                 ->first();
 
             if (! $activeShift) {
-                throw new Exception('Kamu belum membuka shift. Buka shift terlebih dahulu sebelum mencatat pengeluaran.');
+                throw new Exception(
+                    'Kamu belum membuka shift. Buka shift terlebih dahulu sebelum mencatat pengeluaran.'
+                );
+            }
+
+            $totalCashSales = (float) $activeShift->sales()
+                ->where('status', 'selesai')
+                ->where('payment_method', 'tunai')
+                ->sum('grand_total');
+
+            $totalExpenses = (float) $activeShift->expenses()
+                ->sum('nominal');
+
+            $availableCash =
+                (float) $activeShift->opening_cash
+                + $totalCashSales
+                - $totalExpenses;
+
+            $expenseAmount = (float) $data['harga'];
+
+            if ($expenseAmount > $availableCash) {
+                throw new Exception(
+                    'Kas laci tidak mencukupi. Kas tersedia saat ini Rp '
+                        . number_format(max(0, $availableCash), 0, ',', '.')
+                        . '.'
+                );
             }
 
             return CashierExpense::create([
                 'cashier_id' => $cashier->id,
                 'cashier_shift_id' => $activeShift->id,
                 'pos_terminal_id' => $activeShift->pos_terminal_id,
-
                 'tanggal_pengeluaran' => now()->toDateString(),
                 'kategori_pengeluaran' => $data['nama_pengeluaran'],
-                'nominal' => $data['harga'],
+                'nominal' => $expenseAmount,
                 'keterangan' => $data['deskripsi'] ?? null,
             ]);
-        });
+        }, 3);
     }
 
     public function deleteExpense(User $cashier, CashierExpense $expense): void

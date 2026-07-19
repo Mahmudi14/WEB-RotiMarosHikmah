@@ -21,7 +21,7 @@
                         </h1>
 
                         <p class="mt-2 max-w-2xl text-sm font-medium leading-relaxed text-[#F7F6F4]/80">
-                            Pilih terminal kasir dan masukkan kas awal sebelum mulai transaksi POS.
+                            Pilih terminal kasir dan masukkan kas awal sebelum mulai transaksi.
                         </p>
                     </div>
 
@@ -36,17 +36,24 @@
         <div class="rounded-3xl border border-[#F4D3B0]/70 bg-white p-6 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]"
             x-data="{
                 terminalOpen: false,
+                isSubmitting: false,
+            
                 selectedTerminal: @js((string) old('pos_terminal_id', '')),
                 terminals: @js($terminals->mapWithKeys(fn($terminal) => [(string) $terminal->id => $terminal->kode_terminal . ' - ' . $terminal->nama_terminal])->toArray()),
                 openingCash: @js((string) old('opening_cash', '')),
             
                 get selectedTerminalLabel() {
-                    return this.selectedTerminal ? this.terminals[this.selectedTerminal] : 'Pilih Terminal Kasir'
+                    return this.selectedTerminal ?
+                        this.terminals[this.selectedTerminal] :
+                        'Pilih Terminal Kasir'
                 },
             
                 formatCurrency(event) {
                     let value = event.target.value.replace(/[^0-9]/g, '');
-                    this.openingCash = value ? new Intl.NumberFormat('id-ID').format(value) : '';
+                    this.openingCash = value ?
+                        new Intl.NumberFormat('id-ID').format(value) :
+                        '';
+            
                     event.target.value = this.openingCash;
                 }
             }">
@@ -63,7 +70,15 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('cashier.shifts.store') }}" class="mt-6 space-y-6">
+            <form method="POST" action="{{ route('cashier.shifts.store') }}" class="mt-6 space-y-6"
+                @submit="
+                    if (isSubmitting) {
+                        $event.preventDefault();
+                        return;
+                    }
+
+        isSubmitting = true;
+    ">
                 @csrf
 
                 <div class="grid gap-5 lg:grid-cols-2">
@@ -175,7 +190,7 @@
                         <span class="font-semibold text-[#6B3E12]/60">(Opsional)</span>
                     </label>
 
-                    <textarea name="opening_note" rows="4" placeholder="Contoh: Shift pagi dimulai."
+                    <textarea name="opening_note" rows="4"
                         class="block w-full rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-4 py-3 text-sm font-medium text-[#2B1A10] shadow-sm transition placeholder:text-[#6B3E12]/45 focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">{{ old('opening_note') }}</textarea>
 
                     @error('opening_note')
@@ -191,9 +206,25 @@
                         Batal
                     </a>
 
-                    <button type="submit" @disabled($terminals->isEmpty())
-                        class="inline-flex h-12 items-center justify-center rounded-2xl bg-[#1F444C] px-6 text-sm font-black text-white shadow-lg shadow-[#1F444C]/20 transition hover:-translate-y-0.5 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50">
-                        Buka Shift
+                    <button type="submit" :disabled="isSubmitting || @js($terminals->isEmpty())"
+                        class="inline-flex h-12 min-w-[150px] items-center justify-center gap-2 rounded-2xl bg-[#1F444C] px-6 text-sm font-black text-white shadow-lg shadow-[#1F444C]/20 transition hover:-translate-y-0.5 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0">
+
+                        <svg x-show="isSubmitting" x-cloak class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                stroke-width="4">
+                            </circle>
+
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z">
+                            </path>
+                        </svg>
+
+                        <span x-show="!isSubmitting">
+                            Buka Shift
+                        </span>
+
+                        <span x-show="isSubmitting" x-cloak>
+                            Membuka Shift...
+                        </span>
                     </button>
                 </div>
             </form>

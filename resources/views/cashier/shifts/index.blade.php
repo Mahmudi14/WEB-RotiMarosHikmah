@@ -5,6 +5,8 @@
 @section('content')
     <div class="flex flex-col gap-4" x-data="{
         copied: false,
+        isReprinting: false,
+    
         openedAt: @js($activeShift?->opened_at?->toIso8601String()),
         durationText: '-',
     
@@ -33,32 +35,33 @@
             this.durationText = `${hours} jam ${minutes} menit`;
         }
     }" x-init="updateDuration();
-    setInterval(() => updateDuration(), 60000)">
+    setInterval(() => updateDuration(), 60000);">
         {{-- Header --}}
-        <div class="shrink-0 overflow-hidden rounded-3xl bg-[#1F444C] p-5 text-white shadow-lg shadow-[#1F444C]/10">
+        <div class="shrink-0 overflow-hidden rounded-3xl bg-[#1F444C] p-6 text-white shadow-lg shadow-[#1F444C]/10">
             <div class="relative">
-                <div class="absolute -right-10 -top-12 h-28 w-28 rounded-full bg-[#F4B044]/20"></div>
-                <div class="absolute -bottom-14 -left-10 h-28 w-28 rounded-full bg-white/10"></div>
+                <div class="absolute -right-10 -top-12 h-32 w-32 rounded-full bg-[#F4B044]/20"></div>
+                <div class="absolute -bottom-16 -left-12 h-36 w-36 rounded-full bg-white/10"></div>
 
                 <div
-                    class="relative flex flex-col gap-4 min-[835px]:flex-row min-[835px]:items-center min-[835px]:justify-between">
+                    class="relative flex flex-col gap-5 min-[835px]:flex-row min-[835px]:items-center min-[835px]:justify-between">
+
                     <div class="min-w-0">
                         <p class="text-xs font-bold uppercase tracking-[0.28em] text-[#F4D3B0]">
                             Kasir / Shift
                         </p>
 
-                        <h1 class="mt-1.5 text-2xl font-black tracking-tight text-white">
+                        <h1 class="mt-2 text-2xl font-black tracking-tight text-white">
                             Shift Kasir
                         </h1>
 
-                        <p class="mt-1.5 max-w-2xl text-sm font-medium leading-relaxed text-[#F7F6F4]/80">
+                        <p class="mt-2 max-w-2xl text-sm font-medium leading-relaxed text-[#F7F6F4]/80">
                             Buka shift dan lihat terminal aktif.
                         </p>
                     </div>
 
                     @if ($activeShift)
                         <div
-                            class="w-full rounded-2xl border border-white/10 bg-white/10 p-3 backdrop-blur-sm min-[835px]:w-[360px]">
+                            class="w-full rounded-2xl border border-white/10 bg-white/10 p-3 backdrop-blur-sm min-[835px]:w-[360px] min-[835px]:shrink-0">
                             <div class="flex items-center justify-between gap-3">
                                 <div class="min-w-0">
                                     <p class="text-xs font-black uppercase tracking-[0.18em] text-[#F4D3B0]">
@@ -70,7 +73,7 @@
                                     </p>
 
                                     <p class="mt-1 text-xs font-semibold text-white/65">
-                                        Untuk Flutter Printer Bridge
+                                        Untuk Aplikasi Printer Bridge
                                     </p>
                                 </div>
 
@@ -342,12 +345,37 @@
                         </p>
                     </div>
 
-                    <form method="POST" action="{{ route('cashier.shifts.reprint-report', $recentClosedShift) }}">
+                    <form method="POST" action="{{ route('cashier.shifts.reprint-report', $recentClosedShift) }}"
+                        @submit="
+        if (isReprinting) {
+            $event.preventDefault();
+            return;
+        }
+
+        isReprinting = true;
+    ">
                         @csrf
 
-                        <button type="submit"
-                            class="inline-flex h-11 items-center justify-center rounded-2xl bg-[#1F444C] px-5 text-sm font-black text-white shadow-lg shadow-[#1F444C]/20 transition hover:-translate-y-0.5 hover:shadow-xl">
-                            Cetak Ulang Struk Shift
+                        <button type="submit" :disabled="isReprinting"
+                            class="inline-flex h-11 min-w-[210px] items-center justify-center gap-2 rounded-2xl bg-[#1F444C] px-5 text-sm font-black text-white shadow-lg shadow-[#1F444C]/20 transition hover:-translate-y-0.5 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0">
+
+                            <svg x-show="isReprinting" x-cloak class="h-5 w-5 animate-spin" fill="none"
+                                viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                    stroke-width="4">
+                                </circle>
+
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z">
+                                </path>
+                            </svg>
+
+                            <span x-show="!isReprinting">
+                                Cetak Ulang Struk Shift
+                            </span>
+
+                            <span x-show="isReprinting" x-cloak>
+                                Mengirim ke Printer...
+                            </span>
                         </button>
                     </form>
                 </div>

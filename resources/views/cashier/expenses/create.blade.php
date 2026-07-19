@@ -4,6 +4,7 @@
 
 @section('content')
     <div class="space-y-6" x-data="{
+        isSubmitting: false,
         harga: @js((string) old('harga', '')),
     
         parseCurrency(value) {
@@ -16,7 +17,11 @@
     
         formatCurrency(event) {
             let value = event.target.value.replace(/[^0-9]/g, '');
-            this.harga = value ? this.formatCurrencyNumber(value) : '';
+    
+            this.harga = value ?
+                this.formatCurrencyNumber(value) :
+                '';
+    
             event.target.value = this.harga;
         }
     }">
@@ -67,7 +72,15 @@
                     </h2>
                 </div>
 
-                <form method="POST" action="{{ route('cashier.expenses.store') }}" class="mt-6 space-y-6">
+                <form method="POST" action="{{ route('cashier.expenses.store') }}" class="mt-6 space-y-6"
+                    @submit="
+        if (isSubmitting) {
+            $event.preventDefault();
+            return;
+        }
+
+        isSubmitting = true;
+    ">
                     @csrf
 
                     {{-- Apa yang dibeli --}}
@@ -134,9 +147,27 @@
                             Batal
                         </a>
 
-                        <button type="submit"
-                            class="inline-flex h-12 items-center justify-center rounded-2xl bg-[#1F444C] px-6 text-sm font-black text-white shadow-lg shadow-[#1F444C]/15 transition hover:-translate-y-0.5 hover:shadow-xl">
-                            Simpan Pengeluaran
+                        <button type="submit" :disabled="isSubmitting"
+                            class="inline-flex h-12 min-w-[190px] items-center justify-center gap-2 rounded-2xl bg-[#1F444C] px-6 text-sm font-black text-white shadow-lg shadow-[#1F444C]/15 transition hover:-translate-y-0.5 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0">
+
+                            <svg x-show="isSubmitting" x-cloak class="h-5 w-5 animate-spin" fill="none"
+                                viewBox="0 0 24 24">
+
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                    stroke-width="4">
+                                </circle>
+
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z">
+                                </path>
+                            </svg>
+
+                            <span x-show="!isSubmitting">
+                                Simpan Pengeluaran
+                            </span>
+
+                            <span x-show="isSubmitting" x-cloak>
+                                Menyimpan...
+                            </span>
                         </button>
                     </div>
                 </form>

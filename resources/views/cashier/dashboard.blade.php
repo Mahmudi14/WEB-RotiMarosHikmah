@@ -22,7 +22,7 @@
                         </h1>
 
                         <p class="mt-2 max-w-2xl text-sm font-medium leading-relaxed text-[#F7F6F4]/80">
-                            Pantau shift, transaksi, pengeluaran, dan status cetak struk kamu hari ini.
+                            Pantau shift, transaksi, dan pengeluaran kamu hari ini.
                         </p>
                     </div>
 
