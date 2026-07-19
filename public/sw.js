@@ -1,4 +1,4 @@
-const CACHE_NAME = "romahkm-pos-v2";
+const CACHE_NAME = "romahkm-pos-v3";
 
 const STATIC_ASSETS = [
     "/manifest.webmanifest",
@@ -10,8 +10,27 @@ self.addEventListener("install", (event) => {
     self.skipWaiting();
 
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(STATIC_ASSETS);
+        caches.open(CACHE_NAME).then(async (cache) => {
+            for (const asset of STATIC_ASSETS) {
+                try {
+                    const response = await fetch(asset, {
+                        cache: "no-store",
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(
+                            `${response.status} ${response.statusText}`,
+                        );
+                    }
+
+                    await cache.put(asset, response);
+                } catch (error) {
+                    console.error(
+                        `Service Worker gagal menyimpan ${asset}:`,
+                        error,
+                    );
+                }
+            }
         }),
     );
 });
@@ -61,24 +80,19 @@ self.addEventListener("fetch", (event) => {
         url.pathname === "/manifest.webmanifest"
     ) {
         event.respondWith(
-            caches.match(request).then((cachedResponse) => {
+            caches.match(request).then(async (cachedResponse) => {
                 if (cachedResponse) {
                     return cachedResponse;
                 }
 
-                return fetch(request).then((networkResponse) => {
-                    if (!networkResponse.ok) {
-                        return networkResponse;
-                    }
+                const networkResponse = await fetch(request);
 
-                    const responseClone = networkResponse.clone();
+                if (networkResponse.ok) {
+                    const cache = await caches.open(CACHE_NAME);
+                    await cache.put(request, networkResponse.clone());
+                }
 
-                    caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(request, responseClone);
-                    });
-
-                    return networkResponse;
-                });
+                return networkResponse;
             }),
         );
     }
