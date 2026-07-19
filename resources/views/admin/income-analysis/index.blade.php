@@ -71,11 +71,6 @@
                             data.
                         </p>
                     </div>
-
-                    <a href="{{ route('admin.transactions.index') }}"
-                        class="inline-flex h-12 items-center justify-center rounded-2xl bg-[#F4B044] px-5 text-sm font-black text-[#2B1A10] shadow-lg shadow-[#F4B044]/20 transition hover:-translate-y-0.5 hover:shadow-xl min-[1024px]:shrink-0">
-                        Riwayat Transaksi
-                    </a>
                 </div>
             </div>
         </div>
@@ -158,7 +153,10 @@
 
                 {{-- Row 1: Kasir | Terapkan | Reset --}}
                 <div
-                    class="grid gap-3 min-[1024px]:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_180px_160px] min-[1024px]:items-center">
+                    class="grid gap-3
+           min-[835px]:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_140px_120px]
+           min-[835px]:items-center
+           min-[1024px]:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_180px_160px]">
                     {{-- Info Scope --}}
                     <div class="min-w-0 rounded-2xl bg-[#F7F6F4] px-4 py-3">
                         <p class="text-[10px] font-black uppercase tracking-[0.18em] text-[#6B3E12]/70">

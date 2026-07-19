@@ -54,8 +54,9 @@
                 <div class="absolute -right-10 -top-12 h-32 w-32 rounded-full bg-[#F4B044]/20"></div>
                 <div class="absolute -bottom-16 -left-12 h-36 w-36 rounded-full bg-white/10"></div>
 
-                <div class="relative flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-                    <div>
+                <div
+                    class="relative flex flex-col gap-5 min-[835px]:flex-row min-[835px]:items-center min-[835px]:justify-between">
+                    <div class="min-w-0">
                         <p class="text-xs font-bold uppercase tracking-[0.28em] text-[#F4D3B0]">
                             Detail Produk
                         </p>
@@ -69,7 +70,7 @@
                         </p>
                     </div>
 
-                    <div class="flex flex-wrap gap-3">
+                    <div class="flex flex-wrap gap-3 min-[835px]:shrink-0">
                         <a href="{{ route('admin.products.edit', $product) }}"
                             class="inline-flex items-center justify-center rounded-2xl bg-[#F4B044] px-5 py-3 text-sm font-black text-[#2B1A10] shadow-lg shadow-[#F4B044]/20 transition hover:-translate-y-0.5 hover:shadow-xl">
                             Edit
@@ -85,7 +86,10 @@
         </div>
 
         {{-- Ringkasan Produk --}}
-        <div class="grid gap-6 lg:grid-cols-[360px_minmax(0,1fr)]">
+        <div
+            class="grid gap-6
+           min-[835px]:grid-cols-[320px_minmax(0,1fr)]
+           min-[1024px]:grid-cols-[360px_minmax(0,1fr)]">
             {{-- Gambar --}}
             <div
                 class="overflow-hidden rounded-3xl border border-[#F4D3B0]/70 bg-white p-5 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">

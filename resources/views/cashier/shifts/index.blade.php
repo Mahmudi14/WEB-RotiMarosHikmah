@@ -41,7 +41,7 @@
                 <div class="absolute -bottom-14 -left-10 h-28 w-28 rounded-full bg-white/10"></div>
 
                 <div
-                    class="relative flex flex-col gap-4 min-[1024px]:flex-row min-[1024px]:items-center min-[1024px]:justify-between">
+                    class="relative flex flex-col gap-4 min-[835px]:flex-row min-[835px]:items-center min-[835px]:justify-between">
                     <div class="min-w-0">
                         <p class="text-xs font-bold uppercase tracking-[0.28em] text-[#F4D3B0]">
                             Kasir / Shift
@@ -52,13 +52,13 @@
                         </h1>
 
                         <p class="mt-1.5 max-w-2xl text-sm font-medium leading-relaxed text-[#F7F6F4]/80">
-                            Buka shift, lihat terminal aktif, dan pantau kasir yang sedang shift.
+                            Buka shift dan lihat terminal aktif.
                         </p>
                     </div>
 
                     @if ($activeShift)
                         <div
-                            class="w-full rounded-2xl border border-white/10 bg-white/10 p-3 backdrop-blur-sm min-[1024px]:w-[360px]">
+                            class="w-full rounded-2xl border border-white/10 bg-white/10 p-3 backdrop-blur-sm min-[835px]:w-[360px]">
                             <div class="flex items-center justify-between gap-3">
                                 <div class="min-w-0">
                                     <p class="text-xs font-black uppercase tracking-[0.18em] text-[#F4D3B0]">
@@ -88,7 +88,7 @@
 
         @if (!$activeShift)
             {{-- Belum buka shift --}}
-            <div class="grid gap-4 min-[1024px]:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_380px]">
+            <div class="grid gap-4 min-[835px]:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_380px]">
                 <div
                     class="flex min-h-[320px] items-center justify-center rounded-3xl border border-[#F4D3B0]/70 bg-white p-6 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
                     <div class="mx-auto max-w-md text-center">
@@ -183,7 +183,7 @@
             </div>
         @else
             {{-- Shift aktif --}}
-            <div class="grid gap-4 min-[1024px]:grid-cols-[360px_minmax(0,1fr)] xl:grid-cols-[400px_minmax(0,1fr)]">
+            <div class="grid gap-4 min-[835px]:grid-cols-[360px_minmax(0,1fr)] xl:grid-cols-[400px_minmax(0,1fr)]">
                 {{-- Terminal & Token --}}
                 <div
                     class="flex flex-col overflow-hidden rounded-3xl border border-[#F4D3B0]/70 bg-white shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
@@ -316,7 +316,7 @@
 
             <div
                 class="overflow-hidden rounded-3xl border border-[#F4B044]/50 bg-[#F4B044]/10 p-5 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
-                <div class="flex flex-col gap-4 min-[900px]:flex-row min-[900px]:items-center min-[900px]:justify-between">
+                <div class="flex flex-col gap-4 min-[835px]:flex-row min-[835px]:items-center min-[835px]:justify-between">
                     <div>
                         <p class="text-xs font-black uppercase tracking-[0.22em] text-[#6B3E12]">
                             Struk Tutup Shift

@@ -443,7 +443,7 @@
             {{-- Filter --}}
             <div
                 class="relative z-20 overflow-visible rounded-3xl border border-[#F4D3B0]/70 bg-white p-5 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
-                <div class="grid gap-3 min-[1024px]:grid-cols-[minmax(0,1fr)_240px_auto] min-[1024px]:items-center">
+                <div class="grid gap-3 min-[800px]:grid-cols-[minmax(0,1fr)_240px_auto] min-[800px]:items-center">
                     {{-- Search --}}
                     <div class="relative">
                         <label class="sr-only" for="search">Cari produk</label>
@@ -534,7 +534,7 @@
                     {{-- Reset --}}
                     <div class="flex shrink-0">
                         <button type="button" @click="resetFilter(); categoryOpen = false"
-                            class="inline-flex h-12 w-full shrink-0 items-center justify-center gap-2 rounded-2xl bg-[#F4B044] px-5 py-0 text-sm font-black text-[#2B1A10] shadow-lg shadow-[#F4B044]/25 transition hover:-translate-y-0.5 hover:bg-[#f7bd5f] hover:shadow-xl active:translate-y-0 active:scale-95 focus:outline-none focus:ring-4 focus:ring-[#F4B044]/25 min-[1024px]:w-auto">
+                            class="inline-flex h-12 w-full shrink-0 items-center justify-center gap-2 rounded-2xl bg-[#F4B044] px-5 py-0 text-sm font-black text-[#2B1A10] shadow-lg shadow-[#F4B044]/25 transition hover:-translate-y-0.5 hover:bg-[#f7bd5f] hover:shadow-xl active:translate-y-0 active:scale-95 focus:outline-none focus:ring-4 focus:ring-[#F4B044]/25 min-[800px]:w-auto">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.3"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -547,7 +547,10 @@
             </div>
 
             <div
-                class="grid gap-6 min-[1024px]:grid-cols-[minmax(0,1fr)_360px] min-[1280px]:grid-cols-[minmax(0,1fr)_420px]">
+                class="grid gap-6
+           min-[800px]:grid-cols-[minmax(0,1fr)_320px]
+           min-[1024px]:grid-cols-[minmax(0,1fr)_360px]
+           min-[1280px]:grid-cols-[minmax(0,1fr)_420px]">
                 {{-- Product List --}}
                 <div
                     class="overflow-hidden rounded-3xl border border-[#F4D3B0]/70 bg-white shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
@@ -592,7 +595,7 @@
 
                                         {{-- Product Grid --}}
                                         <div
-                                            class="grid grid-cols-2 gap-3 min-[1024px]:grid-cols-3 min-[1280px]:grid-cols-4">
+                                            class="grid grid-cols-2 gap-3 min-[800px]:grid-cols-3 min-[1280px]:grid-cols-4">
                                             <template x-for="product in group.products" :key="product.id">
                                                 <button type="button" @click="addToCart(product)"
                                                     class="group overflow-hidden rounded-2xl border border-[#F4D3B0]/70 bg-white text-left shadow-[0_18px_45px_-35px_rgba(31,68,76,0.55)] transition hover:-translate-y-0.5 hover:border-[#F4B044] hover:shadow-[0_24px_60px_-35px_rgba(31,68,76,0.7)]">
@@ -614,7 +617,7 @@
                                                     </div>
 
                                                     <div class="p-3">
-                                                        <p class="truncate text-xs font-black text-[#2B1A10]"
+                                                        <p class="h-8 overflow-hidden text-xs font-black leading-4 text-[#2B1A10]"
                                                             x-text="product.nama_produk">
                                                         </p>
 
@@ -657,7 +660,7 @@
 
                 {{-- Cart Area --}}
                 <div
-                    class="relative z-0 space-y-6 pb-4 min-[1024px]:sticky min-[1024px]:top-[5.5rem] min-[1024px]:self-start min-[1280px]:top-4">
+                    class="relative z-0 space-y-6 pb-4 min-[800px]:sticky min-[800px]:top-[5.5rem] min-[800px]:self-start min-[1280px]:top-4">
                     <div
                         class="relative z-0 flex h-[calc(100svh-6.5rem)] max-h-[calc(100svh-6.5rem)] min-h-[360px] flex-col overflow-hidden rounded-3xl border border-[#F4D3B0]/70 bg-white shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)] min-[1280px]:h-[calc(100dvh-8rem)] min-[1280px]:max-h-[calc(100dvh-8rem)]">
 
@@ -1057,6 +1060,11 @@
                         <div class="mt-4 border-t border-[#F4D3B0]/70 pt-3">
                             <form method="POST" action="{{ route('cashier.pos.sales.store') }}"
                                 @submit="
+                            if (isSubmitting) {
+                                $event.preventDefault();
+                                return;
+                            }
+
                             if (!canPay) {
                                 $event.preventDefault();
                                 return;

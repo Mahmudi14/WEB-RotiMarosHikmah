@@ -81,7 +81,11 @@
                 }
             }">
             <form method="GET" action="{{ route('admin.products.index') }}"
-                class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_230px_200px_auto] lg:items-center xl:grid-cols-[minmax(0,1fr)_280px_220px_auto]">
+                class="grid gap-3
+           min-[835px]:grid-cols-[minmax(0,1fr)_180px_150px_auto]
+           min-[835px]:items-center
+           min-[1024px]:grid-cols-[minmax(0,1fr)_230px_200px_auto]
+           xl:grid-cols-[minmax(0,1fr)_280px_220px_auto]">
 
                 {{-- Search --}}
                 <div class="relative">

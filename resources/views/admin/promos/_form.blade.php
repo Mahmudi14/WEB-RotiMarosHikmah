@@ -90,7 +90,7 @@
             @method($method)
         @endif
 
-        <div class="grid gap-5 lg:grid-cols-2">
+        <div class="grid gap-5 min-[835px]:grid-cols-2">
             {{-- Nama Promo --}}
             <div>
                 <label class="mb-2 block text-sm font-black text-[#2B1A10]">
@@ -208,7 +208,7 @@
             </div>
 
             {{-- Periode Promo --}}
-            <div class="lg:col-span-2">
+            <div class="min-[835px]:col-span-2">
                 <div class="grid gap-5 md:grid-cols-2">
                     {{-- Tanggal Mulai --}}
                     <div>
