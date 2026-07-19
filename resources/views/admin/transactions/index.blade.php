@@ -25,11 +25,6 @@
                             Pantau seluruh transaksi dari semua kasir, terminal, dan metode pembayaran.
                         </p>
                     </div>
-
-                    <a href="{{ route('admin.income-analysis.index') }}"
-                        class="inline-flex h-12 items-center justify-center rounded-2xl bg-[#F4B044] px-5 text-sm font-black text-[#2B1A10] shadow-lg shadow-[#F4B044]/20 transition hover:-translate-y-0.5 hover:shadow-xl min-[1024px]:shrink-0">
-                        Analisis Pendapatan
-                    </a>
                 </div>
             </div>
         </div>
@@ -152,7 +147,11 @@
             <form method="GET" action="{{ route('admin.transactions.index') }}" class="space-y-3">
                 {{-- Main Filter Row --}}
                 <div
-                    class="grid gap-3 min-[1024px]:grid-cols-[minmax(0,1fr)_190px_190px_auto] min-[1024px]:items-center min-[1280px]:grid-cols-[minmax(0,1fr)_210px_210px_auto]">
+                    class="grid gap-3
+           min-[835px]:grid-cols-[minmax(0,1fr)_160px_160px_auto]
+           min-[835px]:items-center
+           min-[1024px]:grid-cols-[minmax(0,1fr)_190px_190px_auto]
+           min-[1280px]:grid-cols-[minmax(0,1fr)_210px_210px_auto]">
                     {{-- Search --}}
                     <div class="relative min-w-0">
                         <span class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-[#6B3E12]/60">
@@ -171,13 +170,13 @@
                     {{-- Tanggal Mulai --}}
                     <div class="relative min-w-0">
                         <input type="date" name="tanggal_mulai" value="{{ request('tanggal_mulai') }}"
-                            class="block h-12 w-full min-w-[190px] rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-3 text-sm font-medium text-[#2B1A10] shadow-sm transition [color-scheme:light] focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
+                            class="block h-12 w-full min-w-0 rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-3 text-sm font-medium text-[#2B1A10] shadow-sm transition [color-scheme:light] focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
                     </div>
 
                     {{-- Tanggal Selesai --}}
                     <div class="relative min-w-0">
                         <input type="date" name="tanggal_selesai" value="{{ request('tanggal_selesai') }}"
-                            class="block h-12 w-full min-w-[190px] rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-3 text-sm font-medium text-[#2B1A10] shadow-sm transition [color-scheme:light] focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
+                            class="block h-12 w-full min-w-0 rounded-2xl border border-[#F4D3B0] bg-[#F7F6F4] px-3 text-sm font-medium text-[#2B1A10] shadow-sm transition [color-scheme:light] focus:border-[#F4B044] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#F4B044]/20">
                     </div>
 
                     {{-- Action --}}
@@ -205,7 +204,7 @@
                 </div>
 
                 {{-- Dropdown Row --}}
-                <div class="grid gap-3 md:grid-cols-2 min-[1024px]:grid-cols-4">
+                <div class="grid gap-3 md:grid-cols-2 min-[835px]:grid-cols-4">
                     {{-- Kasir --}}
                     <div class="min-w-0">
                         <input type="hidden" name="cashier_id" x-model="selectedCashier">

@@ -26,8 +26,12 @@
                 <div class="absolute -right-10 -top-12 h-32 w-32 rounded-full bg-[#F4B044]/20"></div>
                 <div class="absolute -bottom-16 -left-12 h-36 w-36 rounded-full bg-white/10"></div>
 
-                <div class="relative flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-                    <div>
+                <div
+                    class="relative flex flex-col gap-5
+           min-[835px]:flex-row
+           min-[835px]:items-center
+           min-[835px]:justify-between">
+                    <div class="min-w-0">
                         <p class="text-xs font-bold uppercase tracking-[0.28em] text-[#F4D3B0]">
                             Admin / Promo
                         </p>
@@ -40,7 +44,7 @@
                     </div>
 
                     <a href="{{ route('admin.promos.create') }}"
-                        class="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#F4B044] px-5 py-3 text-sm font-black text-[#2B1A10] shadow-lg shadow-[#F4B044]/20 transition hover:-translate-y-0.5 hover:shadow-xl">
+                        class="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#F4B044] px-5 py-3 text-sm font-black text-[#2B1A10] shadow-lg shadow-[#F4B044]/20 transition hover:-translate-y-0.5 hover:shadow-xl min-[835px]:shrink-0">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m7-7H5" />
                         </svg>
@@ -62,7 +66,10 @@
                 }
             }">
             <form method="GET" action="{{ route('admin.promos.index') }}"
-                class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_230px_auto] lg:items-center xl:grid-cols-[minmax(0,1fr)_310px_auto]">
+                class="grid gap-3
+           min-[835px]:grid-cols-[minmax(0,1fr)_230px_auto]
+           min-[835px]:items-center
+           xl:grid-cols-[minmax(0,1fr)_310px_auto]">
 
                 {{-- Search --}}
                 <div class="relative">
@@ -186,24 +193,45 @@
                 <table class="min-w-full divide-y divide-[#F4D3B0]/70">
                     <thead class="bg-[#F7F6F4]">
                         <tr>
-                            <th
-                                class="w-16 px-5 py-4 text-left text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
-                                No
+                            <th class="w-16 px-6 py-4 text-left">
+                                <span class="text-[11px] font-black uppercase tracking-[0.22em] text-[#6B3E12]/80">
+                                    No
+                                </span>
                             </th>
-                            <th class="px-5 py-4 text-left text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
-                                Promo
+
+                            <th class="px-6 py-4 text-left">
+                                <span
+                                    class="whitespace-nowrap text-[11px] font-black uppercase tracking-[0.22em] text-[#6B3E12]/80">
+                                    Promo
+                                </span>
                             </th>
-                            <th class="px-5 py-4 text-left text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
-                                Diskon
+
+                            <th class="px-6 py-4 text-left">
+                                <span
+                                    class="whitespace-nowrap text-[11px] font-black uppercase tracking-[0.22em] text-[#6B3E12]/80">
+                                    Diskon
+                                </span>
                             </th>
-                            <th class="px-5 py-4 text-left text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
-                                Cakupan
+
+                            <th class="px-6 py-4 text-left">
+                                <span
+                                    class="whitespace-nowrap text-[11px] font-black uppercase tracking-[0.22em] text-[#6B3E12]/80">
+                                    Cakupan
+                                </span>
                             </th>
-                            <th class="px-5 py-4 text-center text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
-                                Status
+
+                            <th class="px-2 py-4 text-center">
+                                <span
+                                    class="whitespace-nowrap text-[11px] font-black uppercase tracking-[0.22em] text-[#6B3E12]/80">
+                                    Status
+                                </span>
                             </th>
-                            <th class="px-5 py-4 text-right text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
-                                Aksi
+
+                            <th class="w-[220px] px-6 py-4 text-right">
+                                <span
+                                    class="whitespace-nowrap text-[11px] font-black uppercase tracking-[0.22em] text-[#6B3E12]/80">
+                                    Aksi
+                                </span>
                             </th>
                         </tr>
                     </thead>
@@ -217,73 +245,66 @@
                                         : 'bg-[#A92A35]/10 text-[#A92A35]';
                             @endphp
 
-                            <tr class="transition hover:bg-[#F7F6F4]/80">
-                                <td class="px-5 py-4 text-sm font-bold text-[#6B3E12]">
+                            <tr class="transition hover:bg-[#F7F6F4]/70">
+                                {{-- Nomor --}}
+                                <td class="whitespace-nowrap px-6 py-4 text-sm font-black text-[#6B3E12]">
                                     {{ $promos->firstItem() + $loop->index }}
                                 </td>
 
-                                <td class="px-5 py-4">
-                                    <div>
-                                        <p class="text-sm font-black text-[#2B1A10]">
-                                            {{ $promo->nama_promo }}
-                                        </p>
-
-                                        <p class="mt-1 text-xs font-bold text-[#6B3E12]">
-                                            {{ $promo->kode_promo ?: 'Tanpa kode promo' }}
-                                        </p>
-                                    </div>
+                                {{-- Promo --}}
+                                <td class="whitespace-nowrap px-6 py-4">
+                                    <p class="text-sm font-black text-[#2B1A10]">
+                                        {{ $promo->nama_promo }}
+                                    </p>
                                 </td>
 
-                                <td class="px-5 py-4">
+                                {{-- Diskon --}}
+                                <td class="whitespace-nowrap px-6 py-4">
                                     <p class="text-sm font-black text-[#2B1A10]">
                                         {{ $promo->nilai_diskon_formatted }}
                                     </p>
-                                    <p class="mt-1 text-xs font-semibold text-[#6B3E12]">
+
+                                    <p class="mt-0.5 text-sm font-medium text-[#6B3E12]">
                                         {{ $promo->tipe_diskon_label }}
                                     </p>
                                 </td>
 
-                                <td class="px-5 py-4">
-                                    <p class="text-sm font-black text-[#2B1A10]">
+                                {{-- Cakupan --}}
+                                <td class="whitespace-nowrap px-6 py-4">
+                                    <p class="text-sm font-bold text-[#6B3E12]">
                                         {{ $promo->cakupan_promo_label }}
                                     </p>
-
-                                    @if ($promo->cakupan_promo === 'menu_tertentu')
-                                        <p class="mt-1 text-xs font-semibold text-[#6B3E12]">
-                                            {{ $promo->products_count }} produk dipilih
-                                        </p>
-                                    @else
-                                        <p class="mt-1 text-xs font-semibold text-[#6B3E12]">
-                                            Berlaku untuk semua produk
-                                        </p>
-                                    @endif
                                 </td>
 
-                                <td class="px-5 py-4">
-                                    <div class="flex flex-col items-center gap-1.5">
+                                {{-- Status --}}
+                                <td class="px-2 py-4">
+                                    <div class="flex items-center justify-center">
                                         <span
-                                            class="inline-flex rounded-full px-3 py-1 text-xs font-black {{ $statusClass }}">
+                                            class="inline-flex w-fit justify-center whitespace-nowrap rounded-full px-3 py-1 text-center text-xs font-black {{ $statusClass }}">
                                             {{ $promo->status_efektif_label }}
                                         </span>
-
                                     </div>
                                 </td>
 
-                                <td class="px-5 py-4">
-                                    <div class="flex flex-wrap items-center justify-end gap-2">
+                                {{-- Aksi --}}
+                                <td class="w-[230px] px-2 py-4">
+                                    <div class="flex flex-nowrap items-center justify-end gap-2 whitespace-nowrap">
                                         <a href="{{ route('admin.promos.show', $promo) }}"
-                                            class="inline-flex items-center justify-center rounded-xl bg-[#F4B044] px-4 py-2 text-xs font-black text-[#2B1A10] shadow-sm shadow-[#F4B044]/20 transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-[#F4B044]/25">
+                                            class="inline-flex items-center justify-center rounded-xl bg-[#F4B044] px-3 py-2 text-xs font-black text-[#2B1A10] shadow-sm shadow-[#F4B044]/25 transition hover:-translate-y-0.5 hover:bg-[#E7A33D] hover:shadow-md active:scale-95">
                                             Detail
                                         </a>
 
                                         <a href="{{ route('admin.promos.edit', $promo) }}"
-                                            class="inline-flex items-center justify-center rounded-xl bg-[#1F444C] px-4 py-2 text-xs font-black text-white shadow-sm shadow-[#1F444C]/20 transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-[#1F444C]/20">
+                                            class="inline-flex items-center justify-center rounded-xl bg-[#1F444C] px-3 py-2 text-xs font-black text-white shadow-sm shadow-[#1F444C]/25 transition hover:-translate-y-0.5 hover:bg-[#183941] hover:shadow-md active:scale-95">
                                             Edit
                                         </a>
 
                                         <button type="button"
-                                            @click="openDeleteModal(@js(route('admin.promos.destroy', $promo)), @js($promo->nama_promo))"
-                                            class="inline-flex items-center justify-center rounded-xl bg-[#A92A35] px-4 py-2 text-xs font-black text-white shadow-sm shadow-[#A92A35]/20 transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-[#A92A35]/20">
+                                            @click="openDeleteModal(
+                                        @js(route('admin.promos.destroy', $promo)),
+                                        @js($promo->nama_promo)
+                                    )"
+                                            class="inline-flex items-center justify-center rounded-xl bg-[#A92A35] px-3 py-2 text-xs font-black text-white shadow-sm shadow-[#A92A35]/25 transition hover:-translate-y-0.5 hover:bg-[#8F202A] hover:shadow-md active:scale-95">
                                             Hapus
                                         </button>
                                     </div>
@@ -291,7 +312,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="px-5 py-14 text-center">
+                                <td colspan="6" class="px-6 py-14 text-center">
                                     <div class="mx-auto flex max-w-sm flex-col items-center">
                                         <div
                                             class="flex h-16 w-16 items-center justify-center rounded-3xl bg-[#F4B044]/20 text-[#6B3E12]">
@@ -302,11 +323,11 @@
                                             </svg>
                                         </div>
 
-                                        <h3 class="mt-4 text-base font-black text-[#2B1A10]">
+                                        <h3 class="mt-4 text-lg font-black text-[#2B1A10]">
                                             Belum ada promo
                                         </h3>
 
-                                        <p class="mt-2 text-sm font-medium leading-relaxed text-[#6B3E12]">
+                                        <p class="mt-1 text-sm text-[#6B3E12]">
                                             Tambahkan promo pertama untuk digunakan pada transaksi POS.
                                         </p>
                                     </div>
@@ -318,7 +339,7 @@
             </div>
 
             @if ($promos->hasPages())
-                <div class="border-t border-[#F4D3B0]/70 px-5 py-4">
+                <div class="border-t border-[#F4D3B0]/70 bg-[#F7F6F4] px-6 py-4">
                     {{ $promos->links() }}
                 </div>
             @endif

@@ -69,7 +69,11 @@
                 }
             }">
             <form method="GET" action="{{ route('cashier.transactions.index') }}"
-                class="grid gap-3 min-[1024px]:grid-cols-[minmax(0,1fr)_190px_190px_auto] min-[1024px]:items-center min-[1280px]:grid-cols-[minmax(0,1fr)_230px_230px_auto]">
+                class="grid gap-3
+           min-[835px]:grid-cols-[minmax(0,1fr)_160px_160px_auto]
+           min-[835px]:items-center
+           min-[1024px]:grid-cols-[minmax(0,1fr)_190px_190px_auto]
+           min-[1280px]:grid-cols-[minmax(0,1fr)_230px_230px_auto]">
 
                 {{-- Search --}}
                 <div class="relative min-w-0">

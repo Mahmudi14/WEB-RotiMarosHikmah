@@ -46,7 +46,6 @@
 
         <div class="grid gap-6 min-[1024px]:grid-cols-[minmax(0,1fr)_440px]">
             {{-- Ringkasan --}}
-            {{-- Ringkasan --}}
             <div class="rounded-3xl border border-[#F4D3B0]/70 bg-white p-6 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
                 <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                     <div>

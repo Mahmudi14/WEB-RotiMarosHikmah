@@ -1,10 +1,9 @@
-const CACHE_NAME = "romahkm-pos-v1";
+const CACHE_NAME = "romahkm-pos-v2";
 
 const STATIC_ASSETS = [
-    "/",
     "/manifest.webmanifest",
-    "/icons/icon-192.png",
-    "/icons/icon-512.png",
+    "/images/icons/icon-192.png",
+    "/images/icons/icon-512.png",
 ];
 
 self.addEventListener("install", (event) => {
@@ -19,16 +18,17 @@ self.addEventListener("install", (event) => {
 
 self.addEventListener("activate", (event) => {
     event.waitUntil(
-        caches.keys().then((keys) => {
-            return Promise.all(
-                keys
-                    .filter((key) => key !== CACHE_NAME)
-                    .map((key) => caches.delete(key)),
-            );
-        }),
+        caches
+            .keys()
+            .then((keys) => {
+                return Promise.all(
+                    keys
+                        .filter((key) => key !== CACHE_NAME)
+                        .map((key) => caches.delete(key)),
+                );
+            })
+            .then(() => self.clients.claim()),
     );
-
-    self.clients.claim();
 });
 
 self.addEventListener("fetch", (event) => {
@@ -57,23 +57,28 @@ self.addEventListener("fetch", (event) => {
 
     if (
         url.pathname.startsWith("/build") ||
-        url.pathname.startsWith("/icons") ||
+        url.pathname.startsWith("/images/icons") ||
         url.pathname === "/manifest.webmanifest"
     ) {
         event.respondWith(
             caches.match(request).then((cachedResponse) => {
-                return (
-                    cachedResponse ||
-                    fetch(request).then((networkResponse) => {
-                        const responseClone = networkResponse.clone();
+                if (cachedResponse) {
+                    return cachedResponse;
+                }
 
-                        caches.open(CACHE_NAME).then((cache) => {
-                            cache.put(request, responseClone);
-                        });
-
+                return fetch(request).then((networkResponse) => {
+                    if (!networkResponse.ok) {
                         return networkResponse;
-                    })
-                );
+                    }
+
+                    const responseClone = networkResponse.clone();
+
+                    caches.open(CACHE_NAME).then((cache) => {
+                        cache.put(request, responseClone);
+                    });
+
+                    return networkResponse;
+                });
             }),
         );
     }

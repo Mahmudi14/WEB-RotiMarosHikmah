@@ -28,8 +28,12 @@
                 <div class="absolute -right-10 -top-12 h-32 w-32 rounded-full bg-[#F4B044]/20"></div>
                 <div class="absolute -bottom-16 -left-12 h-36 w-36 rounded-full bg-white/10"></div>
 
-                <div class="relative flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-                    <div>
+                <div
+                    class="relative flex flex-col gap-5
+           min-[835px]:flex-row
+           min-[835px]:items-center
+           min-[835px]:justify-between">
+                    <div class="min-w-0">
                         <p class="text-xs font-bold uppercase tracking-[0.28em] text-[#F4D3B0]">
                             Admin / Manajemen Kasir
                         </p>
@@ -44,7 +48,7 @@
                     </div>
 
                     <a href="{{ route('admin.cashiers.create') }}"
-                        class="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#F4B044] px-5 py-3 text-sm font-black text-[#2B1A10] shadow-lg shadow-[#F4B044]/20 transition hover:-translate-y-0.5 hover:shadow-xl">
+                        class="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#F4B044] px-5 py-3 text-sm font-black text-[#2B1A10] shadow-lg shadow-[#F4B044]/20 transition hover:-translate-y-0.5 hover:shadow-xl min-[835px]:shrink-0">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m7-7H5" />
                         </svg>
@@ -57,7 +61,9 @@
         {{-- Filter --}}
         <div class="rounded-3xl border border-[#F4D3B0]/70 bg-white p-5 shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
             <form method="GET" action="{{ route('admin.cashiers.index') }}"
-                class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+                class="grid gap-3
+           min-[835px]:grid-cols-[minmax(0,1fr)_auto]
+           min-[835px]:items-center">
 
                 {{-- Search --}}
                 <div class="relative min-w-0">
@@ -74,7 +80,7 @@
                 </div>
 
                 {{-- Action --}}
-                <div class="flex shrink-0 gap-3 lg:justify-end">
+                <div class="flex shrink-0 gap-3 min-[835px]:justify-end">
                     <button type="submit"
                         class="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-2xl bg-[#1F444C] px-5 py-0 text-sm font-black text-white shadow-lg shadow-[#1F444C]/20 transition hover:-translate-y-0.5 hover:shadow-xl">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
@@ -103,24 +109,45 @@
                 <table class="min-w-full divide-y divide-[#F4D3B0]/70">
                     <thead class="bg-[#F7F6F4]">
                         <tr>
-                            <th
-                                class="w-16 px-5 py-4 text-left text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
-                                No
+                            <th class="w-16 px-6 py-4 text-left">
+                                <span class="text-[11px] font-black uppercase tracking-[0.22em] text-[#6B3E12]/80">
+                                    No
+                                </span>
                             </th>
-                            <th class="px-5 py-4 text-left text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
-                                Kasir
+
+                            <th class="px-6 py-4 text-left">
+                                <span
+                                    class="whitespace-nowrap text-[11px] font-black uppercase tracking-[0.22em] text-[#6B3E12]/80">
+                                    Kasir
+                                </span>
                             </th>
-                            <th class="px-5 py-4 text-left text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
-                                Email
+
+                            <th class="px-6 py-4 text-left">
+                                <span
+                                    class="whitespace-nowrap text-[11px] font-black uppercase tracking-[0.22em] text-[#6B3E12]/80">
+                                    Email
+                                </span>
                             </th>
-                            <th class="px-5 py-4 text-center text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
-                                Status
+
+                            <th class="px-2 py-4 text-center">
+                                <span
+                                    class="whitespace-nowrap text-[11px] font-black uppercase tracking-[0.22em] text-[#6B3E12]/80">
+                                    Status
+                                </span>
                             </th>
-                            <th class="px-5 py-4 text-left text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
-                                Dibuat
+
+                            <th class="px-6 py-4 text-left">
+                                <span
+                                    class="whitespace-nowrap text-[11px] font-black uppercase tracking-[0.22em] text-[#6B3E12]/80">
+                                    Dibuat
+                                </span>
                             </th>
-                            <th class="px-5 py-4 text-right text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
-                                Aksi
+
+                            <th class="w-[160px] px-6 py-4 text-right">
+                                <span
+                                    class="whitespace-nowrap text-[11px] font-black uppercase tracking-[0.22em] text-[#6B3E12]/80">
+                                    Aksi
+                                </span>
                             </th>
                         </tr>
                     </thead>
@@ -134,59 +161,62 @@
                                         : 'bg-[#A92A35]/10 text-[#A92A35]';
                             @endphp
 
-                            <tr class="transition hover:bg-[#F7F6F4]/80">
-                                <td class="px-5 py-4 text-sm font-bold text-[#6B3E12]">
+                            <tr class="transition hover:bg-[#F7F6F4]/70">
+                                <td class="whitespace-nowrap px-6 py-4 text-sm font-black text-[#6B3E12]">
                                     {{ $cashiers->firstItem() + $loop->index }}
                                 </td>
 
-                                <td class="px-5 py-4">
+                                <td class="whitespace-nowrap px-6 py-4">
                                     <div class="flex items-center gap-3">
                                         <div
-                                            class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#1F444C] text-sm font-black text-[#F4B044]">
+                                            class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#1F444C] text-sm font-black text-[#F4B044] shadow-sm">
                                             {{ strtoupper(substr($cashier->name, 0, 1)) }}
                                         </div>
 
-                                        <div class="min-w-0">
-                                            <p class="truncate text-sm font-black text-[#2B1A10]">
+                                        <div>
+                                            <p class="whitespace-nowrap font-black text-[#2B1A10]">
                                                 {{ $cashier->name }}
                                             </p>
-                                            <p class="mt-1 text-xs font-bold text-[#6B3E12]">
+
+                                            <p class="mt-0.5 whitespace-nowrap text-sm font-medium text-[#6B3E12]">
                                                 Role Kasir
                                             </p>
                                         </div>
                                     </div>
                                 </td>
 
-                                <td class="px-5 py-4">
-                                    <p class="text-sm font-bold text-[#2B1A10]">
-                                        {{ $cashier->email }}
-                                    </p>
+                                <td class="whitespace-nowrap px-6 py-4 text-sm font-bold text-[#6B3E12]">
+                                    {{ $cashier->email }}
                                 </td>
 
-                                <td class="px-5 py-4 text-center">
-                                    <span class="inline-flex rounded-full px-3 py-1 text-xs font-black {{ $statusClass }}">
-                                        {{ ucfirst($cashier->status) }}
-                                    </span>
+                                <td class="px-2 py-4">
+                                    <div class="flex items-center justify-center">
+                                        <span
+                                            class="inline-flex w-fit justify-center whitespace-nowrap rounded-full px-3 py-1 text-center text-xs font-black {{ $statusClass }}">
+                                            {{ ucfirst($cashier->status) }}
+                                        </span>
+                                    </div>
                                 </td>
 
-                                <td class="px-5 py-4">
+                                <td class="whitespace-nowrap px-6 py-4">
                                     <p class="text-sm font-bold text-[#2B1A10]">
                                         {{ $cashier->created_at->format('d M Y') }}
                                     </p>
-                                    <p class="mt-1 text-xs font-semibold text-[#6B3E12]">
+
+                                    <p class="mt-0.5 text-sm font-medium text-[#6B3E12]">
                                         {{ $cashier->created_at->format('H:i') }}
                                     </p>
                                 </td>
 
-                                <td class="px-5 py-4">
-                                    <div class="flex flex-wrap items-center justify-end gap-2">
+                                <td class="w-[170px] px-2 py-4">
+                                    <div class="flex flex-nowrap items-center justify-end gap-2 whitespace-nowrap">
                                         <a href="{{ route('admin.cashiers.show', $cashier) }}"
-                                            class="inline-flex items-center justify-center rounded-xl bg-[#F4B044] px-4 py-2 text-xs font-black text-[#2B1A10] shadow-sm shadow-[#F4B044]/20 transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-[#F4B044]/25">
+                                            class="inline-flex items-center justify-center rounded-xl bg-[#F4B044] px-3 py-2 text-xs font-black text-[#2B1A10] shadow-sm shadow-[#F4B044]/25 transition hover:-translate-y-0.5 hover:bg-[#E7A33D] hover:shadow-md active:scale-95">
                                             Detail
                                         </a>
 
                                         <a href="{{ route('admin.cashiers.edit', $cashier) }}"
-                                            class="inline-flex items-center justify-center rounded-xl bg-[#1F444C] px-4 py-2 text-xs font-black text-white shadow-sm shadow-[#1F444C]/20 transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-[#1F444C]/20">
+                                            class="inline-flex items-center justify-center rounded-xl bg-[#1F444C] px-3 py-2 text-xs font-black text-white shadow-sm shadow-[#1F444C]/25 transition hover:-translate-y-0.5 hover:bg-[#183941] hover:shadow-md active:scale-95">
                                             Edit
                                         </a>
                                     </div>
@@ -194,7 +224,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="px-5 py-14 text-center">
+                                <td colspan="6" class="px-6 py-14 text-center">
                                     <div class="mx-auto flex max-w-sm flex-col items-center">
                                         <div
                                             class="flex h-16 w-16 items-center justify-center rounded-3xl bg-[#F4B044]/20 text-[#6B3E12]">
@@ -205,11 +235,11 @@
                                             </svg>
                                         </div>
 
-                                        <h3 class="mt-4 text-base font-black text-[#2B1A10]">
+                                        <h3 class="mt-4 text-lg font-black text-[#2B1A10]">
                                             Belum ada kasir
                                         </h3>
 
-                                        <p class="mt-2 text-sm font-medium leading-relaxed text-[#6B3E12]">
+                                        <p class="mt-1 text-sm text-[#6B3E12]">
                                             Tambahkan akun kasir pertama untuk operasional transaksi POS.
                                         </p>
                                     </div>
@@ -221,7 +251,7 @@
             </div>
 
             @if ($cashiers->hasPages())
-                <div class="border-t border-[#F4D3B0]/70 px-5 py-4">
+                <div class="border-t border-[#F4D3B0]/70 bg-[#F7F6F4] px-6 py-4">
                     {{ $cashiers->links() }}
                 </div>
             @endif

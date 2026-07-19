@@ -61,7 +61,7 @@
                 }
             }">
             <form method="GET" action="{{ route('admin.categories.index') }}"
-                class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_230px_auto] lg:items-center xl:grid-cols-[minmax(0,1fr)_310px_auto]">
+                class="grid gap-3 min-[835px]:grid-cols-[minmax(0,1fr)_230px_auto] min-[835px]:items-center xl:grid-cols-[minmax(0,1fr)_310px_auto]">
 
                 {{-- Search --}}
                 <div class="relative">
@@ -217,7 +217,7 @@
                         url: '{{ route('admin.categories.reorder') }}',
                         csrf: '{{ csrf_token() }}',
                         startNumber: {{ $categories->firstItem() ?? 1 }}
-                    })" x-init="init($el)" class="divide-y divide-[#F4D3B0]/60 bg-white">
+                    })" x-init="setup($el)" class="divide-y divide-[#F4D3B0]/60 bg-white">
 
                         @forelse ($categories as $category)
                             @php
@@ -412,6 +412,30 @@
             </div>
         </template>
     </div>
+    <style>
+        .sortable-ghost {
+            opacity: 0.2;
+            background: rgba(244, 176, 68, 0.12);
+        }
+
+        .sortable-chosen {
+            background: rgba(244, 176, 68, 0.1);
+        }
+
+        .sortable-drag,
+        .sortable-fallback {
+            display: table !important;
+            width: 100% !important;
+            background: white !important;
+            opacity: 0.95 !important;
+            box-shadow: 0 20px 45px -20px rgba(31, 68, 76, 0.45);
+            z-index: 9999 !important;
+        }
+
+        .sortable-fallback td {
+            background: white;
+        }
+    </style>
     <script>
         function categorySortable({
             url,
@@ -423,26 +447,38 @@
                 sortable: null,
                 isSaving: false,
 
-                init(element) {
-                    this.tableBody = element;
+                setup(element) {
+                    if (!(element instanceof HTMLElement)) {
+                        console.error('Elemen tabel kategori tidak ditemukan.');
+                        return;
+                    }
 
-                    if (typeof Sortable === 'undefined') {
+                    if (!window.Sortable) {
                         console.error('SortableJS belum dimuat.');
                         return;
                     }
 
-                    this.sortable = Sortable.create(this.tableBody, {
-                        animation: 200,
+                    this.tableBody = element;
+
+                    this.sortable = window.Sortable.create(this.tableBody, {
+                        animation: 180,
+                        easing: 'cubic-bezier(0.2, 0, 0, 1)',
+                        direction: 'vertical',
+
                         handle: '.drag-handle',
                         draggable: 'tr[data-category-id]',
 
-                        ghostClass: 'opacity-40',
-                        chosenClass: 'bg-[#F4B044]/10',
-                        dragClass: 'bg-white',
+                        ghostClass: 'sortable-ghost',
+                        chosenClass: 'sortable-chosen',
+                        dragClass: 'sortable-drag',
+                        fallbackClass: 'sortable-fallback',
 
                         forceFallback: true,
-                        fallbackOnBody: true,
-                        swapThreshold: 0.65,
+                        fallbackOnBody: false,
+                        fallbackTolerance: 4,
+
+                        swapThreshold: 0.5,
+                        invertSwap: false,
 
                         delay: 120,
                         delayOnTouchOnly: true,

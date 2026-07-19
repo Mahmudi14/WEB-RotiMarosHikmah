@@ -35,7 +35,10 @@
         @method($method)
     @endif
 
-    <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
+    <div
+        class="grid gap-5
+           min-[835px]:grid-cols-[minmax(0,1fr)_280px]
+           min-[1024px]:grid-cols-[minmax(0,1fr)_320px]">
         <div class="space-y-5">
             {{-- Nama Produk --}}
             <div>

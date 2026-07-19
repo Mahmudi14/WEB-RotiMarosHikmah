@@ -24,7 +24,7 @@
                 <div class="absolute -bottom-16 -left-12 h-36 w-36 rounded-full bg-white/10"></div>
 
                 <div
-                    class="relative flex flex-col gap-5 min-[1024px]:flex-row min-[1024px]:items-center min-[1024px]:justify-between">
+                    class="relative flex flex-col gap-5 min-[835px]:flex-row min-[835px]:items-center min-[835px]:justify-between">
                     <div class="min-w-0">
                         <p class="text-xs font-bold uppercase tracking-[0.28em] text-[#F4D3B0]">
                             Kasir / Transaksi / Detail
@@ -39,7 +39,7 @@
                         </p>
                     </div>
 
-                    <div class="flex flex-col gap-3 sm:flex-row min-[1024px]:shrink-0">
+                    <div class="flex flex-col gap-3 sm:flex-row min-[835px]:shrink-0">
                         @if ($canReprint)
                             <button type="button" @click="reprintOpen = true"
                                 class="inline-flex h-12 items-center justify-center rounded-2xl bg-[#F4B044] px-5 text-sm font-black text-[#2B1A10] shadow-lg shadow-[#F4B044]/20 transition hover:-translate-y-0.5 hover:shadow-xl">
@@ -104,7 +104,10 @@
         </div>
 
         {{-- Content --}}
-        <div class="grid gap-6 min-[1024px]:grid-cols-[minmax(0,1fr)_380px]">
+        <div
+            class="grid gap-6
+           min-[835px]:grid-cols-[minmax(0,1fr)_320px]
+           min-[1024px]:grid-cols-[minmax(0,1fr)_380px]">
             {{-- Items --}}
             <div
                 class="overflow-hidden rounded-3xl border border-[#F4D3B0]/70 bg-white shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">

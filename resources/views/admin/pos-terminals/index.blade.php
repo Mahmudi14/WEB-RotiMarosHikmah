@@ -64,7 +64,9 @@
                 }
             }">
             <form method="GET" action="{{ route('admin.pos-terminals.index') }}"
-                class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_220px_auto] lg:items-center">
+                class="grid gap-3
+           min-[835px]:grid-cols-[minmax(0,1fr)_220px_auto]
+           min-[835px]:items-center">
 
                 {{-- Search --}}
                 <div class="relative">
