@@ -188,26 +188,38 @@
         {{-- Table --}}
         <div
             class="overflow-hidden rounded-3xl border border-[#F4D3B0]/70 bg-white shadow-[0_20px_60px_-35px_rgba(31,68,76,0.45)]">
-            <div class="overflow-x-auto overscroll-x-contain">
-                <table class="w-full min-w-[900px] divide-y divide-[#F4D3B0]/70">
+
+            <div class="w-full overflow-x-auto overscroll-x-contain pb-2">
+                <table class="min-w-full table-auto divide-y divide-[#F4D3B0]/70">
                     <thead class="bg-[#F7F6F4]">
                         <tr>
-                            <th class="px-6 py-4 text-left text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
+                            <th
+                                class="min-w-[120px] whitespace-nowrap px-6 py-4 text-left text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
                                 No
                             </th>
-                            <th class="px-6 py-4 text-left text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
+
+                            <th
+                                class="min-w-[220px] whitespace-nowrap px-6 py-4 text-left text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
                                 Kategori
                             </th>
-                            <th class="px-6 py-4 text-left text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
+
+                            <th
+                                class="min-w-[140px] whitespace-nowrap px-6 py-4 text-left text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
                                 Total Menu
                             </th>
-                            <th class="px-6 py-4 text-left text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
+
+                            <th
+                                class="min-w-[120px] whitespace-nowrap px-6 py-4 text-left text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
                                 Status
                             </th>
-                            <th class="px-6 py-4 text-left text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
+
+                            <th
+                                class="min-w-[150px] whitespace-nowrap px-6 py-4 text-left text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
                                 Dibuat
                             </th>
-                            <th class="px-6 py-4 text-right text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
+
+                            <th
+                                class="w-[240px] min-w-[240px] whitespace-nowrap px-2 py-4 text-right text-xs font-black uppercase tracking-[0.2em] text-[#6B3E12]">
                                 Aksi
                             </th>
                         </tr>
@@ -222,6 +234,7 @@
                         @forelse ($categories as $category)
                             @php
                                 $statusLabel = $category->status === 'aktif' ? 'Aktif' : 'Nonaktif';
+
                                 $statusClass =
                                     $category->status === 'aktif'
                                         ? 'bg-[#1F444C]/10 text-[#1F444C]'
@@ -230,11 +243,13 @@
 
                             <tr data-category-id="{{ $category->id }}" class="transition hover:bg-[#F7F6F4]/70">
 
-                                <td class="px-6 py-4 text-sm font-black text-[#6B3E12]">
+                                {{-- Nomor dan drag handle --}}
+                                <td class="min-w-[120px] whitespace-nowrap px-6 py-4 text-sm font-black text-[#6B3E12]">
                                     <div class="flex items-center gap-3">
                                         <button type="button"
-                                            class="drag-handle inline-flex h-9 w-9 touch-none select-none items-center justify-center rounded-xl bg-[#F4B044] text-[#2B1A10] shadow-md shadow-[#F4B044]/25 transition active:scale-95"
+                                            class="drag-handle inline-flex h-9 w-9 shrink-0 touch-none select-none items-center justify-center rounded-xl bg-[#F4B044] text-[#2B1A10] shadow-md shadow-[#F4B044]/25 transition active:scale-95"
                                             title="Geser untuk mengubah urutan">
+
                                             <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5"
                                                 viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -248,52 +263,60 @@
                                     </div>
                                 </td>
 
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div>
-                                            <p class="font-black text-[#2B1A10]">
-                                                {{ $category->nama_kategori }}
-                                            </p>
-                                            <p class="mt-0.5 text-sm font-medium text-[#6B3E12]">
-                                                {{ $category->slug }}
-                                            </p>
-                                        </div>
+                                {{-- Kategori --}}
+                                <td class="min-w-[220px] px-6 py-4">
+                                    <div class="min-w-0">
+                                        <p class="font-black text-[#2B1A10]">
+                                            {{ $category->nama_kategori }}
+                                        </p>
+
+                                        <p class="mt-0.5 break-words text-sm font-medium text-[#6B3E12]">
+                                            {{ $category->slug }}
+                                        </p>
                                     </div>
                                 </td>
 
-                                <td class="px-6 py-4">
+                                {{-- Total menu --}}
+                                <td class="min-w-[140px] whitespace-nowrap px-6 py-4">
                                     <span
-                                        class="inline-flex rounded-full bg-[#F4B044]/20 px-3 py-1 text-xs font-black text-[#6B3E12]">
+                                        class="inline-flex whitespace-nowrap rounded-full bg-[#F4B044]/20 px-3 py-1 text-xs font-black text-[#6B3E12]">
                                         {{ $category->products_count }} Menu
                                     </span>
                                 </td>
 
-                                <td class="px-6 py-4">
+                                {{-- Status --}}
+                                <td class="min-w-[120px] whitespace-nowrap px-6 py-4">
                                     <span
-                                        class="inline-flex rounded-full px-3 py-1 text-xs font-black {{ $statusClass }}">
+                                        class="inline-flex whitespace-nowrap rounded-full px-3 py-1 text-xs font-black {{ $statusClass }}">
                                         {{ $statusLabel }}
                                     </span>
                                 </td>
 
-                                <td class="px-6 py-4 text-sm font-semibold text-[#6B3E12]">
+                                {{-- Tanggal dibuat --}}
+                                <td class="min-w-[150px] whitespace-nowrap px-6 py-4 text-sm font-semibold text-[#6B3E12]">
                                     {{ $category->created_at?->format('d M Y') }}
                                 </td>
 
-                                <td class="px-6 py-4">
-                                    <div class="flex flex-wrap items-center justify-end gap-2">
+                                {{-- Aksi --}}
+                                <td class="w-[240px] min-w-[240px] px-2 py-4">
+                                    <div class="flex flex-nowrap items-center justify-end gap-2 whitespace-nowrap">
+
                                         <a href="{{ route('admin.categories.show', $category) }}"
-                                            class="inline-flex items-center justify-center rounded-xl bg-[#F4B044] px-4 py-2 text-xs font-black text-[#2B1A10] shadow-sm shadow-[#F4B044]/20 transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-[#F4B044]/25">
+                                            class="inline-flex shrink-0 items-center justify-center rounded-xl bg-[#F4B044] px-3 py-2 text-xs font-black text-[#2B1A10] shadow-sm shadow-[#F4B044]/20 transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-[#F4B044]/25">
                                             Detail
                                         </a>
 
                                         <a href="{{ route('admin.categories.edit', $category) }}"
-                                            class="inline-flex items-center justify-center rounded-xl bg-[#1F444C] px-4 py-2 text-xs font-black text-white shadow-sm shadow-[#1F444C]/20 transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-[#1F444C]/20">
+                                            class="inline-flex shrink-0 items-center justify-center rounded-xl bg-[#1F444C] px-3 py-2 text-xs font-black text-white shadow-sm shadow-[#1F444C]/20 transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-[#1F444C]/20">
                                             Edit
                                         </a>
 
                                         <button type="button"
-                                            @click="openDeleteModal(@js(route('admin.categories.destroy', $category)), @js($category->nama_kategori))"
-                                            class="inline-flex items-center justify-center rounded-xl bg-[#A92A35] px-4 py-2 text-xs font-black text-white shadow-sm shadow-[#A92A35]/20 transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-[#A92A35]/20">
+                                            @click="openDeleteModal(
+                                        @js(route('admin.categories.destroy', $category)),
+                                        @js($category->nama_kategori)
+                                    )"
+                                            class="inline-flex shrink-0 items-center justify-center rounded-xl bg-[#A92A35] px-3 py-2 text-xs font-black text-white shadow-sm shadow-[#A92A35]/20 transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-[#A92A35]/20">
                                             Hapus
                                         </button>
                                     </div>
@@ -305,15 +328,18 @@
                                     <div class="mx-auto flex max-w-sm flex-col items-center">
                                         <div
                                             class="flex h-16 w-16 items-center justify-center rounded-3xl bg-[#F4B044]/20 text-[#6B3E12]">
+
                                             <svg class="h-8 w-8" fill="none" stroke="currentColor" stroke-width="2"
                                                 viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round"
                                                     d="M20 7.5L12 3 4 7.5m16 0L12 12m8-4.5v9L12 21m0-9L4 7.5m8 4.5v9M4 7.5v9L12 21" />
                                             </svg>
                                         </div>
+
                                         <h3 class="mt-4 text-lg font-black text-[#2B1A10]">
                                             Belum ada kategori
                                         </h3>
+
                                         <p class="mt-1 text-sm text-[#6B3E12]">
                                             Tambahkan kategori untuk mulai mengelompokkan menu produk.
                                         </p>
